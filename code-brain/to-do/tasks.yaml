@@ -474,7 +474,7 @@ tasks:
   area: CLI/Tool
   inputs: params
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-044
   epico: Workflow
@@ -485,7 +485,7 @@ tasks:
   area: CLI/Tool
   inputs: ''
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 0.7h
 - id: T-045
   epico: VSCode

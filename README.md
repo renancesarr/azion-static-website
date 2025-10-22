@@ -118,6 +118,9 @@ Copie `.env.example` para `.env` e preencha os valores:
       "headers": { "cache-control": "max-age" },
       "bodyIncludes": ["<title>Marketing</title>"]
     }
-  }
+  },
+  "dryRun": false
 }
 ```
+
+> Use `"dryRun": true` para obter apenas o plano de execução sem tocar na Azion.
