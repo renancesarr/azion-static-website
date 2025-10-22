@@ -1,0 +1,13 @@
+schema:
+  version: '1.0'
+  description: Registro cognitivo da execução técnica vinculada a use-cases e to-dos.
+  rules:
+  - Cada commit deve estar vinculado a um TO-DO e a um USE-CASE.
+  - DevLogs explicam raciocínio e impacto técnico.
+  - Implementation Notes acompanham toda PR.
+  - metrics.yaml é atualizado por CI (Bamboo/Sonar).
+  artifacts:
+  - devlog.md
+  - implementation-notes.md
+  - metrics.yaml
+  - commits/*.yaml

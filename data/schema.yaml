@@ -1,0 +1,11 @@
+schema:
+  version: '1.0'
+  description: Modelo do dicionário de dados do projeto.
+  entity_fields:
+  - name
+  - type
+  - format
+  - constraints
+  rules:
+  - IA deve respeitar tipos e constraints ao criar novos campos.
+  - Todos os campos devem ser validados com base no dicionário.

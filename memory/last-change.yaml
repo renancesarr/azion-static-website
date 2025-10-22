@@ -1,0 +1,6 @@
+last_change:
+  id: T001
+  use_case: UC-001
+  summary: Fluxo de link mágico implementado; aguardando CI.
+  result: partial
+  timestamp: '2025-10-22T05:40:42.791108Z'

@@ -1,0 +1,9 @@
+tasks:
+- id: T001
+  title: Implementar autenticação via link mágico
+  description: Permitir login sem senha usando link de email com JWT temporário.
+  status: in_progress
+  owner: ia
+  priority: high
+  related_use_case: UC-001
+  updated_at: '2025-10-22T05:40:42.785614Z'

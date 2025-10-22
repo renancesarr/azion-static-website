@@ -1,0 +1,20 @@
+project:
+  name: RNR-Atendente
+  version: '1.0'
+  description: Infraestrutura cognitiva modular para agentes de IA desenvolvedores.
+  mission: Permitir que agentes artificiais mantenham coerência e continuidade em
+    projetos de software.
+context:
+  business_rules: code-brain/business-model/schema.yaml
+  architecture: code-brain/solution-architect/schema.yaml
+  data_dictionary: code-brain/data/data-dictionary.yaml
+  backlog: code-brain/to-do/tasks.yaml
+  decisions: code-brain/decisions/
+  memory: code-brain/memory/
+  developer_journal: code-brain/developer/
+principles:
+- Ler antes de agir.
+- Respeitar decisões anteriores.
+- Manter consistência de estilo e objetivos.
+- Registrar tudo o que foi feito.
+- Criticar a si mesmo ao final de cada ação.
