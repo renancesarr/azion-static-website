@@ -1,9 +1,2570 @@
 tasks:
-- id: T001
-  title: Implementar autenticação via link mágico
-  description: Permitir login sem senha usando link de email com JWT temporário.
-  status: in_progress
-  owner: ia
-  priority: high
-  related_use_case: UC-001
-  updated_at: '2025-10-22T05:40:42.785614Z'
+- id: T-001
+  epico: Fundação
+  tarefa: Definir objetivo do MVP
+  descricao: 'Escopo: storage, edge app, rules, domain, WAF, orquestrador; DoD estabelecido.'
+  ca: mvp_scope.md
+  dep: —
+  area: Ambiente
+  inputs: Documento de escopo
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-002
+  epico: Fundação
+  tarefa: Criar repositório local do MCP
+  descricao: Repositório azion-mcp com estrutura mínima (src/, dist/, .mcp-state/)
+  ca: Estrutura de pastas criada
+  dep: —
+  area: Ambiente
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-003
+  epico: Fundação
+  tarefa: Configurar Node 18+
+  descricao: Node funcional; `node -v` ≥ 18
+  ca: Node instalado
+  dep: —
+  area: Ambiente
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-004
+  epico: Fundação
+  tarefa: Inicializar package.json mínimo
+  descricao: '`npm init -y`; scripts build/dev/start definidos'
+  ca: package.json
+  dep: —
+  area: Ambiente
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-005
+  epico: Fundação
+  tarefa: Adicionar TypeScript & SDK MCP
+  descricao: Instalar `typescript`, `@modelcontextprotocol/sdk`, `tsx`
+  ca: deps instaladas
+  dep: T-001
+  area: Ambiente
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-006
+  epico: Fundação
+  tarefa: Criar tsconfig.json
+  descricao: Compilar para dist/ com ModuleResolution NodeNext
+  ca: tsconfig.json
+  dep: T-004
+  area: Ambiente
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-007
+  epico: Fundação
+  tarefa: Criar pasta .mcp-state
+  descricao: Local de estado/artefatos JSON/LOG
+  ca: .mcp-state/
+  dep: T-002
+  area: Ambiente
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.2h
+- id: T-008
+  epico: Fundação
+  tarefa: Definir variáveis de ambiente
+  descricao: AZION_TOKEN, CONTEXT7_API, UPLOAD_CONCURRENCY
+  ca: .env.example (sem segredos)
+  dep: T-001
+  area: Segurança
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-009
+  epico: Fundação
+  tarefa: Criar README base
+  descricao: Como rodar build/dev; visão geral; risco/limitações
+  ca: README.md
+  dep: T-001
+  area: Docs
+  inputs: ''
+  prioridade: P1
+  status: A Fazer
+  estimativa: 1h
+- id: T-010
+  epico: MCP
+  tarefa: Implementar bootstrap via STDIO
+  descricao: '`src/server.ts` com `Server`+`StdioServerTransport` e registro de tools'
+  ca: src/server.ts
+  dep: T-004,T-005
+  area: Servidor
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-011
+  epico: MCP
+  tarefa: Script de build e start
+  descricao: '`npm run build` compila; `npm run start` inicia loop MCP'
+  ca: dist/server.js
+  dep: T-010
+  area: Servidor
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-012
+  epico: MCP
+  tarefa: Health check básico
+  descricao: Log inicial e encerramento; erro claro se faltam envs
+  ca: stdout logs
+  dep: T-010
+  area: Servidor
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.3h
+- id: T-013
+  epico: MCP
+  tarefa: Tratamento de exceções globais
+  descricao: Capturar unhandledRejection/uncaughtException
+  ca: logger central
+  dep: T-010
+  area: Servidor
+  inputs: ''
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-014
+  epico: Utils
+  tarefa: Função required(env)
+  descricao: Falhar cedo se env ausente
+  ca: Erro amigável
+  dep: T-008
+  area: HTTP
+  inputs: AZION_TOKEN, CONTEXT7_API
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.3h
+- id: T-015
+  epico: Utils
+  tarefa: Função http(method,path,body,headers)
+  descricao: fetch nativo; Authorization Token; Accept JSON; erros ricos
+  ca: JSON/Erro detalhado
+  dep: T-013
+  area: HTTP
+  inputs: method,path,body
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-016
+  epico: Utils
+  tarefa: Mapeador MIME
+  descricao: Inferir Content-Type por extensão (.html,.css,.js,.json,.png,.jpg,.svg,.webp,.ico,.map)
+  ca: string MIME
+  dep: T-013
+  area: MIME
+  inputs: extensão
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-017
+  epico: Utils
+  tarefa: Detecção gzip
+  descricao: Se nome termina .gz, setar Content-Encoding=gzip; derivar MIME pela base
+    sem .gz
+  ca: headers corretos
+  dep: T-016
+  area: Compressão
+  inputs: nome arquivo
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-018
+  epico: Utils
+  tarefa: Walk de diretório
+  descricao: Listar arquivos recursivamente; normalizar caminhos POSIX
+  ca: lista de paths
+  dep: T-013
+  area: FS
+  inputs: local_dir
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.8h
+- id: T-019
+  epico: Utils
+  tarefa: SHA256 de arquivo
+  descricao: Calcular hash p/ idempotência de upload
+  ca: hex sha256
+  dep: T-017
+  area: Hash
+  inputs: arquivo
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.8h
+- id: T-020
+  epico: Utils
+  tarefa: Pool de promessas
+  descricao: Executor com limite (4–8) e retries simples
+  ca: resultados
+  dep: T-017
+  area: Concorrência
+  inputs: lista de jobs
+  prioridade: P1
+  status: A Fazer
+  estimativa: 1h
+- id: T-021
+  epico: Storage
+  tarefa: Tool azion.create_bucket
+  descricao: POST /v4/storage/buckets; edge_access default read_only; salvar storage_bucket.json
+  ca: .mcp-state/storage_bucket.json
+  dep: T-014
+  area: Bucket
+  inputs: .name,.edge_access
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-022
+  epico: Storage
+  tarefa: Idempotência create_bucket
+  descricao: Se já existe, retornar estado/ID existente
+  ca: JSON coerente
+  dep: T-021
+  area: Bucket
+  inputs: name
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.8h
+- id: T-023
+  epico: Storage
+  tarefa: Tool azion.put_object
+  descricao: POST objetos; body binário; respeitar content_type/encoding
+  ca: JSON da API
+  dep: T-016,T-017
+  area: Upload
+  inputs: bucket,object_path,content_b64
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1.2h
+- id: T-024
+  epico: Storage
+  tarefa: Erros de upload verbosos
+  descricao: Incluir status, body truncado, dica de causa
+  ca: Mensagens claras
+  dep: T-023
+  area: Upload
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-025
+  epico: Storage
+  tarefa: Tool azion.upload_dir
+  descricao: Walk; inferência MIME; .gz → encoding; concurrency; dry_run; index.json
+    (hash)
+  ca: uploads.log, index.json
+  dep: T-018,T-019,T-020,T-024
+  area: Upload
+  inputs: bucket,local_dir,strip_gz?,concurrency?,dry_run?
+  prioridade: P0
+  status: A Fazer
+  estimativa: 3h
+- id: T-026
+  epico: Storage
+  tarefa: Idempotência por hash
+  descricao: Pular upload se sha256 igual salvo em index.json
+  ca: uploads otimizados
+  dep: T-026
+  area: Upload
+  inputs: object_path,sha
+  prioridade: P1
+  status: A Fazer
+  estimativa: 1h
+- id: T-027
+  epico: Storage
+  tarefa: Relatório final de upload
+  descricao: 'Resumo: enviados, pulados, falhas, duração'
+  ca: stdout + uploads.log
+  dep: T-026
+  area: Upload
+  inputs: ''
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-028
+  epico: Edge App & Rules
+  tarefa: Tool azion.create_edge_application
+  descricao: Cria app ativa com modules.edge_cache=true (edge_functions opcional)
+  ca: edge_application.json
+  dep: T-013
+  area: App
+  inputs: name
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-029
+  epico: Edge App & Rules
+  tarefa: Tool azion.create_edge_connector
+  descricao: type=edge_storage, attributes:{bucket,prefix:'/'}
+  ca: edge_connector.json
+  dep: T-030,T-022
+  area: Connector
+  inputs: name,bucket,prefix?
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-030
+  epico: Edge App & Rules
+  tarefa: Tool azion.add_origin_rule
+  descricao: criteria ${uri} starts_with '/'; behavior set_edge_connector
+  ca: rule_origin.json
+  dep: T-031
+  area: Rules
+  inputs: edge_application_id,connector_id
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-031
+  epico: Edge App & Rules
+  tarefa: Validação regra de origem
+  descricao: GET rules e confirmar behavior/value esperado
+  ca: validation_rules.md
+  dep: T-032
+  area: Rules
+  inputs: edge_application_id
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.8h
+- id: T-032
+  epico: DNS/Domain
+  tarefa: Tool azion.create_domain
+  descricao: Cria workload/domain ativo p/ custom domain; HTTP/2 on
+  ca: edge_domain.json (workload_id)
+  dep: T-029
+  area: Domain
+  inputs: domain_name,protocols?
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1.5h
+- id: T-033
+  epico: DNS/Domain
+  tarefa: Tool azion.deploy_domain_to_app
+  descricao: Cria deployment current/active=true p/ app
+  ca: deployment.json
+  dep: T-036,T-033
+  area: Deploy
+  inputs: workload_id,edge_application_id
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-034
+  epico: DNS/Domain
+  tarefa: Tool azion.dns_instructions
+  descricao: Gera instruções CNAME (ou nota se Azion DNS)
+  ca: dns_instructions.txt
+  dep: T-037
+  area: DNS
+  inputs: workload_id ou endpoint
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-035
+  epico: DNS/Domain
+  tarefa: Validação endpoint provisório
+  descricao: Testar domínio *.azionedge.net responde 200 index.html
+  ca: validation_dns.md
+  dep: T-038
+  area: DNS
+  inputs: endpoint
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.8h
+- id: T-036
+  epico: WAF
+  tarefa: Tool azion.create_firewall
+  descricao: Cria firewall com módulo WAF on; associa domínio
+  ca: firewall.json (firewall_id)
+  dep: T-035
+  area: Firewall
+  inputs: name,domains[]?
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1.5h
+- id: T-037
+  epico: WAF
+  tarefa: Tool azion.create_waf_ruleset
+  descricao: Cria ruleset default (mode blocking)
+  ca: waf_ruleset.json
+  dep: T-041
+  area: Ruleset
+  inputs: mode
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-038
+  epico: WAF
+  tarefa: Tool azion.apply_waf_ruleset
+  descricao: Aplica ruleset ao firewall p/ todas as requisições
+  ca: firewall_rule.json
+  dep: T-041,T-042
+  area: Apply
+  inputs: firewall_id,waf_ruleset_id
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-039
+  epico: WAF
+  tarefa: Teste de WAF não quebrar estáticos
+  descricao: Acesso às rotas estáticas ok; logs de bloqueio vazios
+  ca: validation_waf.md
+  dep: T-043
+  area: Validação
+  inputs: domain
+  prioridade: P1
+  status: A Fazer
+  estimativa: 1h
+- id: T-040
+  epico: Workflow
+  tarefa: Spec do azion.provision_static_site
+  descricao: 'Input: domain,bucket,local_dir,strip_gz?,waf_mode?,dry_run?; sequência
+    completa'
+  ca: spec.md
+  dep: T-023..T-045
+  area: CLI/Tool
+  inputs: spec json
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-041
+  epico: Workflow
+  tarefa: Implementar orquestração passo-a-passo
+  descricao: 'Invocar em ordem: bucket→upload→app→connector→rule→domain→deploy→waf'
+  ca: summary.json
+  dep: T-046
+  area: CLI/Tool
+  inputs: inputs do usuário
+  prioridade: P0
+  status: A Fazer
+  estimativa: 3h
+- id: T-042
+  epico: Workflow
+  tarefa: Persistir IDs e saídas
+  descricao: Salvar em .mcp-state/ (storage_bucket, app, connector, domain, deploy,
+    waf)
+  ca: .mcp-state/*.json
+  dep: T-047
+  area: CLI/Tool
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.8h
+- id: T-043
+  epico: Workflow
+  tarefa: Dry-run do orquestrador
+  descricao: Imprimir plano completo sem executar; indicar chamadas e cabeçalhos
+  ca: plan.md
+  dep: T-046
+  area: CLI/Tool
+  inputs: params
+  prioridade: P1
+  status: A Fazer
+  estimativa: 1h
+- id: T-044
+  epico: Workflow
+  tarefa: Relatório final do orquestrador
+  descricao: Resumo de recursos criados/atualizados e próximos passos DNS
+  ca: summary.json + stdout
+  dep: T-048
+  area: CLI/Tool
+  inputs: ''
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.7h
+- id: T-045
+  epico: VSCode
+  tarefa: Configurar mcpServers (azion)
+  descricao: Adicionar entry com command/args/cwd/env; prefixo azion.*
+  ca: VSCode reconhece tools
+  dep: T-011
+  area: Cliente
+  inputs: settings.json
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.7h
+- id: T-046
+  epico: VSCode
+  tarefa: Teste de tools via chat
+  descricao: Chamar create_bucket, upload_dir, create_edge_application, etc.
+  ca: prints/retornos
+  dep: T-050
+  area: Cliente
+  inputs: inputs
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1h
+- id: T-047
+  epico: VSCode
+  tarefa: Logs e troubleshooting
+  descricao: Checklist de erros comuns (env, path, perms)
+  ca: TROUBLESHOOTING.md
+  dep: T-052
+  area: Cliente
+  inputs: ''
+  prioridade: P1
+  status: A Fazer
+  estimativa: 1h
+- id: T-048
+  epico: Validação
+  tarefa: Script de verificação geral
+  descricao: Confere existência de bucket, app, rule, domain, firewall; tenta GET
+    index
+  ca: validation_report.md
+  dep: T-048,T-054
+  area: Checks
+  inputs: ids
+  prioridade: P0
+  status: A Fazer
+  estimativa: 1.5h
+- id: T-049
+  epico: Validação
+  tarefa: Teste de upload com .gz + strip_gz
+  descricao: Publica app.js.gz como app.js com encoding gzip
+  ca: validation_upload_gzip.md
+  dep: T-025
+  area: Teste
+  inputs: bucket,local_dir
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.8h
+- id: T-050
+  epico: Validação
+  tarefa: Teste de mimetypes (html, css, js, svg, png, webp, json, map)
+  descricao: Respostas corretas no browser/curl
+  ca: validation_mime.md
+  dep: T-016,T-023
+  area: Teste
+  inputs: arquivos amostra
+  prioridade: P1
+  status: A Fazer
+  estimativa: 1h
+- id: T-051
+  epico: Validação
+  tarefa: Teste de idempotência (hash)
+  descricao: 2ª execução não reenvia arquivos inalterados
+  ca: validation_idempotency.md
+  dep: T-026
+  area: Teste
+  inputs: index.json
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.8h
+- id: T-052
+  epico: Validação
+  tarefa: Teste de erros forçados
+  descricao: Token inválido, bucket inexistente, path inválido
+  ca: error_matrix.md
+  dep: T-023,T-024
+  area: Teste
+  inputs: cenários
+  prioridade: P1
+  status: A Fazer
+  estimativa: 1h
+- id: T-053
+  epico: Observabilidade
+  tarefa: Estruturar uploads.log em JSONL
+  descricao: Cada linha com path,status,duração,bytes,sha
+  ca: uploads.log
+  dep: T-024
+  area: Logs
+  inputs: ''
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-054
+  epico: Observabilidade
+  tarefa: Exportar resumo em CSV opcional
+  descricao: path,action,status,bytes,sha
+  ca: uploads_summary.csv
+  dep: T-071
+  area: Relatórios
+  inputs: ''
+  prioridade: P2
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-055
+  epico: Segurança
+  tarefa: Nunca logar tokens
+  descricao: Revisão de logs/códigos
+  ca: ok
+  dep: T-009
+  area: Segredos
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.2h
+- id: T-056
+  epico: Segurança
+  tarefa: Tratar 401/403 com dica
+  descricao: Mensagem sugere revisar token e escopos
+  ca: erro guiado
+  dep: T-023
+  area: Permissões
+  inputs: ''
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.3h
+- id: T-057
+  epico: DevEx
+  tarefa: Mensagens curtas e técnicas
+  descricao: Uma linha com o porquê antes do como
+  ca: padrão textos
+  dep: T-011
+  area: UX
+  inputs: ''
+  prioridade: P2
+  status: A Fazer
+  estimativa: 0.3h
+- id: T-058
+  epico: DevEx
+  tarefa: Exemplos de chamadas no chat
+  descricao: Snippets do que pedir ao agente
+  ca: README.md seção
+  dep: T-053
+  area: Docs
+  inputs: ''
+  prioridade: P2
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-059
+  epico: Hardening
+  tarefa: Upload de arquivos grandes
+  descricao: Chunk opcional ou aviso de limite; timeout maior
+  ca: nota + retry
+  dep: T-024
+  area: Edge Cases
+  inputs: file grande
+  prioridade: P2
+  status: A Fazer
+  estimativa: 1h
+- id: T-060
+  epico: Hardening
+  tarefa: Nomes com espaços e unicode
+  descricao: Encode correto no object_path
+  ca: sucesso upload
+  dep: T-024
+  area: Edge Cases
+  inputs: paths
+  prioridade: P2
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-061
+  epico: Hardening
+  tarefa: Pastas vazias e .dotfiles
+  descricao: Ignorar pastas vazias; decisão sobre .env/.DS_Store
+  ca: regra aplicada
+  dep: T-024
+  area: Edge Cases
+  inputs: local_dir
+  prioridade: P2
+  status: A Fazer
+  estimativa: 0.3h
+- id: T-062
+  epico: Hardening
+  tarefa: Simulação DNS indisponível
+  descricao: Mensagem clara e alternativa por endpoint provisório
+  ca: nota no summary
+  dep: T-038,T-039
+  area: Edge Cases
+  inputs: ''
+  prioridade: P2
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-063
+  epico: Entrega
+  tarefa: Script quickstart
+  descricao: 'Um comando: export envs + run; doc curta'
+  ca: quickstart.sh (sem segredos)
+  dep: T-018,T-050
+  area: Onboarding
+  inputs: ''
+  prioridade: P2
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-064
+  epico: Entrega
+  tarefa: Template de issues
+  descricao: Bugs/Features/Tasks com checklists
+  ca: .github/ISSUE_TEMPLATE
+  dep: T-001
+  area: Onboarding
+  inputs: ''
+  prioridade: P3
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-065
+  epico: Entrega
+  tarefa: Changelog inicial
+  descricao: Registrar decisões e quebras
+  ca: CHANGELOG.md
+  dep: T-001
+  area: Onboarding
+  inputs: ''
+  prioridade: P3
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-066
+  epico: Fechamento
+  tarefa: Validar critérios globais
+  descricao: Todos passos OK; site servindo; WAF aplicado; summary gerado
+  ca: DoD_checked.md
+  dep: T-060..T-065
+  area: DoD
+  inputs: ''
+  prioridade: P0
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-067
+  epico: Fechamento
+  tarefa: Roteiro de demo
+  descricao: Sequência de comandos e prints pro showcase
+  ca: DEMO.md
+  dep: T-079,T-080
+  area: Demo
+  inputs: ''
+  prioridade: P1
+  status: A Fazer
+  estimativa: 0.5h
+- id: T-121
+  epico: Azion DNS
+  tarefa: Importar zona (opcional)
+  descricao: Criar/associar zona DNS na Azion para domínio custom.
+  ca: Zona criada/associada.
+  dep: T-041
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-122
+  epico: Azion DNS
+  tarefa: Criar registro CNAME
+  descricao: Criar CNAME do host (www) para endpoint provisório gerado.
+  ca: CNAME ativo na zona.
+  dep: T-121,T-043
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-123
+  epico: Azion DNS
+  tarefa: Registro A/AAAA (quando aplicável)
+  descricao: Criar A/AAAA se necessário para raiz (ALIAS/ANAME).
+  ca: Raiz do domínio resolvendo.
+  dep: T-122
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-124
+  epico: Azion DNS
+  tarefa: TTL e política de cache
+  descricao: Definir TTL inicial (300s) e revisar política.
+  ca: TTL aplicado.
+  dep: T-123
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-125
+  epico: Azion DNS
+  tarefa: Validação de propagação
+  descricao: Executar dig/nslookup e registrar tempos de propagação.
+  ca: report_dns_propagation.md.
+  dep: T-124
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-126
+  epico: Azion DNS
+  tarefa: Alerta de expiração de zona
+  descricao: Checklist/cron para lembrar renovação de zona/domínio.
+  ca: alerta cadastrado.
+  dep: T-125
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-127
+  epico: Azion DNS
+  tarefa: Failover de registros (opcional)
+  descricao: Planejar fallback para origem alternativa se app cair.
+  ca: plano documentado.
+  dep: T-126
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-128
+  epico: Azion DNS
+  tarefa: Remoção segura (teardown)
+  descricao: Procedimento de deleção de registros com validação.
+  ca: teardown_dns.md.
+  dep: T-127
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-129
+  epico: Azion DNS
+  tarefa: Script de verificação
+  descricao: Automatizar checagens de resolução e TTL.
+  ca: dns_check.sh.
+  dep: T-128
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-130
+  epico: Azion DNS
+  tarefa: Documentar boas práticas
+  descricao: Registrar naming, TTL, split-horizon (se aplicável).
+  ca: dns_best_practices.md.
+  dep: T-129
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-131
+  epico: Teardown
+  tarefa: Planejamento seguro
+  descricao: 'Plano com checkpoints para remoção: domain→deploy→rules→connector→app→objects→bucket.'
+  ca: teardown_plan.md.
+  dep: T-052,T-040
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-132
+  epico: Teardown
+  tarefa: Flag de confirmação dupla
+  descricao: Requer `--confirm` e digitar o domínio para prosseguir.
+  ca: dupla confirmação implementada.
+  dep: T-131
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-133
+  epico: Teardown
+  tarefa: Backup de estado
+  descricao: Exportar .mcp-state antes de deletar (tar.gz).
+  ca: state_backup.tgz.
+  dep: T-132
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-134
+  epico: Teardown
+  tarefa: Deletar rules (sequência)
+  descricao: Listar e remover rules da app com ordem correta.
+  ca: rules removidas.
+  dep: T-133,T-038
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-135
+  epico: Teardown
+  tarefa: Deletar connector
+  descricao: Remover connector e esperar consistência.
+  ca: connector removido.
+  dep: T-134,T-036
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-136
+  epico: Teardown
+  tarefa: Desativar app
+  descricao: Set active=false antes de deleção.
+  ca: app desativada.
+  dep: T-135,T-034
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-137
+  epico: Teardown
+  tarefa: Apagar app
+  descricao: DELETE application; tratar 409/423 se houver vínculos.
+  ca: app removida.
+  dep: T-136
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-138
+  epico: Teardown
+  tarefa: Listar e remover objetos
+  descricao: Percorrer prefixos e excluir objetos remanescentes.
+  ca: bucket vazio.
+  dep: T-137,T-028
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-139
+  epico: Teardown
+  tarefa: Apagar bucket
+  descricao: DELETE bucket quando vazio; tratar 409 se não vazio.
+  ca: bucket removido.
+  dep: T-138
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-140
+  epico: Teardown
+  tarefa: Remover domain/deploy
+  descricao: Remover deployment e workload/domain.
+  ca: domain removido.
+  dep: T-139,T-042,T-043
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-141
+  epico: Teardown
+  tarefa: Remover firewall e WAF ruleset
+  descricao: Excluir firewall e ruleset; ordem correta.
+  ca: waf removido.
+  dep: T-140,T-048
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-142
+  epico: Teardown
+  tarefa: Pós-validação
+  descricao: Certificar que nada responde no endpoint.
+  ca: teardown_report.md.
+  dep: T-141
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-143
+  epico: Teardown
+  tarefa: Script único
+  descricao: Implementar `azion.teardown_site` com passos e dry-run.
+  ca: teardown_summary.json.
+  dep: T-142
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-144
+  epico: Teardown
+  tarefa: Documentação de riscos
+  descricao: Listar riscos e mitigação (deleções irreversíveis).
+  ca: teardown_risks.md.
+  dep: T-143
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-145
+  epico: Teardown
+  tarefa: Proteção contra produção
+  descricao: Bloquear execução se label=prod sem override explícito.
+  ca: guardas implementados.
+  dep: T-144
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-146
+  epico: Teardown
+  tarefa: Auditoria
+  descricao: Log de deleções com timestamps e IDs.
+  ca: teardown_audit.log.
+  dep: T-145
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-147
+  epico: Teardown
+  tarefa: Restore parcial (opcional)
+  descricao: Restaurar app e domain a partir do backup .mcp-state.
+  ca: restore.md.
+  dep: T-146
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-148
+  epico: Teardown
+  tarefa: Teste e2e
+  descricao: Criar e destruir ambiente dummy para validar roteiro.
+  ca: teardown_e2e.md.
+  dep: T-147
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-149
+  epico: Teardown
+  tarefa: Integração CI
+  descricao: Job manual (workflow_dispatch) com flags de segurança.
+  ca: ci_teardown.yml.
+  dep: T-148,T-166
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-149
+  epico: Teardown
+  tarefa: Planejamento seguro
+  descricao: 'Plano com checkpoints para remoção: domain→deploy→rules→connector→app→objects→bucket.'
+  ca: teardown_plan.md.
+  dep: T-052,T-040
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-150
+  epico: Teardown
+  tarefa: Flag de confirmação dupla
+  descricao: Requer `--confirm` e digitar o domínio para prosseguir.
+  ca: dupla confirmação implementada.
+  dep: T-149
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-151
+  epico: Teardown
+  tarefa: Backup de estado
+  descricao: Exportar .mcp-state antes de deletar (tar.gz).
+  ca: state_backup.tgz.
+  dep: T-150
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-152
+  epico: Teardown
+  tarefa: Deletar rules (sequência)
+  descricao: Listar e remover rules da app com ordem correta.
+  ca: rules removidas.
+  dep: T-151,T-038
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-153
+  epico: Teardown
+  tarefa: Deletar connector
+  descricao: Remover connector e esperar consistência.
+  ca: connector removido.
+  dep: T-152,T-036
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-154
+  epico: Teardown
+  tarefa: Desativar app
+  descricao: Set active=false antes de deleção.
+  ca: app desativada.
+  dep: T-153,T-034
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-155
+  epico: Teardown
+  tarefa: Apagar app
+  descricao: DELETE application; tratar 409/423 se houver vínculos.
+  ca: app removida.
+  dep: T-154
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-156
+  epico: Teardown
+  tarefa: Listar e remover objetos
+  descricao: Percorrer prefixos e excluir objetos remanescentes.
+  ca: bucket vazio.
+  dep: T-155,T-028
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-157
+  epico: Teardown
+  tarefa: Apagar bucket
+  descricao: DELETE bucket quando vazio; tratar 409 se não vazio.
+  ca: bucket removido.
+  dep: T-156
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-158
+  epico: Teardown
+  tarefa: Remover domain/deploy
+  descricao: Remover deployment e workload/domain.
+  ca: domain removido.
+  dep: T-157,T-042,T-043
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-159
+  epico: Teardown
+  tarefa: Remover firewall e WAF ruleset
+  descricao: Excluir firewall e ruleset; ordem correta.
+  ca: waf removido.
+  dep: T-158,T-048
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-160
+  epico: Teardown
+  tarefa: Pós-validação
+  descricao: Certificar que nada responde no endpoint.
+  ca: teardown_report.md.
+  dep: T-159
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-161
+  epico: Teardown
+  tarefa: Script único
+  descricao: Implementar `azion.teardown_site` com passos e dry-run.
+  ca: teardown_summary.json.
+  dep: T-160
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-162
+  epico: Teardown
+  tarefa: Documentação de riscos
+  descricao: Listar riscos e mitigação (deleções irreversíveis).
+  ca: teardown_risks.md.
+  dep: T-161
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-163
+  epico: Teardown
+  tarefa: Proteção contra produção
+  descricao: Bloquear execução se label=prod sem override explícito.
+  ca: guardas implementados.
+  dep: T-162
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-164
+  epico: Teardown
+  tarefa: Auditoria
+  descricao: Log de deleções com timestamps e IDs.
+  ca: teardown_audit.log.
+  dep: T-163
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-165
+  epico: Teardown
+  tarefa: Restore parcial (opcional)
+  descricao: Restaurar app e domain a partir do backup .mcp-state.
+  ca: restore.md.
+  dep: T-164
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-166
+  epico: Teardown
+  tarefa: Teste e2e
+  descricao: Criar e destruir ambiente dummy para validar roteiro.
+  ca: teardown_e2e.md.
+  dep: T-165
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-167
+  epico: Teardown
+  tarefa: Integração CI
+  descricao: Job manual (workflow_dispatch) com flags de segurança.
+  ca: ci_teardown.yml.
+  dep: T-166,T-166
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-167
+  epico: CI/CD
+  tarefa: Workflow de build estático
+  descricao: YAML com passos de checkout, build (se houver) e artifact.
+  ca: build.yml criado.
+  dep: T-057
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-168
+  epico: CI/CD
+  tarefa: Job de deploy (Azion)
+  descricao: Executar orquestrador com AZION_TOKEN do secrets.
+  ca: deploy.yml criado.
+  dep: T-167,T-051
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-169
+  epico: CI/CD
+  tarefa: Strategy matrix (branches)
+  descricao: Executar em main e tags v*; bloquear em PRs se necessário.
+  ca: matrix aplicada.
+  dep: T-168
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-170
+  epico: CI/CD
+  tarefa: Cache de dependências
+  descricao: Usar actions/cache p/ node_modules e dist.
+  ca: cache ativo.
+  dep: T-169
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-171
+  epico: CI/CD
+  tarefa: Notifications (opcional)
+  descricao: Notificar canal/telegram ao finalizar deploy/erro.
+  ca: notificações integradas.
+  dep: T-170
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-172
+  epico: CI/CD
+  tarefa: Gate de aprovação (prod)
+  descricao: Requer aprovação manual antes de produção.
+  ca: ambiente protegido.
+  dep: T-171
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-173
+  epico: CI/CD
+  tarefa: Secrets management
+  descricao: AZION_TOKEN, DOMAIN, BUCKET como secrets; sem logs.
+  ca: secrets configurados.
+  dep: T-172
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-174
+  epico: CI/CD
+  tarefa: Relatório pós-deploy
+  descricao: Publicar summary.json como artifact.
+  ca: artifact disponível.
+  dep: T-173
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-175
+  epico: CI/CD
+  tarefa: Rollback manual
+  descricao: Workflow para reverter para N-1 (domain->prev app/deploy).
+  ca: rollback.yml.
+  dep: T-174,T-034
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-176
+  epico: CI/CD
+  tarefa: Canary (10→50→100%)
+  descricao: Strategy para gradualmente promover tráfego se app suportar.
+  ca: canary.yml.
+  dep: T-175
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-177
+  epico: CI/CD
+  tarefa: Lint de YAML
+  descricao: Validação de workflows com action específica.
+  ca: lint ok.
+  dep: T-176
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-178
+  epico: CI/CD
+  tarefa: Re-run com artifacts
+  descricao: Permitir reexecução usando artifacts anteriores (cache).
+  ca: re-run configurado.
+  dep: T-177
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-179
+  epico: CI/CD
+  tarefa: Pipeline docs
+  descricao: Documentar triggers, ambientes e variáveis.
+  ca: ci_docs.md.
+  dep: T-178
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-180
+  epico: CI/CD
+  tarefa: Branch protection rules
+  descricao: Configurar proteções + status checks obrigatórios.
+  ca: regras aplicadas.
+  dep: T-179
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-181
+  epico: CI/CD
+  tarefa: Teste e2e do pipeline
+  descricao: Executar em ambiente dummy e validar sucesso.
+  ca: ci_e2e.md.
+  dep: T-180
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-182
+  epico: CI/CD
+  tarefa: Limpeza de artifacts antigos
+  descricao: Rotina para expirar artifacts > N dias.
+  ca: retention configurada.
+  dep: T-181
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-183
+  epico: CI/CD
+  tarefa: Parâmetros de release
+  descricao: Permitir setar versão/tag e nota de release.
+  ca: release parametrizada.
+  dep: T-182
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-184
+  epico: CI/CD
+  tarefa: Template de release notes
+  descricao: Gerar CHANGELOG parcial com commits.
+  ca: release_notes.md.
+  dep: T-183
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-185
+  epico: CI/CD
+  tarefa: Step de validação HTTP
+  descricao: curl no endpoint final; esperar 200 + asset.
+  ca: check http ok.
+  dep: T-184,T-061
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-186
+  epico: CI/CD
+  tarefa: Injeção de headers via API
+  descricao: Verificar/ajustar headers no storage/aplicação durante deploy.
+  ca: headers consistentes.
+  dep: T-185
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-186
+  epico: Headers
+  tarefa: Cache-Control para estáticos
+  descricao: Definir s-maxage, immutable quando aplicável.
+  ca: headers_cache.md.
+  dep: T-028
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-187
+  epico: Headers
+  tarefa: ETag/If-None-Match
+  descricao: Habilitar validação condicional (quando suportado).
+  ca: etag habilitado.
+  dep: T-186
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-188
+  epico: Headers
+  tarefa: Content-Security-Policy
+  descricao: Definir CSP básica segura p/ site estático.
+  ca: csp.md.
+  dep: T-187
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-189
+  epico: Headers
+  tarefa: HSTS
+  descricao: Strict-Transport-Security com preload opcional.
+  ca: hsts.md.
+  dep: T-188
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-190
+  epico: Headers
+  tarefa: MIME-Sniffing
+  descricao: 'X-Content-Type-Options: nosniff.'
+  ca: nosniff aplicado.
+  dep: T-189
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-191
+  epico: Headers
+  tarefa: Referrer-Policy
+  descricao: Definir policy (no-referrer / strict-origin-when-cross-origin).
+  ca: referrer_policy.md.
+  dep: T-190
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-192
+  epico: Headers
+  tarefa: X-Frame-Options
+  descricao: deny/sameorigin conforme necessidade.
+  ca: xfo aplicado.
+  dep: T-191
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-193
+  epico: Headers
+  tarefa: Brotli (opcional)
+  descricao: Suporte a .br além de .gz se disponível.
+  ca: br_support.md.
+  dep: T-192
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-194
+  epico: Perf
+  tarefa: Preload/Preconnect
+  descricao: Incluir hints para assets críticos.
+  ca: perf_hints.md.
+  dep: T-193
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-195
+  epico: Perf
+  tarefa: Medir p95/p99
+  descricao: Coletar latência p95/p99 do endpoint.
+  ca: perf_report.md.
+  dep: T-194
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-196
+  epico: Perf
+  tarefa: Cache HIT ratio
+  descricao: Medir % de cache-hit e ajustar TTLs.
+  ca: cache_report.md.
+  dep: T-195
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-197
+  epico: Perf
+  tarefa: Warmup opcional
+  descricao: Varredura inicial de URLs críticas para aquecer cache.
+  ca: warmup.md.
+  dep: T-196
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-198
+  epico: Perf
+  tarefa: Imagens estáticas
+  descricao: Checar formatos otimizados (webp) e compressão.
+  ca: img_audit.md.
+  dep: T-197
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-199
+  epico: WAF
+  tarefa: Sensibilidade fina
+  descricao: Ajustar sensibilidade por família (SQLi/XSS).
+  ca: waf_tuning.md.
+  dep: T-198
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-200
+  epico: WAF
+  tarefa: Allow-list
+  descricao: Listar IPs/paths permitidos se necessário (admin).
+  ca: allow_list.md.
+  dep: T-199
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-201
+  epico: WAF
+  tarefa: Monitoramento de falsos positivos
+  descricao: Procedimento para reclassificar e ajustar regras.
+  ca: waf_fp.md.
+  dep: T-200
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-202
+  epico: WAF
+  tarefa: Integração SIEM (opcional)
+  descricao: Enviar eventos para SIEM/Telegram.
+  ca: waf_siem.md.
+  dep: T-201
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-203
+  epico: WAF
+  tarefa: Stress test controlado
+  descricao: Executar testes controlados sem afetar prod.
+  ca: waf_stress.md.
+  dep: T-202
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-204
+  epico: WAF
+  tarefa: Playbook de incidentes
+  descricao: Como responder a bloqueios legítimos e ataques reais.
+  ca: waf_playbook.md.
+  dep: T-203
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-204
+  epico: MCP
+  tarefa: Multi-servers (git)
+  descricao: Adicionar servidor MCP para git (branch, tag, release).
+  ca: git-mcp registrado.
+  dep: T-056
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-205
+  epico: MCP
+  tarefa: Multi-servers (dns)
+  descricao: Adicionar servidor MCP para DNS externo (cloudflare/route53).
+  ca: dns-mcp registrado.
+  dep: T-204
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-206
+  epico: MCP
+  tarefa: Resources (templates)
+  descricao: Expor resources com templates de YAML/JSON (workflows).
+  ca: resources listados.
+  dep: T-205
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-207
+  epico: MCP
+  tarefa: Prompts (assistenciais)
+  descricao: Prompts que guiam usuário a fornecer inputs corretos.
+  ca: prompts disponíveis.
+  dep: T-206
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-208
+  epico: MCP
+  tarefa: Tool orquestradora de rollback
+  descricao: Adicionar tool `azion.rollback_to_previous`.
+  ca: rollback executável.
+  dep: T-170,T-034
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-209
+  epico: MCP
+  tarefa: Metrics resource
+  descricao: Resource com últimos KPIs (latência, hit ratio).
+  ca: metrics.json.
+  dep: T-195,T-196
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-210
+  epico: MCP
+  tarefa: Error matrix resource
+  descricao: Resource com catálogo de erros e soluções.
+  ca: error_matrix.json.
+  dep: T-077
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-211
+  epico: Docs
+  tarefa: Guia avançado
+  descricao: 'Guia de operação: DNS gerenciado, WAF tuning, rollback.'
+  ca: OPERATIONS.md.
+  dep: T-181..T-200
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-212
+  epico: Docs
+  tarefa: Diagramas de fluxo
+  descricao: Fluxos do orquestrador e teardown (mermaid).
+  ca: diagrams.md.
+  dep: T-131..T-150,T-152
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-213
+  epico: Release
+  tarefa: MVP Final
+  descricao: Tag de release, changelog e artefatos anexos.
+  ca: v1.0.0 publicado.
+  dep: T-151..T-200,T-210..T-219
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-213
+  epico: MCP
+  tarefa: Multi-servers (git)
+  descricao: Adicionar servidor MCP para git (branch, tag, release).
+  ca: git-mcp registrado.
+  dep: T-056
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-214
+  epico: MCP
+  tarefa: Multi-servers (dns)
+  descricao: Adicionar servidor MCP para DNS externo (cloudflare/route53).
+  ca: dns-mcp registrado.
+  dep: T-213
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-215
+  epico: MCP
+  tarefa: Resources (templates)
+  descricao: Expor resources com templates de YAML/JSON (workflows).
+  ca: resources listados.
+  dep: T-214
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-216
+  epico: MCP
+  tarefa: Prompts (assistenciais)
+  descricao: Prompts que guiam usuário a fornecer inputs corretos.
+  ca: prompts disponíveis.
+  dep: T-215
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-217
+  epico: MCP
+  tarefa: Tool orquestradora de rollback
+  descricao: Adicionar tool `azion.rollback_to_previous`.
+  ca: rollback executável.
+  dep: T-170,T-034
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-218
+  epico: MCP
+  tarefa: Metrics resource
+  descricao: Resource com últimos KPIs (latência, hit ratio).
+  ca: metrics.json.
+  dep: T-195,T-196
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-219
+  epico: MCP
+  tarefa: Error matrix resource
+  descricao: Resource com catálogo de erros e soluções.
+  ca: error_matrix.json.
+  dep: T-077
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-220
+  epico: Docs
+  tarefa: Guia avançado
+  descricao: 'Guia de operação: DNS gerenciado, WAF tuning, rollback.'
+  ca: OPERATIONS.md.
+  dep: T-181..T-200
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-221
+  epico: Docs
+  tarefa: Diagramas de fluxo
+  descricao: Fluxos do orquestrador e teardown (mermaid).
+  ca: diagrams.md.
+  dep: T-131..T-150,T-152
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-222
+  epico: Release
+  tarefa: MVP Final
+  descricao: Tag de release, changelog e artefatos anexos.
+  ca: v1.0.0 publicado.
+  dep: T-151..T-200,T-210..T-219
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-221
+  epico: Blueprint Blue/Green
+  tarefa: desenho do fluxo
+  descricao: Definir estratégia de manter duas versões (blue, green) e alternar tráfego.
+  ca: Documento blue_green.md.
+  dep: T-151,T-170
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-225
+  epico: Feature Flags
+  tarefa: design
+  descricao: Escolher mecanismo de flags (config JSON/state) sem framework.
+  ca: feature_flags.md.
+  dep: T-221
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-228
+  epico: Config multi-ambientes
+  tarefa: convenções
+  descricao: Definir naming p/ recursos (prefixo dev/stage/prod).
+  ca: naming.md.
+  dep: T-057,T-051
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-235
+  epico: Pós-migração
+  tarefa: verificação
+  descricao: Checklist de equivalência (conteúdo e headers).
+  ca: post_migration_check.md.
+  dep: T-234
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-242
+  epico: Rate limiting
+  tarefa: design
+  descricao: Mapear limites da API; backoff + retries.
+  ca: rate_limit.md.
+  dep: T-017,T-025
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-254
+  epico: Certificados
+  tarefa: automação ACME
+  descricao: Planejar integração ACME/Let's Encrypt (se aplicável).
+  ca: tls_acme.md.
+  dep: T-041,T-042
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-257
+  epico: Invalidação de cache
+  tarefa: design
+  descricao: Definir política para purge seletivo/global.
+  ca: cache_invalidation.md.
+  dep: T-196,T-228
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-267
+  epico: Guia avançado
+  tarefa: operações
+  descricao: DNS gerenciado, WAF tuning, rollback, blue/green.
+  ca: OPERATIONS.md.
+  dep: T-214,T-215,T-223
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-268
+  epico: Guia avançado
+  tarefa: troubleshooting
+  descricao: Códigos de erro, mensagens e soluções.
+  ca: ADV_TROUBLESHOOTING.md.
+  dep: T-277
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-321
+  epico: Data Streaming
+  tarefa: desenho de pipeline
+  descricao: Arquitetar fluxo de eventos (requests, cache status, WAF) para coletor
+    externo.
+  ca: data_stream_design.md.
+  dep: T-195,T-196,T-214
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-334
+  epico: SIEM
+  tarefa: mapeamento de campos
+  descricao: Definir tabela de correspondência dos eventos para SIEM.
+  ca: siem_mapping.md.
+  dep: T-321,T-331
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-335
+  epico: SIEM
+  tarefa: conector de envio
+  descricao: Script/Tool que publica eventos no SIEM.
+  ca: siem_connector.md.
+  dep: T-333
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-337
+  epico: TLS
+  tarefa: estratégia wildcard
+  descricao: Planejar uso de *.<domínio> para subdomínios diversos.
+  ca: tls_wildcard.md.
+  dep: T-259
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-345
+  epico: DNS
+  tarefa: Anycast e Geo
+  descricao: Documentar implicações de Anycast e geo-proximidade.
+  ca: dns_anycast.md.
+  dep: T-126,T-181
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-346
+  epico: DNS
+  tarefa: Health-check externo
+  descricao: Verificação externa do host final (uptime).
+  ca: dns_external_hc.md.
+  dep: T-349
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-347
+  epico: DNS
+  tarefa: Split-horizon
+  descricao: Documentar quando usar vista interna/externa.
+  ca: dns_split_horizon.md.
+  dep: T-350
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-348
+  epico: Experimento
+  tarefa: Preload crítico
+  descricao: Avaliar ganhos com preload em hero assets.
+  ca: exp_preload.md.
+  dep: T-190,T-196
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-349
+  epico: Experimento
+  tarefa: Brotli vs Gzip
+  descricao: Comparar tamanhos e latências.
+  ca: exp_brotli_gzip.md.
+  dep: T-190,T-198
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-350
+  epico: Experimento
+  tarefa: TTL agressivo
+  descricao: Testar impacto de TTL alto em cache-hit.
+  ca: exp_ttl.md.
+  dep: T-196,T-263
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-351
+  epico: Experimento
+  tarefa: Warmup inteligente
+  descricao: Definir conjunto ótimo de URLs para aquecimento.
+  ca: exp_warmup.md.
+  dep: T-199
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-352
+  epico: Custos
+  tarefa: modelo por ambiente
+  descricao: Estimar custos dev/stage/prod separadamente.
+  ca: costs_env.md.
+  dep: T-256
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-353
+  epico: Custos
+  tarefa: alerta de estouro
+  descricao: Alertar quando tráfego/banda extrapolar estimativas.
+  ca: costs_alerts.md.
+  dep: T-359,T-327
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-354
+  epico: Custos
+  tarefa: consolidação mensal
+  descricao: Planilha com consolidação por centro de custo.
+  ca: costs_monthly.xlsx.
+  dep: T-360
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-358
+  epico: DR
+  tarefa: Objetivos RTO/RPO
+  descricao: Definir tempos máximos de recuperação e perda de dados.
+  ca: dr_objectives.md.
+  dep: T-221,T-246
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-359
+  epico: DR
+  tarefa: Playbook de recuperação
+  descricao: Roteiro para recuperar app/dns/storage rapidamente.
+  ca: dr_playbook.md.
+  dep: T-366
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-360
+  epico: DR
+  tarefa: Exercício de simulação
+  descricao: Rodar simulado e medir tempos.
+  ca: dr_exercise.md.
+  dep: T-367
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-361
+  epico: MCP
+  tarefa: Ajuda contextual
+  descricao: Tool `help(tool)` que retorna schema e exemplos.
+  ca: help disponível.
+  dep: T-012,T-021
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-362
+  epico: MCP
+  tarefa: Autocomplete de inputs
+  descricao: 'Sugestões de valores (ex.: buckets, domains existentes).'
+  ca: autocomplete implementado.
+  dep: T-321,T-328
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-363
+  epico: MCP
+  tarefa: Prompts de validação
+  descricao: Prompts pedem confirmação quando detectam riscos.
+  ca: confirm prompts.
+  dep: T-230,T-170
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-364
+  epico: MCP
+  tarefa: Telemetria de uso (local)
+  descricao: Contar uso de tools (local) para melhorias.
+  ca: mcp_usage.md.
+  dep: T-327
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-365
+  epico: DX
+  tarefa: Erros em linguagem humana
+  descricao: Mapear mensagens para versões explicativas curtas.
+  ca: dx_errors.md.
+  dep: T-023,T-077
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-366
+  epico: DX
+  tarefa: Exemplos prontos (cookbook)
+  descricao: Coleção de comandos prontos para casos comuns.
+  ca: cookbook.md.
+  dep: T-057
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-367
+  epico: DX
+  tarefa: Alias para tools longas
+  descricao: 'Alias curtos (ex.: azion.updir → azion.upload_dir).'
+  ca: aliases.json.
+  dep: T-021
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-368
+  epico: i18n
+  tarefa: mensageria PT/EN
+  descricao: Mensagens chave em PT e EN.
+  ca: i18n_strings.json.
+  dep: T-388
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-369
+  epico: i18n
+  tarefa: seleção de idioma
+  descricao: Flag `--lang` no orquestrador.
+  ca: idioma selecionável.
+  dep: T-389
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-370
+  epico: Compliance
+  tarefa: política de privacidade
+  descricao: Documento básico e link no README.
+  ca: privacy_policy.md.
+  dep: T-331,T-371
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-371
+  epico: Compliance
+  tarefa: registro de consentimento (nota)
+  descricao: Anotar se é necessário para analytics.
+  ca: consent_notes.md.
+  dep: T-392
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-421
+  epico: Multi-site
+  tarefa: catálogo de projetos
+  descricao: Criar catálogo (JSON/YAML) com metadados por site (domínio, bucket, owner).
+  ca: projects_catalog.json.
+  dep: T-241,T-242
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-422
+  epico: Multi-site
+  tarefa: seleção via --project
+  descricao: Orquestrador aceita `--project <name>` e carrega metadados do catálogo.
+  ca: suporte a múltiplos sites.
+  dep: T-421
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-423
+  epico: Multi-site
+  tarefa: estado segregado
+  descricao: Salvar .mcp-state/<project>/<env>/*.json por site.
+  ca: estados isolados.
+  dep: T-422
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-424
+  epico: Multi-site
+  tarefa: policies por projeto
+  descricao: Definir limites e guardas (prod block, dry-run default) por projeto.
+  ca: project_policies.md.
+  dep: T-423
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-425
+  epico: Multi-site
+  tarefa: owners e contatos
+  descricao: Mapa de responsáveis por projeto (oncall/telegram).
+  ca: owners_map.md.
+  dep: T-421
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-426
+  epico: Multi-site
+  tarefa: rota de suporte
+  descricao: Definir canal de suporte por projeto (labels/tags).
+  ca: support_routes.md.
+  dep: T-425
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-427
+  epico: Multi-site
+  tarefa: template de novo site
+  descricao: Script para bootstrap rápido de um novo site (bucket + app + domain).
+  ca: new_site_template.md.
+  dep: T-424,T-051
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-428
+  epico: Quotas
+  tarefa: design de limites
+  descricao: Limites de objetos, tamanho total, req/s por projeto.
+  ca: quotas_design.md.
+  dep: T-423
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-429
+  epico: Quotas
+  tarefa: medição mínima
+  descricao: Coletar métricas base para comparação com limites.
+  ca: quotas_metrics.md.
+  dep: T-431,T-196
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-430
+  epico: Quotas
+  tarefa: alertas proativos
+  descricao: Alertar quando atingir 80/90/100% da quota.
+  ca: quotas_alerts.md.
+  dep: T-432,T-327
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-431
+  epico: Quotas
+  tarefa: enforcement suave
+  descricao: Bloquear uploads acima de X com override manual.
+  ca: enforcement_notes.md.
+  dep: T-433
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-432
+  epico: Chargeback
+  tarefa: modelo de rateio
+  descricao: 'Definir fórmula: (tráfego, objetos, requisições).'
+  ca: chargeback_model.md.
+  dep: T-257,T-361
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-433
+  epico: Showback
+  tarefa: relatórios por projeto
+  descricao: Gerar csv mensal por projeto com consumo estimado.
+  ca: showback_report.csv.
+  dep: T-436,T-359
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-434
+  epico: Chargeback
+  tarefa: integração com billing interno
+  descricao: Exportar JSON para sistema interno de cobrança.
+  ca: billing_export.json.
+  dep: T-437
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-435
+  epico: Chargeback
+  tarefa: auditoria
+  descricao: Rastrear origens de cálculo (artefatos e métricas).
+  ca: chargeback_audit.md.
+  dep: T-438
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-436
+  epico: Purge
+  tarefa: design por PR/branch
+  descricao: 'Definir estratégia de prefixos por branch (ex.: /preview/BRANCH/).'
+  ca: purge_branch_design.md.
+  dep: T-196,T-262
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-437
+  epico: Purge
+  tarefa: tool purge_by_branch
+  descricao: Invalidar prefixos do branch após merges/closes.
+  ca: purge_branch.json.
+  dep: T-441,T-263
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-439
+  epico: Painel comparativo
+  tarefa: ambientes
+  descricao: Dashboard de latência/hit ratio por dev/stage/prod.
+  ca: env_compare.md.
+  dep: T-247
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-440
+  epico: Painel comparativo
+  tarefa: projetos
+  descricao: Mapa de KPIs por projeto (top 5 consumo).
+  ca: projects_compare.md.
+  dep: T-444
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-442
+  epico: Hook pós-upload
+  tarefa: verify & warmup
+  descricao: Após upload_dir, verificar asset crítico e acionar warmup.
+  ca: post_upload_hook.md.
+  dep: T-028,T-199
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-443
+  epico: Hook pós-deploy
+  tarefa: smoke tests
+  descricao: Executar curls essenciais e registrar tempos.
+  ca: post_deploy_smoke.md.
+  dep: T-061,T-152
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
+- id: T-444
+  epico: Hook pré-teardown
+  tarefa: backups
+  descricao: Realizar backup de .mcp-state/ e lista de objetos.
+  ca: pre_teardown_backup.md.
+  dep: T-134,T-139
+  area: ''
+  inputs: ''
+  prioridade: ''
+  status: ''
+  estimativa: ''
