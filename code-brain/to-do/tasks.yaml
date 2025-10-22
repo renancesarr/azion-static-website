@@ -451,7 +451,7 @@ tasks:
   area: CLI/Tool
   inputs: inputs do usuário
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 3h
 - id: T-042
   epico: Workflow
@@ -463,7 +463,7 @@ tasks:
   area: CLI/Tool
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.8h
 - id: T-043
   epico: Workflow
