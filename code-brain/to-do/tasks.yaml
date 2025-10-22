@@ -8,7 +8,7 @@ tasks:
   area: Ambiente
   inputs: Documento de escopo
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-002
   epico: Fundação
@@ -19,7 +19,7 @@ tasks:
   area: Ambiente
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-003
   epico: Fundação
@@ -30,7 +30,7 @@ tasks:
   area: Ambiente
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-004
   epico: Fundação
@@ -41,7 +41,7 @@ tasks:
   area: Ambiente
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-005
   epico: Fundação
@@ -52,7 +52,7 @@ tasks:
   area: Ambiente
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-006
   epico: Fundação
@@ -63,7 +63,7 @@ tasks:
   area: Ambiente
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-007
   epico: Fundação
@@ -74,7 +74,7 @@ tasks:
   area: Ambiente
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.2h
 - id: T-008
   epico: Fundação
@@ -85,7 +85,7 @@ tasks:
   area: Segurança
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-009
   epico: Fundação
@@ -96,7 +96,7 @@ tasks:
   area: Docs
   inputs: ''
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-010
   epico: MCP
@@ -107,7 +107,7 @@ tasks:
   area: Servidor
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-011
   epico: MCP
@@ -118,7 +118,7 @@ tasks:
   area: Servidor
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-012
   epico: MCP
@@ -129,7 +129,7 @@ tasks:
   area: Servidor
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.3h
 - id: T-013
   epico: MCP
@@ -140,7 +140,7 @@ tasks:
   area: Servidor
   inputs: ''
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-014
   epico: Utils
@@ -151,7 +151,7 @@ tasks:
   area: HTTP
   inputs: AZION_TOKEN, CONTEXT7_API
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.3h
 - id: T-015
   epico: Utils
@@ -162,7 +162,7 @@ tasks:
   area: HTTP
   inputs: method,path,body
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-016
   epico: Utils
@@ -173,7 +173,7 @@ tasks:
   area: MIME
   inputs: extensão
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-017
   epico: Utils
@@ -185,7 +185,7 @@ tasks:
   area: Compressão
   inputs: nome arquivo
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-018
   epico: Utils
@@ -196,7 +196,7 @@ tasks:
   area: FS
   inputs: local_dir
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.8h
 - id: T-019
   epico: Utils
@@ -207,7 +207,7 @@ tasks:
   area: Hash
   inputs: arquivo
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 0.8h
 - id: T-020
   epico: Utils
@@ -218,7 +218,7 @@ tasks:
   area: Concorrência
   inputs: lista de jobs
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-021
   epico: Storage
@@ -229,7 +229,7 @@ tasks:
   area: Bucket
   inputs: .name,.edge_access
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-022
   epico: Storage
@@ -240,7 +240,7 @@ tasks:
   area: Bucket
   inputs: name
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.8h
 - id: T-023
   epico: Storage
@@ -251,7 +251,7 @@ tasks:
   area: Upload
   inputs: bucket,object_path,content_b64
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1.2h
 - id: T-024
   epico: Storage
@@ -262,7 +262,7 @@ tasks:
   area: Upload
   inputs: ''
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-025
   epico: Storage
@@ -274,7 +274,7 @@ tasks:
   area: Upload
   inputs: bucket,local_dir,strip_gz?,concurrency?,dry_run?
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 3h
 - id: T-026
   epico: Storage
@@ -285,7 +285,7 @@ tasks:
   area: Upload
   inputs: object_path,sha
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-027
   epico: Storage
@@ -296,7 +296,7 @@ tasks:
   area: Upload
   inputs: ''
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-028
   epico: Edge App & Rules
@@ -307,7 +307,7 @@ tasks:
   area: App
   inputs: name
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-029
   epico: Edge App & Rules
@@ -318,7 +318,7 @@ tasks:
   area: Connector
   inputs: name,bucket,prefix?
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-030
   epico: Edge App & Rules
@@ -329,7 +329,7 @@ tasks:
   area: Rules
   inputs: edge_application_id,connector_id
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-031
   epico: Edge App & Rules
@@ -340,7 +340,7 @@ tasks:
   area: Rules
   inputs: edge_application_id
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 0.8h
 - id: T-032
   epico: DNS/Domain
@@ -351,7 +351,7 @@ tasks:
   area: Domain
   inputs: domain_name,protocols?
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1.5h
 - id: T-033
   epico: DNS/Domain
@@ -362,7 +362,7 @@ tasks:
   area: Deploy
   inputs: workload_id,edge_application_id
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-034
   epico: DNS/Domain
@@ -373,7 +373,7 @@ tasks:
   area: DNS
   inputs: workload_id ou endpoint
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 0.5h
 - id: T-035
   epico: DNS/Domain
@@ -384,7 +384,7 @@ tasks:
   area: DNS
   inputs: endpoint
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 0.8h
 - id: T-036
   epico: WAF
