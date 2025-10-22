@@ -103,7 +103,13 @@ Copie `.env.example` para `.env` e preencha os valores:
   "waf": { "mode": "blocking" },
   "postDeploy": {
     "domain": "www.exemplo.com",
-    "paths": ["/", "/assets/app.js"],
+    "paths": [
+      "/",
+      {
+        "path": "/assets/app.js",
+        "headers": { "content-type": "application/javascript" }
+      }
+    ],
     "assertions": {
       "headers": { "cache-control": "max-age" },
       "bodyIncludes": ["<title>Marketing</title>"]

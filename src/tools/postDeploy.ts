@@ -5,10 +5,17 @@ import { writeStateFile, statePath } from '../utils/state.js';
 
 const POST_DEPLOY_DIR = 'post-deploy/checks';
 
+const pathCheckSchema = z.object({
+  path: z.string().startsWith('/'),
+  expectedStatus: z.number().int().min(100).max(599).optional(),
+  headers: z.record(z.string(), z.string()).optional(),
+  bodyIncludes: z.array(z.string()).optional(),
+});
+
 export const postDeployCheckSchema = z.object({
   domain: z.string().min(3).describe('Domínio público já apontado para a Azion.'),
   protocol: z.enum(['https', 'http']).default('https'),
-  paths: z.array(z.string().startsWith('/')).default(['/']),
+  paths: z.array(z.union([z.string().startsWith('/'), pathCheckSchema])).default(['/']),
   expectedStatus: z.number().int().min(100).max(599).default(200),
   timeoutMs: z.number().int().min(500).max(30000).default(5000),
   headers: z.record(z.string(), z.string()).default({}),
@@ -39,6 +46,13 @@ interface CheckResult {
   issues?: string[];
 }
 
+interface PathEntry {
+  path: string;
+  expectedStatus: number;
+  headers: Record<string, string>;
+  bodyIncludes: string[];
+}
+
 interface CheckReport {
   domain: string;
   protocol: string;
@@ -60,12 +74,29 @@ export async function executePostDeployCheck(
   server: McpServer,
   context: ToolExecutionContext,
 ): Promise<CheckReport> {
-  const { domain, protocol, paths, expectedStatus, timeoutMs, headers, assertions } = input;
+  const { domain, protocol, expectedStatus, timeoutMs, headers, assertions } = input;
+  const pathEntries: PathEntry[] = (input.paths ?? ['/']).map((entry) => {
+    if (typeof entry === 'string') {
+      return {
+        path: entry,
+        expectedStatus,
+        headers: assertions?.headers ?? {},
+        bodyIncludes: assertions?.bodyIncludes ?? [],
+      };
+    }
+    return {
+      path: entry.path,
+      expectedStatus: entry.expectedStatus ?? expectedStatus,
+      headers: { ...(assertions?.headers ?? {}), ...(entry.headers ?? {}) },
+      bodyIncludes: [...(assertions?.bodyIncludes ?? []), ...(entry.bodyIncludes ?? [])],
+    };
+  });
+
   const startedAt = new Date();
   const results: CheckResult[] = [];
 
-  for (const path of paths) {
-    const url = `${protocol}://${domain}${path}`;
+  for (const entry of pathEntries) {
+    const url = `${protocol}://${domain}${entry.path}`;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -79,11 +110,11 @@ export async function executePostDeployCheck(
       const durationMs = performance.now() - start;
       const issues: string[] = [];
 
-      if (response.status !== expectedStatus) {
-        issues.push(`Esperado status ${expectedStatus}, obtido ${response.status}`);
+      if (response.status !== entry.expectedStatus) {
+        issues.push(`Esperado status ${entry.expectedStatus}, obtido ${response.status}`);
       }
 
-      const expectedHeaders = assertions?.headers ?? {};
+      const expectedHeaders = entry.headers;
       if (Object.keys(expectedHeaders).length > 0) {
         const headerEntries: Record<string, string | null> = {};
         response.headers.forEach((value, key) => {
@@ -99,7 +130,7 @@ export async function executePostDeployCheck(
         }
       }
 
-      const bodyIncludes = assertions?.bodyIncludes ?? [];
+      const bodyIncludes = entry.bodyIncludes;
       if (bodyIncludes.length > 0) {
         const bodyText = await response.text();
         for (const snippet of bodyIncludes) {
@@ -111,7 +142,7 @@ export async function executePostDeployCheck(
 
       const ok = issues.length === 0;
       results.push({
-        path,
+        path: entry.path,
         status: response.status,
         ok,
         durationMs,
@@ -129,7 +160,7 @@ export async function executePostDeployCheck(
       const durationMs = performance.now() - start;
       const message = error instanceof Error ? error.message : String(error);
       results.push({
-        path,
+        path: entry.path,
         ok: false,
         durationMs,
         error: message,
