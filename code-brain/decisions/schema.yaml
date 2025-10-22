@@ -1,0 +1,12 @@
+schema:
+  version: '1.0'
+  description: Modelo de decisão (ADR) que guia o raciocínio da IA.
+  fields:
+    id: string
+    title: string
+    context: string
+    options: list
+    decision: string
+    rationale: string
+    date: datetime
+    author: string

@@ -1,0 +1,8 @@
+schema:
+  version: '1.0'
+  description: 'Camada de propósito: insights (ideias) e use-cases (intenções executáveis).'
+  rules:
+  - Todo TO-DO deve estar vinculado a um único USE-CASE.
+  - Um USE-CASE pode nascer de um ou mais INSIGHTS.
+  - Insights não geram ação direta; alimentam a ideação.
+  - A IA deve registrar o vínculo da ação com o USE-CASE.

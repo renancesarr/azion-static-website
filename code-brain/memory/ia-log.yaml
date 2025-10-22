@@ -1,0 +1,5 @@
+log:
+- ts: '2025-10-22T05:40:42.791707Z'
+  actor: ia
+  event: Implementação inicial do fluxo de link mágico
+  outcome: partial

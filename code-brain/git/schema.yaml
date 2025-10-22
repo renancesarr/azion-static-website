@@ -1,0 +1,17 @@
+schema:
+  version: '1.1'
+  description: Conjunto de regras e comportamento Git global do Code-Brain.
+  workflow:
+  - branch_creation
+  - commit
+  - rebase
+  - test_validation
+  - push
+  - pull_request
+  - human_approval
+  - post_merge_cleanup
+  templates:
+    pr: git/pr-template.md
+    commands_log: git/commands-log-template.yaml
+    workflow_doc: git/workflow-template.md
+    commit_convention: git/commit-convention.md

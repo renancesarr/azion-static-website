@@ -1,0 +1,7 @@
+terms:
+- name: insight
+  meaning: Ideia ou hipótese inicial que pode inspirar um use-case.
+- name: use-case
+  meaning: Intenção humana estruturada que gera to-dos executáveis.
+- name: magic link
+  meaning: Link com token temporário que autentica o usuário sem senha.
