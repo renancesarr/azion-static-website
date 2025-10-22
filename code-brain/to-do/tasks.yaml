@@ -552,7 +552,7 @@ tasks:
   area: Teste
   inputs: arquivos amostra
   prioridade: P1
-  status: A Fazer
+  status: Em Progresso
   estimativa: 1h
 - id: T-051
   epico: Validação

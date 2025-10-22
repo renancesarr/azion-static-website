@@ -57,6 +57,10 @@ Copie `.env.example` para `.env` e preencha os valores:
   - `azion.provision_static_site`: orquestra fluxo completo (bucket→edge→domain→WAF) e gera relatório consolidado.
   - `azion.post_deploy_check`: valida paths críticos via HTTP e grava métricas em `.mcp-state/post-deploy/`.
   - `azion.validate_stack`: confere a existência dos artefatos em `.mcp-state/` e testa um GET no domínio publicado.
+  - `azion.validate_mimetypes`: audita Content-Type/Encoding armazenados no índice de upload.
+  - `azion.validate_upload_idempotency`: verifica hashes/duplicatas do índice de upload.
+  - `azion.inspect_upload_logs`: resume os últimos relatórios de upload.
+  - `azion.verify_bucket_conflict` / `azion.verify_domain_conflict`: confirma recursos existentes para evitar 409.
 - Observação: defina o bloco `upload` para disparar `azion.upload_dir` automaticamente (suporta `dryRun`).
 - Próximos passos: enriquecer `azion.post_deploy_check` com asserts de headers e adicionar métricas de tráfego aos relatórios.
 

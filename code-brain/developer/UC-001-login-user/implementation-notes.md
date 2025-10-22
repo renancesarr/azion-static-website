@@ -41,4 +41,6 @@ Entregar fluxo de autenticação via link mágico (login sem senha).
 - **Dry-run/relatórios**: orquestrador registra estados intermediários em `.mcp-state/` (bucket/app/connector/domain/firewall/waf) e exporta relatórios resumidos, garantindo cumprimento dos critérios T-041/T-043.
 - **Validação**: `azion.validate_stack` reaproveita os arquivos de estado (storage/edge/security) e executa HTTP GET simples para confirmar publicação, compondo relatório com resultado de cada artefato.
 - **Gzip**: a leitura do índice de uploads identifica objetos com `contentEncoding=gzip`, permitindo validar `strip_gz` sem consultar a API externa (ca cobrindo T-049).
+- **Mimetypes & Logs**: `azion.validate_mimetypes` compara Content-Type inferido com o armazenado na indexação, `azion.validate_upload_idempotency` garante ausência de duplicatas/hashes ausentes e `azion.inspect_upload_logs` oferece resumo rápido das execuções.
+- **Conflitos 409**: `azion.verify_bucket_conflict`/`azion.verify_domain_conflict` verificam presença em `.mcp-state/` para confirmar reaproveitamento em chamadas subsequentes.
 - **Observabilidade**: `azion.post_deploy_check` executa GET em endpoints críticos, registra status/latência e armazena relatórios em `.mcp-state/post-deploy/checks/`, servindo como smoke test pós-provisionamento.
