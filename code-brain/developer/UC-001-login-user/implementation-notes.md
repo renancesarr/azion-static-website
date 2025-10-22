@@ -40,4 +40,5 @@ Entregar fluxo de autenticação via link mágico (login sem senha).
 - **WAF**: `azion.create_firewall`, `azion.create_waf_ruleset` e `azion.apply_waf_ruleset` conversam com os endpoints `/v4/edge_firewall/*` e `/v4/waf/rulesets`, persistindo estado em `.mcp-state/security/` para idempotência e permitindo reaproveitamento pelo orchestrator.
 - **Dry-run/relatórios**: orquestrador registra estados intermediários em `.mcp-state/` (bucket/app/connector/domain/firewall/waf) e exporta relatórios resumidos, garantindo cumprimento dos critérios T-041/T-043.
 - **Validação**: `azion.validate_stack` reaproveita os arquivos de estado (storage/edge/security) e executa HTTP GET simples para confirmar publicação, compondo relatório com resultado de cada artefato.
+- **Gzip**: a leitura do índice de uploads identifica objetos com `contentEncoding=gzip`, permitindo validar `strip_gz` sem consultar a API externa (ca cobrindo T-049).
 - **Observabilidade**: `azion.post_deploy_check` executa GET em endpoints críticos, registra status/latência e armazena relatórios em `.mcp-state/post-deploy/checks/`, servindo como smoke test pós-provisionamento.

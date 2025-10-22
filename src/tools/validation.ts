@@ -38,6 +38,18 @@ interface CheckResult {
   detail: string;
 }
 
+interface UploadIndexFile {
+  files: Record<string, {
+    hash: string;
+    size: number;
+    objectPath: string;
+    updatedAt: string;
+    contentType?: string;
+    contentEncoding?: string;
+    sourcePath?: string;
+  }>;
+}
+
 interface StackValidationReport {
   project?: string;
   domain?: string;
@@ -53,6 +65,7 @@ interface StackValidationReport {
     durationMs: number;
     error?: string;
   };
+  gzipAssets?: string[];
 }
 
 async function readState<T>(relativePath: string): Promise<T | undefined> {
@@ -183,6 +196,26 @@ async function validateStack(input: ValidateInput): Promise<StackValidationRepor
     }
   }
 
+  let gzipAssets: string[] | undefined;
+  const bucketIds = bucketState ? Object.values(bucketState.buckets ?? {}).map((b) => b.id) : [];
+  if (bucketIds.length > 0) {
+    const sanitize = (value: string) => value.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const indexPath = `storage/uploads/index-${sanitize(bucketIds[0])}.json`;
+    const uploadIndex = await readState<UploadIndexFile>(indexPath);
+    if (uploadIndex) {
+      gzipAssets = Object.values(uploadIndex.files ?? {})
+        .filter((entry) => entry.contentEncoding === 'gzip')
+        .map((entry) => `${entry.objectPath} <= ${entry.sourcePath ?? 'n/d'}`);
+      checks.push(
+        summarizeState(
+          'Gzip Assets',
+          (gzipAssets?.length ?? 0) > 0,
+          gzipAssets && gzipAssets.length > 0 ? gzipAssets.join(', ') : 'Nenhum objeto com encoding gzip registrado.',
+        ),
+      );
+    }
+  }
+
   const finishedAt = new Date();
   return {
     project: input.project,
@@ -193,6 +226,7 @@ async function validateStack(input: ValidateInput): Promise<StackValidationRepor
     finishedAt: finishedAt.toISOString(),
     checks,
     http: httpResult,
+    gzipAssets,
   };
 }
 

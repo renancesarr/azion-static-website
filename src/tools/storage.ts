@@ -119,6 +119,9 @@ interface UploadIndexEntry {
   size: number;
   objectPath: string;
   updatedAt: string;
+  contentType?: string;
+  contentEncoding?: string;
+  sourcePath?: string;
 }
 
 interface UploadIndexFile {
@@ -415,6 +418,8 @@ async function handlePutObject(server: McpServer, input: PutObjectInput, ctx: To
     size: buffer.length,
     objectPath,
     updatedAt: new Date().toISOString(),
+    contentType,
+    contentEncoding,
   };
   await saveUploadIndex(bucket, index);
 
@@ -511,6 +516,9 @@ export async function processUploadDir(server: McpServer, input: UploadDirInput,
         hash,
         size: entry.size,
         updatedAt: new Date().toISOString(),
+        contentType,
+        contentEncoding,
+        sourcePath: entry.relativePath,
       };
       continue;
     }
@@ -560,6 +568,9 @@ export async function processUploadDir(server: McpServer, input: UploadDirInput,
         size: candidate.size,
         objectPath: candidate.objectPath,
         updatedAt: new Date().toISOString(),
+        contentType: candidate.contentType,
+        contentEncoding: candidate.contentEncoding,
+        sourcePath: candidate.relativePath,
       };
       return makeReportEntry(candidate, 'uploaded', 1);
     };

@@ -541,7 +541,7 @@ tasks:
   area: Teste
   inputs: bucket,local_dir
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 0.8h
 - id: T-050
   epico: Validação
