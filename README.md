@@ -56,6 +56,7 @@ Copie `.env.example` para `.env` e preencha os valores:
   - `azion.waf_status`: consulta estado atual da política WAF.
   - `azion.provision_static_site`: orquestra fluxo completo (bucket→edge→domain→WAF) e gera relatório consolidado.
   - `azion.post_deploy_check`: valida paths críticos via HTTP e grava métricas em `.mcp-state/post-deploy/`.
+  - `azion.validate_stack`: confere a existência dos artefatos em `.mcp-state/` e testa um GET no domínio publicado.
 - Observação: defina o bloco `upload` para disparar `azion.upload_dir` automaticamente (suporta `dryRun`).
 - Próximos passos: enriquecer `azion.post_deploy_check` com asserts de headers e adicionar métricas de tráfego aos relatórios.
 

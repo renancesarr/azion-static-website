@@ -47,3 +47,4 @@ pendências: tornar expiração configurável.
 - **T-041/T-043**: fluxo completo do orquestrador validado (passo-a-passo, persistência das saídas em `.mcp-state/`, suporte a dry-run, relatórios resumidos) garantindo que cada reexecução seja idempotente e auditável.
 - **T-036/T-038 (WAF)**: criadas ferramentas `azion.create_firewall`, `azion.create_waf_ruleset` e `azion.apply_waf_ruleset`, armazenando artefatos em `.mcp-state/security/*.json` e habilitando idempotência de firewall/ruleset no orchestrator.
 - **T-043/T-044**: `azion.post_deploy_check` adiciona verificação pós-deploy (HTTP), persiste métricas em `.mcp-state/post-deploy/` e emite logs com latência/erros.
+- **T-048**: `azion.validate_stack` confere artefatos persistidos em `.mcp-state/` e realiza GET simples no domínio provisionado.

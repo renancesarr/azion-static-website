@@ -7,6 +7,7 @@ import { registerDomainTools } from './tools/domain.js';
 import { registerSecurityTools } from './tools/security.js';
 import { registerOrchestratorTools } from './tools/orchestrator.js';
 import { registerPostDeployTools } from './tools/postDeploy.js';
+import { registerValidationTools } from './tools/validation.js';
 
 const server = new McpServer(
   {
@@ -27,6 +28,7 @@ registerDomainTools(server);
 registerSecurityTools(server);
 registerOrchestratorTools(server);
 registerPostDeployTools(server);
+registerValidationTools(server);
 
 server.registerTool(
   'azion.health_check',

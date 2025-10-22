@@ -530,7 +530,7 @@ tasks:
   area: Checks
   inputs: ids
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1.5h
 - id: T-049
   epico: Validação
