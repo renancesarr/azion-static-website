@@ -47,11 +47,11 @@ const applyWafRulesetSchema = z.object({
 
 export const configureWafInputSchema = configureWafSchema;
 
-type ConfigureWafInput = z.infer<typeof configureWafSchema>;
+export type ConfigureWafInput = z.infer<typeof configureWafSchema>;
 type WafStatusInput = z.infer<typeof wafStatusSchema>;
-type CreateFirewallInput = z.infer<typeof createFirewallSchema>;
-type CreateWafRulesetInput = z.infer<typeof createWafRulesetSchema>;
-type ApplyWafRulesetInput = z.infer<typeof applyWafRulesetSchema>;
+export type CreateFirewallInput = z.infer<typeof createFirewallSchema>;
+export type CreateWafRulesetInput = z.infer<typeof createWafRulesetSchema>;
+export type ApplyWafRulesetInput = z.infer<typeof applyWafRulesetSchema>;
 
 interface ToolResponse {
   content: Array<{ type: 'text'; text: string }>;

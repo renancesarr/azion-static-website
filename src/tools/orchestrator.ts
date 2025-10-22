@@ -19,7 +19,16 @@ import {
   type CreateRuleInput,
 } from './edge.js';
 import { createDomainInputSchema, ensureDomain, type CreateDomainInput } from './domain.js';
-import { configureWafInputSchema, ensureWaf } from './security.js';
+import {
+  configureWafInputSchema,
+  ensureWaf,
+  ensureFirewall,
+  ensureWafRuleset,
+  ensureFirewallRule,
+  type CreateFirewallInput,
+  type CreateWafRulesetInput,
+  type ApplyWafRulesetInput,
+} from './security.js';
 import { writeStateFile, statePath } from '../utils/state.js';
 import {
   postDeployCheckSchema,
@@ -89,6 +98,26 @@ const orchestrateSchema = z.object({
       wafId: z.string().optional(),
     })
     .optional(),
+  firewall: z
+    .object({
+      name: z.string().min(3).max(128).optional(),
+      domainIds: z.array(z.string()).optional(),
+      domainNames: z.array(z.string()).optional(),
+      isActive: z.boolean().optional(),
+    })
+    .optional(),
+  wafRuleset: z
+    .object({
+      name: z.string().min(3).max(128).optional(),
+      mode: z.enum(['learning', 'blocking']).optional(),
+      description: z.string().optional(),
+    })
+    .optional(),
+  firewallRule: z
+    .object({
+      order: z.number().int().min(0).default(0),
+    })
+    .optional(),
   postDeploy: postDeployCheckSchema.optional(),
 });
 
@@ -145,6 +174,22 @@ interface OrchestrationReport {
     id: string;
     mode: string;
     enabled: boolean;
+    created: boolean;
+  };
+  firewall: {
+    id: string;
+    name: string;
+    created: boolean;
+  };
+  wafRuleset: {
+    id: string;
+    name: string;
+    mode: string;
+    created: boolean;
+  };
+  firewallRule: {
+    id: string;
+    order: number;
     created: boolean;
   };
   postDeploy?: {
@@ -296,6 +341,47 @@ export function registerOrchestratorTools(server: McpServer): void {
         domainResult.created ? `Domain criado: ${summarizeRecord(domainResult.record)}` : `Domain reutilizado: ${summarizeRecord(domainResult.record)}`,
       );
 
+      const firewallInput = {
+        name: parsed.firewall?.name ?? `${parsed.project}-firewall`,
+        domainIds: parsed.firewall?.domainIds ?? [domainResult.record.id],
+        domainNames: parsed.firewall?.domainNames,
+        isActive: parsed.firewall?.isActive ?? true,
+      } satisfies CreateFirewallInput;
+
+      const firewallResult = await ensureFirewall(firewallInput);
+      await log(
+        'info',
+        firewallResult.created ? `Firewall criado: ${summarizeRecord(firewallResult.record)}` : `Firewall reutilizado: ${summarizeRecord(firewallResult.record)}`,
+      );
+
+      const wafRulesetInput = {
+        name: parsed.wafRuleset?.name ?? `${parsed.project}-waf-ruleset`,
+        mode: parsed.wafRuleset?.mode ?? parsed.waf?.mode ?? 'blocking',
+        description: parsed.wafRuleset?.description,
+      } satisfies CreateWafRulesetInput;
+
+      const wafRulesetResult = await ensureWafRuleset(wafRulesetInput);
+      await log(
+        'info',
+        wafRulesetResult.created
+          ? `Ruleset WAF criado: ${summarizeRecord(wafRulesetResult.record)}`
+          : `Ruleset WAF reutilizado: ${summarizeRecord(wafRulesetResult.record)}`,
+      );
+
+      const firewallRuleInput: ApplyWafRulesetInput = {
+        firewallId: firewallResult.record.id,
+        rulesetId: wafRulesetResult.record.id,
+        order: parsed.firewallRule?.order ?? 0,
+      };
+
+      const firewallRuleResult = await ensureFirewallRule(firewallRuleInput);
+      await log(
+        'info',
+        firewallRuleResult.created
+          ? `Ruleset ${firewallRuleInput.rulesetId} aplicado ao firewall ${firewallRuleInput.firewallId}.`
+          : `Ruleset ${firewallRuleInput.rulesetId} já estava aplicado ao firewall ${firewallRuleInput.firewallId}.`,
+      );
+
       const wafInput = {
         edgeApplicationId: edgeResult.record.id,
         ...(parsed.waf ?? { enable: true, mode: 'blocking' }),
@@ -356,6 +442,22 @@ export function registerOrchestratorTools(server: McpServer): void {
           name: connectorResult.record.name,
           created: connectorResult.created,
         },
+        firewall: {
+          id: firewallResult.record.id,
+          name: firewallResult.record.name,
+          created: firewallResult.created,
+        },
+        wafRuleset: {
+          id: wafRulesetResult.record.id,
+          name: wafRulesetResult.record.name,
+          mode: wafRulesetResult.record.mode,
+          created: wafRulesetResult.created,
+        },
+        firewallRule: {
+          id: firewallRuleResult.record.id,
+          order: firewallRuleResult.record.order,
+          created: firewallRuleResult.created,
+        },
         cacheRules: ruleResults.map((result) => ({
           id: result.record.id,
           phase: result.record.phase,
@@ -384,6 +486,9 @@ export function registerOrchestratorTools(server: McpServer): void {
         `- Bucket: ${summarizeRecord(bucketResult.record)} (${bucketResult.created ? 'criado' : 'reutilizado'})`,
         `- Edge Application: ${summarizeRecord(edgeResult.record)} (${edgeResult.created ? 'criada' : 'reutilizada'})`,
         `- Connector: ${summarizeRecord(connectorResult.record)} (${connectorResult.created ? 'criado' : 'reutilizado'})`,
+        `- Firewall: ${summarizeRecord(firewallResult.record)} (${firewallResult.created ? 'criado' : 'reutilizado'})`,
+        `- WAF Ruleset: ${summarizeRecord(wafRulesetResult.record)} (${wafRulesetResult.created ? 'criado' : 'reutilizado'})`,
+        `- Firewall Rule: ${firewallRuleResult.record.id} (${firewallRuleResult.created ? 'criada' : 'reutilizada'})`,
         `- Domain: ${summarizeRecord(domainResult.record)} (${domainResult.created ? 'criado' : 'reutilizado'})`,
         `- WAF: ${wafResult.record.mode} | enabled=${wafResult.record.enabled}`,
         `- Rules criadas: ${ruleResults.filter((r) => r.created).length}/${ruleResults.length}`,

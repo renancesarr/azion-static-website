@@ -81,6 +81,16 @@ Copie `.env.example` para `.env` e preencha os valores:
     "name": "marketing-connector",
     "originPath": "/"
   },
+  "firewall": {
+    "name": "marketing-firewall"
+  },
+  "wafRuleset": {
+    "name": "marketing-ruleset",
+    "mode": "blocking"
+  },
+  "firewallRule": {
+    "order": 0
+  },
   "cacheRules": [
     {
       "phase": "request",
