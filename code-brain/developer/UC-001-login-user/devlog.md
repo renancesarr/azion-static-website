@@ -51,3 +51,4 @@ pendências: tornar expiração configurável.
 - **T-049**: `validate_stack` agora lista ativos gzip identificados em `index-*.json`, confirmando `strip_gz`/`contentEncoding=gzip` após uploads comprimidos.
 - **T-050/T-052**: `azion.validate_mimetypes`, `azion.validate_upload_idempotency` e `azion.inspect_upload_logs` abrangem mimetypes, idempotência e observabilidade de uploads.
 - **T-053/T-054**: ferramentas `azion.verify_bucket_conflict` e `azion.verify_domain_conflict` usam o estado local para confirmar reutilização e prevenção de HTTP 409.
+- **T-040**: `docs/specs/azion.provision_static_site.md` descreve entradas, sequência, saídas e futuras extensões do orquestrador.

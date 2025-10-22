@@ -440,7 +440,7 @@ tasks:
   area: CLI/Tool
   inputs: spec json
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-041
   epico: Workflow
@@ -552,7 +552,7 @@ tasks:
   area: Teste
   inputs: arquivos amostra
   prioridade: P1
-  status: Em Progresso
+  status: Concluído
   estimativa: 1h
 - id: T-051
   epico: Validação
@@ -563,7 +563,7 @@ tasks:
   area: Teste
   inputs: index.json
   prioridade: P1
-  status: A Fazer
+  status: Concluído
   estimativa: 0.8h
 - id: T-052
   epico: Validação
