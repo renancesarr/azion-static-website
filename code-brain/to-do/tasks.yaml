@@ -395,7 +395,7 @@ tasks:
   area: Firewall
   inputs: name,domains[]?
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1.5h
 - id: T-037
   epico: WAF
@@ -406,7 +406,7 @@ tasks:
   area: Ruleset
   inputs: mode
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-038
   epico: WAF
@@ -417,7 +417,7 @@ tasks:
   area: Apply
   inputs: firewall_id,waf_ruleset_id
   prioridade: P0
-  status: A Fazer
+  status: Concluído
   estimativa: 1h
 - id: T-039
   epico: WAF

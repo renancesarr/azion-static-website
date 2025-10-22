@@ -49,10 +49,13 @@ Copie `.env.example` para `.env` e preencha os valores:
   - `azion.create_cache_rule`: adiciona regra básica no Rules Engine.
   - `azion.create_domain`: cria Domain apontando para a Edge Application.
   - `azion.dns_instructions`: gera instruções DNS (CNAME) atualizadas.
+  - `azion.create_firewall`: provisiona Edge Firewall com domínios vinculados.
+  - `azion.create_waf_ruleset`: cria ruleset WAF (blocking/learning).
+  - `azion.apply_waf_ruleset`: associa ruleset ao firewall via regra dedicada.
   - `azion.configure_waf`: habilita/atualiza WAF para a Edge Application.
   - `azion.waf_status`: consulta estado atual da política WAF.
-- `azion.provision_static_site`: orquestra fluxo completo (bucket→edge→domain→WAF) e gera relatório consolidado.
-- `azion.post_deploy_check`: valida paths críticos via HTTP e grava métricas em `.mcp-state/post-deploy/`.
+  - `azion.provision_static_site`: orquestra fluxo completo (bucket→edge→domain→WAF) e gera relatório consolidado.
+  - `azion.post_deploy_check`: valida paths críticos via HTTP e grava métricas em `.mcp-state/post-deploy/`.
 - Observação: defina o bloco `upload` para disparar `azion.upload_dir` automaticamente (suporta `dryRun`).
 - Próximos passos: enriquecer `azion.post_deploy_check` com asserts de headers e adicionar métricas de tráfego aos relatórios.
 

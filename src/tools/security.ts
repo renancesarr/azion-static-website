@@ -6,6 +6,9 @@ import { readStateFile, writeStateFile, statePath } from '../utils/state.js';
 import type { EnsureResult } from '../utils/ensure.js';
 
 const WAF_STATE_FILE = 'security/waf_policies.json';
+const FIREWALL_STATE_FILE = 'security/firewalls.json';
+const WAF_RULESET_STATE_FILE = 'security/waf_rulesets.json';
+const FIREWALL_RULE_STATE_FILE = 'security/firewall_rules.json';
 
 const configureWafSchema = z.object({
   edgeApplicationId: z.string().min(1),
@@ -18,10 +21,37 @@ const wafStatusSchema = z.object({
   edgeApplicationId: z.string().min(1),
 });
 
+const createFirewallSchema = z
+  .object({
+    name: z.string().min(3).max(128),
+    domainIds: z.array(z.string()).optional(),
+    domainNames: z.array(z.string()).optional(),
+    isActive: z.boolean().default(true),
+  })
+  .refine((value) => (value.domainIds?.length ?? 0) > 0 || (value.domainNames?.length ?? 0) > 0, {
+    message: 'Informe ao menos um domainIds ou domainNames.',
+    path: ['domainIds'],
+  });
+
+const createWafRulesetSchema = z.object({
+  name: z.string().min(3).max(128),
+  mode: z.enum(['learning', 'blocking']).default('blocking'),
+  description: z.string().optional(),
+});
+
+const applyWafRulesetSchema = z.object({
+  firewallId: z.string().min(1),
+  rulesetId: z.string().min(1),
+  order: z.number().int().min(0).default(0),
+});
+
 export const configureWafInputSchema = configureWafSchema;
 
 type ConfigureWafInput = z.infer<typeof configureWafSchema>;
 type WafStatusInput = z.infer<typeof wafStatusSchema>;
+type CreateFirewallInput = z.infer<typeof createFirewallSchema>;
+type CreateWafRulesetInput = z.infer<typeof createWafRulesetSchema>;
+type ApplyWafRulesetInput = z.infer<typeof applyWafRulesetSchema>;
 
 interface ToolResponse {
   content: Array<{ type: 'text'; text: string }>;
@@ -44,6 +74,48 @@ interface WafState {
   policies: Record<string, WafPolicyRecord>;
 }
 
+interface FirewallRecord {
+  id: string;
+  name: string;
+  domainIds: string[];
+  isActive: boolean;
+  createdAt: string;
+  raw: unknown;
+}
+
+interface FirewallState {
+  firewalls: Record<string, FirewallRecord>;
+}
+
+interface WafRulesetRecord {
+  id: string;
+  name: string;
+  mode: string;
+  createdAt: string;
+  raw: unknown;
+}
+
+interface WafRulesetState {
+  rulesets: Record<string, WafRulesetRecord>;
+}
+
+interface FirewallRuleBinding {
+  id: string;
+  firewallId: string;
+  rulesetId: string;
+  order: number;
+  createdAt: string;
+  raw: unknown;
+}
+
+interface FirewallRuleState {
+  bindings: Record<string, FirewallRuleBinding>;
+}
+
+interface DomainState {
+  domains: Record<string, { id: string }>;
+}
+
 interface AzionWafResponse {
   results?: AzionWafPolicy;
   data?: AzionWafPolicy;
@@ -58,11 +130,84 @@ interface AzionWafPolicy {
   [key: string]: unknown;
 }
 
+interface AzionFirewallResponse {
+  results?: AzionFirewall;
+  data?: AzionFirewall;
+}
+
+interface AzionFirewallListResponse {
+  results?: AzionFirewall[];
+}
+
+interface AzionFirewall {
+  id: string;
+  name: string;
+  domains?: string[];
+  is_active?: boolean;
+  created_at?: string;
+  [key: string]: unknown;
+}
+
+interface AzionWafRulesetResponse {
+  results?: AzionWafRuleset;
+  data?: AzionWafRuleset;
+}
+
+interface AzionWafRulesetListResponse {
+  results?: AzionWafRuleset[];
+}
+
+interface AzionWafRuleset {
+  id: string;
+  name: string;
+  mode: string;
+  created_at?: string;
+  [key: string]: unknown;
+}
+
+interface AzionFirewallRuleResponse {
+  results?: AzionFirewallRule;
+  data?: AzionFirewallRule;
+}
+
+interface AzionFirewallRuleListResponse {
+  results?: AzionFirewallRule[];
+}
+
+interface AzionFirewallRule {
+  id: string;
+  order: number;
+  behaviors: unknown[];
+  created_at?: string;
+  [key: string]: unknown;
+}
+
 function normalizeWafState(state?: WafState): WafState {
   if (!state) {
     return { policies: {} };
   }
   return { policies: state.policies ?? {} };
+}
+
+function normalizeFirewallState(state?: FirewallState): FirewallState {
+  if (!state) {
+    return { firewalls: {} };
+  }
+  return { firewalls: state.firewalls ?? {} };
+}
+
+function normalizeWafRulesetState(state?: WafRulesetState): WafRulesetState {
+  if (!state) {
+    return { rulesets: {} };
+  }
+  return { rulesets: state.rulesets ?? {} };
+}
+
+function normalizeFirewallRuleState(state?: FirewallRuleState): FirewallRuleState {
+  if (!state) {
+    return { bindings: {} };
+  }
+  return { bindings: state.bindings ?? {} };
 }
 
 function buildWafRecord(payload: AzionWafPolicy): WafPolicyRecord {
@@ -76,10 +221,67 @@ function buildWafRecord(payload: AzionWafPolicy): WafPolicyRecord {
   };
 }
 
+function buildFirewallRecord(payload: AzionFirewall): FirewallRecord {
+  return {
+    id: payload.id,
+    name: payload.name,
+    domainIds: payload.domains ?? [],
+    isActive: payload.is_active ?? true,
+    createdAt: payload.created_at ?? new Date().toISOString(),
+    raw: payload,
+  };
+}
+
+function buildWafRulesetRecord(payload: AzionWafRuleset): WafRulesetRecord {
+  return {
+    id: payload.id,
+    name: payload.name,
+    mode: payload.mode,
+    createdAt: payload.created_at ?? new Date().toISOString(),
+    raw: payload,
+  };
+}
+
+function buildFirewallRuleBinding(payload: AzionFirewallRule, firewallId: string, rulesetId: string): FirewallRuleBinding {
+  return {
+    id: payload.id,
+    firewallId,
+    rulesetId,
+    order: payload.order,
+    createdAt: payload.created_at ?? new Date().toISOString(),
+    raw: payload,
+  };
+}
+
 async function persistWaf(record: WafPolicyRecord): Promise<WafPolicyRecord> {
   const current = normalizeWafState(await readStateFile<WafState>(WAF_STATE_FILE));
   current.policies[record.edgeApplicationId] = record;
   await writeStateFile(WAF_STATE_FILE, current);
+  return record;
+}
+
+async function persistFirewall(record: FirewallRecord): Promise<FirewallRecord> {
+  const current = normalizeFirewallState(await readStateFile<FirewallState>(FIREWALL_STATE_FILE));
+  current.firewalls[record.name] = record;
+  await writeStateFile(FIREWALL_STATE_FILE, current);
+  return record;
+}
+
+async function persistWafRuleset(record: WafRulesetRecord): Promise<WafRulesetRecord> {
+  const current = normalizeWafRulesetState(await readStateFile<WafRulesetState>(WAF_RULESET_STATE_FILE));
+  current.rulesets[record.name] = record;
+  await writeStateFile(WAF_RULESET_STATE_FILE, current);
+  return record;
+}
+
+function bindingKey(firewallId: string, rulesetId: string): string {
+  return `${firewallId}:${rulesetId}`;
+}
+
+async function persistFirewallRule(record: FirewallRuleBinding): Promise<FirewallRuleBinding> {
+  const current = normalizeFirewallRuleState(await readStateFile<FirewallRuleState>(FIREWALL_RULE_STATE_FILE));
+  current.bindings[bindingKey(record.firewallId, record.rulesetId)] = record;
+  await writeStateFile(FIREWALL_RULE_STATE_FILE, current);
   return record;
 }
 
@@ -88,13 +290,37 @@ async function findWaf(edgeApplicationId: string): Promise<WafPolicyRecord | und
   return current.policies[edgeApplicationId];
 }
 
-export async function ensureWaf(input: ConfigureWafInput): Promise<EnsureResult<WafPolicyRecord>> {
-  const cached = await findWaf(input.edgeApplicationId);
-  if (cached) {
-    return { record: cached, created: false };
+async function findFirewallByName(name: string): Promise<FirewallRecord | undefined> {
+  const current = normalizeFirewallState(await readStateFile<FirewallState>(FIREWALL_STATE_FILE));
+  return current.firewalls[name];
+}
+
+async function findWafRulesetByName(name: string): Promise<WafRulesetRecord | undefined> {
+  const current = normalizeWafRulesetState(await readStateFile<WafRulesetState>(WAF_RULESET_STATE_FILE));
+  return current.rulesets[name];
+}
+
+async function findFirewallRuleBinding(firewallId: string, rulesetId: string): Promise<FirewallRuleBinding | undefined> {
+  const current = normalizeFirewallRuleState(await readStateFile<FirewallRuleState>(FIREWALL_RULE_STATE_FILE));
+  return current.bindings[bindingKey(firewallId, rulesetId)];
+}
+
+async function resolveDomainIds(input: CreateFirewallInput): Promise<string[]> {
+  const ids = new Set<string>(input.domainIds ?? []);
+  if (input.domainNames && input.domainNames.length > 0) {
+    const domainState = (await readStateFile<DomainState>('edge/domains.json')) ?? { domains: {} };
+    for (const name of input.domainNames) {
+      const entry = domainState.domains[name];
+      if (!entry) {
+        throw new Error(`Domain ${name} não encontrado em cache local. Execute azion.create_domain antes.`);
+      }
+      ids.add(entry.id);
+    }
   }
-  const record = await configureWafViaApi(input);
-  return { record, created: true };
+  if (ids.size === 0) {
+    throw new Error('Nenhum domínio válido encontrado para o firewall.');
+  }
+  return Array.from(ids);
 }
 
 async function configureWafViaApi(input: ConfigureWafInput): Promise<WafPolicyRecord> {
@@ -132,6 +358,161 @@ async function fetchWafByEdgeApp(edgeApplicationId: string): Promise<AzionWafPol
   return response.data.results?.find((policy) => policy.edge_application_id === edgeApplicationId);
 }
 
+async function createFirewallViaApi(input: CreateFirewallInput): Promise<FirewallRecord> {
+  const apiBase = azionApiBase();
+  const domainIds = await resolveDomainIds(input);
+  try {
+    const response = await http<AzionFirewallResponse>({
+      method: 'POST',
+      url: `${apiBase}/v4/edge_firewall/firewalls`,
+      body: {
+        name: input.name,
+        domains: domainIds,
+        is_active: input.isActive ?? true,
+        waf: {
+          active: true,
+        },
+      },
+    });
+    const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionFirewall);
+    return await persistFirewall(buildFirewallRecord(payload));
+  } catch (error) {
+    if (error instanceof HttpError && error.status === 409) {
+      const existing = await fetchFirewallByName(input.name);
+      if (existing) {
+        return await persistFirewall(buildFirewallRecord(existing));
+      }
+    }
+    throw error;
+  }
+}
+
+async function fetchFirewallByName(name: string): Promise<AzionFirewall | undefined> {
+  const apiBase = azionApiBase();
+  const response = await http<AzionFirewallListResponse>({
+    method: 'GET',
+    url: `${apiBase}/v4/edge_firewall/firewalls?name=${encodeURIComponent(name)}`,
+  });
+  return response.data.results?.find((fw) => fw.name === name);
+}
+
+async function createWafRulesetViaApi(input: CreateWafRulesetInput): Promise<WafRulesetRecord> {
+  const apiBase = azionApiBase();
+  try {
+    const response = await http<AzionWafRulesetResponse>({
+      method: 'POST',
+      url: `${apiBase}/v4/waf/rulesets`,
+      body: {
+        name: input.name,
+        mode: input.mode,
+        description: input.description,
+      },
+    });
+    const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionWafRuleset);
+    return await persistWafRuleset(buildWafRulesetRecord(payload));
+  } catch (error) {
+    if (error instanceof HttpError && error.status === 409) {
+      const existing = await fetchWafRulesetByName(input.name);
+      if (existing) {
+        return await persistWafRuleset(buildWafRulesetRecord(existing));
+      }
+    }
+    throw error;
+  }
+}
+
+async function fetchWafRulesetByName(name: string): Promise<AzionWafRuleset | undefined> {
+  const apiBase = azionApiBase();
+  const response = await http<AzionWafRulesetListResponse>({
+    method: 'GET',
+    url: `${apiBase}/v4/waf/rulesets?name=${encodeURIComponent(name)}`,
+  });
+  return response.data.results?.find((ruleset) => ruleset.name === name);
+}
+
+async function fetchFirewallRules(firewallId: string): Promise<AzionFirewallRule[]> {
+  const apiBase = azionApiBase();
+  const response = await http<AzionFirewallRuleListResponse>({
+    method: 'GET',
+    url: `${apiBase}/v4/edge_firewall/firewalls/${encodeURIComponent(firewallId)}/rules`,
+  });
+  return response.data.results ?? [];
+}
+
+async function applyWafRulesetViaApi(input: ApplyWafRulesetInput): Promise<FirewallRuleBinding> {
+  const apiBase = azionApiBase();
+  try {
+    const response = await http<AzionFirewallRuleResponse>({
+      method: 'POST',
+      url: `${apiBase}/v4/edge_firewall/firewalls/${encodeURIComponent(input.firewallId)}/rules`,
+      body: {
+        name: `waf-${input.rulesetId}`,
+        order: input.order,
+        is_active: true,
+        behaviors: [
+          {
+            name: 'waf',
+            target: input.rulesetId,
+          },
+        ],
+        criteria: [
+          {
+            name: 'all',
+            arguments: ['*'],
+          },
+        ],
+      },
+    });
+    const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionFirewallRule);
+    return await persistFirewallRule(buildFirewallRuleBinding(payload, input.firewallId, input.rulesetId));
+  } catch (error) {
+    if (error instanceof HttpError && error.status === 409) {
+      const existingRules = await fetchFirewallRules(input.firewallId);
+      const match = existingRules.find((rule) => JSON.stringify(rule.behaviors).includes(input.rulesetId));
+      if (match) {
+        return await persistFirewallRule(buildFirewallRuleBinding(match, input.firewallId, input.rulesetId));
+      }
+    }
+    throw error;
+  }
+}
+
+export async function ensureWaf(input: ConfigureWafInput): Promise<EnsureResult<WafPolicyRecord>> {
+  const cached = await findWaf(input.edgeApplicationId);
+  if (cached) {
+    return { record: cached, created: false };
+  }
+  const record = await configureWafViaApi(input);
+  return { record, created: true };
+}
+
+export async function ensureFirewall(input: CreateFirewallInput): Promise<EnsureResult<FirewallRecord>> {
+  const cached = await findFirewallByName(input.name);
+  if (cached) {
+    return { record: cached, created: false };
+  }
+  const record = await createFirewallViaApi(input);
+  return { record, created: true };
+}
+
+export async function ensureWafRuleset(input: CreateWafRulesetInput): Promise<EnsureResult<WafRulesetRecord>> {
+  const cached = await findWafRulesetByName(input.name);
+  if (cached) {
+    return { record: cached, created: false };
+  }
+  const record = await createWafRulesetViaApi(input);
+  return { record, created: true };
+}
+
+export async function ensureFirewallRule(input: ApplyWafRulesetInput): Promise<EnsureResult<FirewallRuleBinding>> {
+  const cached = await findFirewallRuleBinding(input.firewallId, input.rulesetId);
+  if (cached) {
+    return { record: cached, created: false };
+  }
+  const record = await applyWafRulesetViaApi(input);
+  return { record, created: true };
+}
+
 function buildWafToolResponse(prefix: string, record: WafPolicyRecord): ToolResponse {
   return {
     content: [
@@ -151,6 +532,108 @@ function buildWafToolResponse(prefix: string, record: WafPolicyRecord): ToolResp
 }
 
 export function registerSecurityTools(server: McpServer): void {
+  server.registerTool(
+    'azion.create_firewall',
+    {
+      title: 'Criar Edge Firewall',
+      description: 'Provisiona firewall com WAF ativo e associa domínios.',
+      inputSchema: createFirewallSchema,
+    },
+    async (args: unknown, extra: ToolExecutionContext = {}): Promise<ToolResponse> => {
+      const parsed = createFirewallSchema.parse(args ?? {});
+      const result = await ensureFirewall(parsed);
+      await server.sendLoggingMessage(
+        {
+          level: 'info',
+          data: result.created ? `Firewall ${result.record.name} criado.` : `Firewall ${result.record.name} reutilizado.`,
+        },
+        extra.sessionId,
+      );
+      return {
+        content: [
+          {
+            type: 'text',
+            text: [
+              result.created ? 'Firewall criado com sucesso.' : 'Firewall reutilizado do cache.',
+              `- ID: ${result.record.id}`,
+              `- Domínios: ${result.record.domainIds.join(', ')}`,
+              `- State: ${statePath(FIREWALL_STATE_FILE)}`,
+            ].join('\n'),
+          },
+        ],
+      };
+    },
+  );
+
+  server.registerTool(
+    'azion.create_waf_ruleset',
+    {
+      title: 'Criar WAF Ruleset',
+      description: 'Cria um ruleset WAF com modo configurável.',
+      inputSchema: createWafRulesetSchema,
+    },
+    async (args: unknown, extra: ToolExecutionContext = {}): Promise<ToolResponse> => {
+      const parsed = createWafRulesetSchema.parse(args ?? {});
+      const result = await ensureWafRuleset(parsed);
+      await server.sendLoggingMessage(
+        {
+          level: 'info',
+          data: result.created ? `Ruleset ${result.record.name} criado.` : `Ruleset ${result.record.name} reutilizado.`,
+        },
+        extra.sessionId,
+      );
+      return {
+        content: [
+          {
+            type: 'text',
+            text: [
+              result.created ? 'Ruleset criado com sucesso.' : 'Ruleset reaproveitado do cache.',
+              `- ID: ${result.record.id}`,
+              `- Mode: ${result.record.mode}`,
+              `- State: ${statePath(WAF_RULESET_STATE_FILE)}`,
+            ].join('\n'),
+          },
+        ],
+      };
+    },
+  );
+
+  server.registerTool(
+    'azion.apply_waf_ruleset',
+    {
+      title: 'Aplicar WAF Ruleset ao Firewall',
+      description: 'Cria uma regra no firewall para executar o ruleset WAF informado.',
+      inputSchema: applyWafRulesetSchema,
+    },
+    async (args: unknown, extra: ToolExecutionContext = {}): Promise<ToolResponse> => {
+      const parsed = applyWafRulesetSchema.parse(args ?? {});
+      const result = await ensureFirewallRule(parsed);
+      await server.sendLoggingMessage(
+        {
+          level: 'info',
+          data: result.created
+            ? `Ruleset ${parsed.rulesetId} aplicado ao firewall ${parsed.firewallId}.`
+            : `Ruleset ${parsed.rulesetId} já estava aplicado ao firewall ${parsed.firewallId}.`,
+        },
+        extra.sessionId,
+      );
+      return {
+        content: [
+          {
+            type: 'text',
+            text: [
+              result.created ? 'Ruleset aplicado ao firewall.' : 'Ruleset já estava aplicado, reaproveitado.',
+              `- Firewall ID: ${parsed.firewallId}`,
+              `- Ruleset ID: ${parsed.rulesetId}`,
+              `- Rule ID: ${result.record.id}`,
+              `- State: ${statePath(FIREWALL_RULE_STATE_FILE)}`,
+            ].join('\n'),
+          },
+        ],
+      };
+    },
+  );
+
   server.registerTool(
     'azion.configure_waf',
     {
