@@ -12,3 +12,5 @@ export type {
   UploadDirInput,
 } from './schemas.js';
 export { defaultStorageDependencies } from './dependencies.js';
+export { resolveBucketReference } from './resolveBucketReference.js';
+export type { StorageDependencies } from './types.js';

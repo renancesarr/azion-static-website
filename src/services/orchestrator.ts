@@ -16,7 +16,7 @@ import {
   type CreateEdgeAppInput,
   type CreateConnectorInput,
   type CreateRuleInput,
-} from './edge.js';
+} from './edge/index.js';
 import { createDomainInputSchema, ensureDomain, type CreateDomainInput } from './domain/index.js';
 import {
   configureWafInputSchema,
