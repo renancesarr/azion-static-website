@@ -28,7 +28,7 @@ export async function createEdgeApplicationViaApi(
     });
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionEdgeApplication);
     return await persistEdgeApplication(buildEdgeApplicationRecord(payload));
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await findEdgeApplicationByNameApi(input.name, deps);
       if (existing) {
