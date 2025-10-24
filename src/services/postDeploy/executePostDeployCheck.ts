@@ -1,23 +1,16 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
 import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
 import { PostDeployCheckResult } from '../../models/postDeployCheckResult.js';
-import { PostDeployPathEntry } from '../../models/postDeployPathEntry.js';
 import { PostDeployReport } from '../../models/postDeployReport.js';
 import { PostDeployCheckInput } from './schemas.js';
 import { buildPathEntries } from './buildPathEntries.js';
 import { calculateStats } from './calculateStats.js';
 import { defaultPostDeployDependencies } from './dependencies.js';
 import type { PostDeployDependencies } from './types.js';
+import { HttpError } from '../../utils/http.js';
 
 function createAbortController(): AbortController {
   return new AbortController();
-}
-
-async function fetchBodyIfNeeded(response: Response, entry: PostDeployPathEntry): Promise<string | undefined> {
-  if ((entry.bodyIncludes ?? []).length === 0) {
-    return undefined;
-  }
-  return await response.text();
 }
 
 export async function executePostDeployCheck(
@@ -37,14 +30,15 @@ export async function executePostDeployCheck(
     const controller = createAbortController();
     const timer = deps.setTimeout(() => controller.abort(), timeoutMs);
 
-    const start = deps.now();
+    const start = deps.clock.now();
     try {
-      const response = await deps.fetch(url, {
+      const response = await deps.http.request<string>({
         method: 'GET',
+        url,
         headers,
         signal: controller.signal,
       });
-      const durationMs = deps.now() - start;
+      const durationMs = deps.clock.now() - start;
       const issues: string[] = [];
 
       if (response.status !== entry.expectedStatus) {
@@ -69,7 +63,7 @@ export async function executePostDeployCheck(
 
       const bodyIncludes = entry.bodyIncludes;
       if (bodyIncludes.length > 0) {
-        const bodyText = await fetchBodyIfNeeded(response, entry);
+        const bodyText = response.data;
         for (const snippet of bodyIncludes) {
           if (!bodyText || !bodyText.includes(snippet)) {
             issues.push(`Body não contém "${snippet}"`);
@@ -87,18 +81,20 @@ export async function executePostDeployCheck(
         issues: ok ? undefined : issues,
       });
 
+      const logMessage = ok
+        ? `${url} -> ${response.status} (${Math.round(durationMs)}ms)`
+        : `${url} falhou: ${issues.join('; ')}`;
+      deps.logger[ok ? 'info' : 'error'](logMessage);
       await server.sendLoggingMessage(
         {
           level: ok ? 'info' : 'error',
-          data: ok
-            ? `${url} -> ${response.status} (${Math.round(durationMs)}ms)`
-            : `${url} falhou: ${issues.join('; ')}`,
+          data: logMessage,
         },
         context.sessionId,
       );
     } catch (error) {
-      const durationMs = deps.now() - start;
-      const message = error instanceof Error ? error.message : String(error);
+      const durationMs = deps.clock.now() - start;
+      const message = error instanceof HttpError ? `${error.message}` : error instanceof Error ? error.message : String(error);
       results.push({
         path: entry.path,
         ok: false,
@@ -106,6 +102,7 @@ export async function executePostDeployCheck(
         error: message,
         issues: [message],
       });
+      deps.logger.error(`${url} falhou: ${message}`);
       await server.sendLoggingMessage(
         {
           level: 'error',
