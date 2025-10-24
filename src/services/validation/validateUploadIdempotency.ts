@@ -1,9 +1,12 @@
 import { ValidationCheckResult } from '../../models/validationCheckResult.js';
 import { loadFirstUploadIndex } from './loadFirstUploadIndex.js';
 import { summarizeState } from './stateUtils.js';
+import type { ValidationDependencies } from './types.js';
 
-export async function validateUploadIdempotency(): Promise<ValidationCheckResult[]> {
-  const uploadIndex = await loadFirstUploadIndex();
+export async function validateUploadIdempotency(
+  deps: ValidationDependencies,
+): Promise<ValidationCheckResult[]> {
+  const uploadIndex = await loadFirstUploadIndex(deps.state);
   if (!uploadIndex) {
     return [summarizeState('Upload index', false, 'Nenhum índice encontrado para avaliar idempotência.')];
   }
