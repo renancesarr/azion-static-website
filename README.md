@@ -30,7 +30,7 @@ Copie `.env.example` para `.env` e preencha os valores:
 ## Estrutura
 ```
 .
-├── src/             # Código-fonte TypeScript (tools, utils, server MCP)
+├── src/             # Código-fonte TypeScript (services, utils, server MCP)
 ├── dist/            # Saída compilada (gerada por `npm run build`)
 ├── .mcp-state/      # Artefatos persistentes (JSON/LOG) por execução
 └── code-brain/      # Documentos cognitivos (use-case, to-dos, devlog, etc.)

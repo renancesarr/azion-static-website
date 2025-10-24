@@ -1,13 +1,13 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/dist/esm/server/stdio.js';
 import { MissingEnvError, requiredEnv } from './utils/env.js';
-import { registerStorageTools } from './tools/storage.js';
-import { registerEdgeTools } from './tools/edge.js';
-import { registerDomainTools } from './tools/domain.js';
-import { registerSecurityTools } from './tools/security.js';
-import { registerOrchestratorTools } from './tools/orchestrator.js';
-import { registerPostDeployTools } from './tools/postDeploy.js';
-import { registerValidationTools } from './tools/validation.js';
+import { registerStorageTools } from './services/storage.js';
+import { registerEdgeTools } from './services/edge.js';
+import { registerDomainTools } from './services/domain.js';
+import { registerSecurityTools } from './services/security.js';
+import { registerOrchestratorTools } from './services/orchestrator.js';
+import { registerPostDeployTools } from './services/postDeploy.js';
+import { registerValidationTools } from './services/validation.js';
 
 const server = new McpServer(
   {

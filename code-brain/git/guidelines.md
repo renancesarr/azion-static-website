@@ -31,6 +31,6 @@ A IA deve:
 - Criar PRs automaticamente, mas **aguardar aprovação humana** antes do merge.
 
 ## 5. Convenções de Código (`src/`)
-- Declarar **interfaces e tipos** em `src/models/` (um arquivo por interface) e importar nas implementações. Evitar interfaces inline dentro de `src/tools/`.
+- Declarar **interfaces e tipos** em `src/models/` (um arquivo por interface) e importar nas implementações. Evitar interfaces inline dentro de `src/services/`.
 - Declarar **schemas Zod** em `src/constants/` e importar nas tools correspondentes. Não deixar `const schema = z.object()` espalhado nos arquivos de lógica.
 - Reutilizar `ToolResponse` e `ToolExecutionContext` dos modelos compartilhados sempre que possível.
