@@ -22,7 +22,7 @@ export async function ensureCacheRule(
   try {
     const created = await createRuleViaApi(input, deps);
     return { record: created, created: true };
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await findRuleByOrderApi(input.edgeApplicationId, input.phase, input.order, deps);
       if (existing) {
