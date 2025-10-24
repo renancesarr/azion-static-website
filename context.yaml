@@ -1,10 +1,17 @@
 context:
-  last_update: '2025-10-22T05:40:42.734332Z'
-  active_use_case: UC-001
+  last_update: '2025-10-24T12:30:00Z'
+  active_use_case: UC-AZION-PROVISIONING
   current_todos:
-  - T001
-  insights_under_review: []
+  - T-045
+  - T-046
+  - T-047
+  - T-052
+  insights_under_review:
+  - IN-001
   reading_order:
-  - code-brain/business/use-cases/UC-001-login-user.md
+  - code-brain/business/mvp_scope.md
   - code-brain/to-do/tasks.yaml
   - code-brain/developer/UC-001-login-user/devlog.md
+  - code-brain/git/guidelines.md
+  - code-brain/requirements/backlog-links.yaml
+  - code-brain/memory/last-change.yaml
