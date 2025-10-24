@@ -11,5 +11,5 @@ export async function fetchFirewallByNameApi(
     method: 'GET',
     url: `${deps.apiBase}/v4/edge_firewall/firewalls?name=${encodeURIComponent(name)}`,
   });
-  return response.data.results?.find((fw) => fw.name === name);
+  return response.data.results?.find((fw: AzionFirewall) => fw.name === name);
 }
