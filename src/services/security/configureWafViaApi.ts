@@ -26,7 +26,7 @@ export async function configureWafViaApi(
 
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionWafPolicy);
     return await persistWaf(buildWafRecord(payload));
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await fetchWafByEdgeAppApi(input.edgeApplicationId, deps);
       if (existing) {
