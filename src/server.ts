@@ -8,6 +8,8 @@ import { registerSecurityServices } from './services/security/index.js';
 import { registerOrchestratorServices } from './services/orchestrator/index.js';
 import { registerPostDeployServices } from './services/postDeploy/index.js';
 import { registerValidationServices } from './services/validation/index.js';
+import { ConsoleLogger } from './core/logging/ConsoleLogger.js';
+import { Logger } from './core/logging/Logger.js';
 
 const server = new McpServer(
   {
@@ -21,6 +23,8 @@ const server = new McpServer(
     },
   },
 );
+
+const logger: Logger = new ConsoleLogger();
 
 registerStorageServices(server);
 registerEdgeServices(server);
@@ -49,14 +53,14 @@ server.registerTool(
 const transport = new StdioServerTransport();
 
 async function main(): Promise<void> {
-  console.info('[startup] inicializando Azion MCP...');
+  logger.info('[startup] inicializando Azion MCP...');
   process.on('uncaughtException', (error) => {
-    console.error('[fatal] uncaughtException', error);
+    logger.error(`[fatal] uncaughtException ${error instanceof Error ? error.stack ?? error.message : String(error)}`);
     process.exitCode = 1;
   });
 
   process.on('unhandledRejection', (reason) => {
-    console.error('[fatal] unhandledRejection', reason);
+    logger.error(`[fatal] unhandledRejection ${reason instanceof Error ? reason.stack ?? reason.message : String(reason)}`);
     process.exitCode = 1;
   });
 
@@ -64,7 +68,7 @@ async function main(): Promise<void> {
     requiredEnv('AZION_TOKEN');
   } catch (error) {
     if (error instanceof MissingEnvError) {
-      console.error('[startup] falha: variável obrigatória ausente.', error.message);
+      logger.error(`[startup] falha: variável obrigatória ausente. ${error.message}`);
       process.exit(1);
       return;
     }
@@ -78,7 +82,7 @@ async function main(): Promise<void> {
   });
 
   const shutdown = async (signal: string) => {
-    console.error(`[signal] ${signal} recebido; encerrando MCP...`);
+    logger.error(`[signal] ${signal} recebido; encerrando MCP...`);
     await transport.close();
     process.exit(0);
   };
@@ -86,7 +90,7 @@ async function main(): Promise<void> {
   process.once('SIGINT', () => void shutdown('SIGINT'));
   process.once('SIGTERM', () => void shutdown('SIGTERM'));
 
-  console.info('[startup] agente pronto para receber requisições.');
+  logger.info('[startup] agente pronto para receber requisições.');
 }
 
 void main();
