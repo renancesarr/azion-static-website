@@ -13,8 +13,8 @@ export async function findBucketByNameApi(
       method: 'GET',
       url: `${deps.apiBase}/v4/storage/buckets?name=${encodeURIComponent(name)}`,
     });
-    return response.data.results?.find((bucket) => bucket.name === name);
-  } catch (error) {
+    return response.data.results?.find((bucket: AzionBucketPayload) => bucket.name === name);
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 404) {
       return undefined;
     }
