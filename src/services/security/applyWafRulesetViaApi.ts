@@ -37,7 +37,7 @@ export async function applyWafRulesetViaApi(
 
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionFirewallRule);
     return await persistFirewallRule(buildFirewallRuleBinding(payload, input.firewallId, input.rulesetId));
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existingRules = await fetchFirewallRulesApi(input.firewallId, deps);
       const match = existingRules.find((rule) => JSON.stringify(rule.behaviors).includes(input.rulesetId));
