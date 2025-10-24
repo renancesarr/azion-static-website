@@ -1,17 +1,16 @@
 context:
-  last_update: '2025-10-24T12:30:00Z'
+  last_update: '2025-01-13T15:40:00Z'
   active_use_case: UC-AZION-PROVISIONING
   current_todos:
-  - T-045
-  - T-046
-  - T-047
-  - T-052
+  - REF-02-Storage-SOLID
+  - REF-03-Services-SOLID
+  - DOC-Context-Refresh
   insights_under_review:
   - IN-001
   reading_order:
+  - code-brain/decisions/AD-001-storage-services-structure.md
   - code-brain/business/mvp_scope.md
   - code-brain/to-do/tasks.yaml
   - code-brain/developer/UC-001-login-user/devlog.md
   - code-brain/git/guidelines.md
-  - code-brain/requirements/backlog-links.yaml
   - code-brain/memory/last-change.yaml

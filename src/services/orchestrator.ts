@@ -7,7 +7,7 @@ import {
   type CreateBucketInput,
   type UploadDirInput,
   processUploadDir,
-} from './storage.js';
+} from './storage/index.js';
 import {
   createEdgeApplicationInputSchema,
   ensureEdgeApplication,

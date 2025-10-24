@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/dist/esm/server/stdio.js';
 import { MissingEnvError, requiredEnv } from './utils/env.js';
-import { registerStorageTools } from './services/storage.js';
+import { registerStorageServices } from './services/storage/index.js';
 import { registerEdgeTools } from './services/edge.js';
 import { registerDomainServices } from './services/domain/index.js';
 import { registerSecurityTools } from './services/security.js';
@@ -22,7 +22,7 @@ const server = new McpServer(
   },
 );
 
-registerStorageTools(server);
+registerStorageServices(server);
 registerEdgeTools(server);
 registerDomainServices(server);
 registerSecurityTools(server);
