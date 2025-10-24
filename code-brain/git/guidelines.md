@@ -29,3 +29,8 @@ A IA deve:
 - Justificar cada commit em linguagem natural (`devlog.md`).
 - Nunca alterar histórico sem explicação no log.
 - Criar PRs automaticamente, mas **aguardar aprovação humana** antes do merge.
+
+## 5. Convenções de Código (`src/`)
+- Declarar **interfaces e tipos** em `src/models/` (um arquivo por interface) e importar nas implementações. Evitar interfaces inline dentro de `src/tools/`.
+- Declarar **schemas Zod** em `src/constants/` e importar nas tools correspondentes. Não deixar `const schema = z.object()` espalhado nos arquivos de lógica.
+- Reutilizar `ToolResponse` e `ToolExecutionContext` dos modelos compartilhados sempre que possível.

@@ -4,59 +4,28 @@ import { azionApiBase } from '../utils/env.js';
 import { http, HttpError } from '../utils/http.js';
 import { readStateFile, writeStateFile, statePath } from '../utils/state.js';
 import type { EnsureResult } from '../utils/ensure.js';
+import { ToolResponse } from '../models/toolResponse.js';
+import { ToolExecutionContext } from '../models/toolExecutionContext.js';
+import { EdgeApplicationRecord } from '../models/edgeApplicationRecord.js';
+import { EdgeConnectorRecord } from '../models/edgeConnectorRecord.js';
+import { EdgeRuleRecord } from '../models/edgeRuleRecord.js';
+import { EdgeAppState } from '../models/edgeAppState.js';
+import { EdgeConnectorState } from '../models/edgeConnectorState.js';
+import { EdgeRuleState } from '../models/edgeRuleState.js';
+import { AzionEdgeApplicationResponse } from '../models/azionEdgeApplicationResponse.js';
+import { AzionEdgeApplicationListResponse } from '../models/azionEdgeApplicationListResponse.js';
+import { AzionEdgeApplication } from '../models/azionEdgeApplication.js';
+import { AzionConnectorResponse } from '../models/azionConnectorResponse.js';
+import { AzionConnectorListResponse } from '../models/azionConnectorListResponse.js';
+import { AzionConnector } from '../models/azionConnector.js';
+import { AzionRuleResponse } from '../models/azionRuleResponse.js';
+import { AzionRuleListResponse } from '../models/azionRuleListResponse.js';
+import { AzionRule } from '../models/azionRule.js';
+import { createEdgeApplicationSchema, createConnectorSchema, createRuleSchema } from '../constants/edgeSchemas.js';
 
 const EDGE_APP_STATE_FILE = 'edge/edge_applications.json';
 const EDGE_CONNECTOR_STATE_FILE = 'edge/edge_connectors.json';
 const EDGE_RULE_STATE_FILE = 'edge/rules_engine.json';
-
-const createEdgeApplicationSchema = z.object({
-  name: z.string().min(3).max(128),
-  deliveryProtocol: z.enum(['http', 'https', 'http-and-https']).default('http-and-https'),
-  originProtocol: z.enum(['http', 'https']).default('https'),
-  caching: z
-    .object({
-      browserCacheSettings: z.enum(['override', 'honor']).default('override'),
-      edgeCacheSettings: z.enum(['override', 'honor']).default('override'),
-      browserCacheTTL: z.number().int().min(0).default(300),
-      edgeCacheTTL: z.number().int().min(0).default(300),
-    })
-    .default({}),
-  enableWaf: z.boolean().default(true),
-});
-
-const createConnectorSchema = z
-  .object({
-    name: z.string().min(3).max(128),
-    bucketId: z.string().optional(),
-    bucketName: z.string().optional(),
-    originPath: z.string().optional(),
-  })
-  .refine((value) => value.bucketId || value.bucketName, {
-    message: 'Informe bucketId ou bucketName.',
-    path: ['bucketId'],
-  });
-
-const createRuleSchema = z.object({
-  edgeApplicationId: z.string(),
-  phase: z.enum(['request', 'response']).default('request'),
-  behaviors: z.array(
-    z.object({
-      name: z.string(),
-      target: z.unknown().optional(),
-    }),
-  ),
-  criteria: z.array(
-    z.object({
-      name: z.string(),
-      arguments: z.array(z.string()).default([]),
-      variable: z.string().optional(),
-      operator: z.string().optional(),
-      isNegated: z.boolean().optional(),
-    }),
-  ),
-  description: z.string().optional(),
-  order: z.number().int().min(0).default(0),
-});
 
 export const createEdgeApplicationInputSchema = createEdgeApplicationSchema;
 export const createConnectorInputSchema = createConnectorSchema;
@@ -65,121 +34,6 @@ export const createRuleInputSchema = createRuleSchema;
 export type CreateEdgeAppInput = z.infer<typeof createEdgeApplicationSchema>;
 export type CreateConnectorInput = z.infer<typeof createConnectorSchema>;
 export type CreateRuleInput = z.infer<typeof createRuleSchema>;
-
-interface ToolResponse {
-  content: Array<{ type: 'text'; text: string }>;
-}
-
-interface ToolExecutionContext {
-  sessionId?: string;
-}
-
-export interface EdgeApplicationRecord {
-  id: string;
-  name: string;
-  deliveryProtocol: string;
-  originProtocol: string;
-  caching: Record<string, unknown>;
-  enableWaf: boolean;
-  createdAt: string;
-  raw: unknown;
-}
-
-export interface EdgeConnectorRecord {
-  id: string;
-  name: string;
-  bucketId: string;
-  bucketName?: string;
-  originPath?: string;
-  createdAt: string;
-  raw: unknown;
-}
-
-export interface EdgeRuleRecord {
-  id: string;
-  edgeApplicationId: string;
-  phase: string;
-  order: number;
-  createdAt: string;
-  raw: unknown;
-}
-
-interface EdgeAppState {
-  applications: Record<string, EdgeApplicationRecord>;
-}
-
-interface EdgeConnectorState {
-  connectors: Record<string, EdgeConnectorRecord>;
-}
-
-interface EdgeRuleState {
-  rules: Record<string, EdgeRuleRecord>;
-}
-
-interface AzionEdgeApplicationResponse {
-  results?: AzionEdgeApplication;
-  data?: AzionEdgeApplication;
-}
-
-interface AzionEdgeApplicationListResponse {
-  results?: AzionEdgeApplication[];
-}
-
-interface AzionEdgeApplication {
-  id: string;
-  name: string;
-  delivery_protocol: string;
-  origin_protocol_policy: string;
-  caching: Record<string, unknown>;
-  active: boolean;
-  waf: {
-    active: boolean;
-  };
-  created_at?: string;
-  [key: string]: unknown;
-}
-
-interface AzionConnectorResponse {
-  results?: AzionConnector;
-  data?: AzionConnector;
-}
-
-interface AzionConnectorListResponse {
-  results?: AzionConnector[];
-}
-
-interface AzionConnector {
-  id: string;
-  name: string;
-  origin_type: string;
-  origin_id: string;
-  bucket: {
-    id: string;
-    name?: string;
-  };
-  origin_path?: string;
-  created_at?: string;
-  [key: string]: unknown;
-}
-
-interface AzionRuleResponse {
-  results?: AzionRule;
-  data?: AzionRule;
-}
-
-interface AzionRuleListResponse {
-  results?: AzionRule[];
-}
-
-interface AzionRule {
-  id: string;
-  phase: string;
-  order: number;
-  behaviors: unknown[];
-  criteria: unknown[];
-  created_at?: string;
-  [key: string]: unknown;
-}
 
 function normalizeAppState(state?: EdgeAppState): EdgeAppState {
   if (!state) {

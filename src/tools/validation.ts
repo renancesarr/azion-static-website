@@ -4,7 +4,21 @@ import { performance } from 'node:perf_hooks';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
 import { readStateFile, statePath } from '../utils/state.js';
+import { ToolResponse } from '../models/toolResponse.js';
+import { ToolExecutionContext } from '../models/toolExecutionContext.js';
+import { StorageBucketsState } from '../models/storageBucketsState.js';
+import { UploadIndexFile } from '../models/uploadIndexFile.js';
+import { ValidationCheckResult } from '../models/validationCheckResult.js';
+import { StackValidationReport } from '../models/stackValidationReport.js';
 import { lookupMimeType } from '../utils/mime.js';
+import {
+  stackValidateSchema,
+  mimetypeValidationSchema,
+  idempotencyValidationSchema,
+  uploadLogInspectSchema,
+  bucketConflictSchema,
+  domainConflictSchema,
+} from '../constants/validationSchemas.js';
 
 const STACK_STATE = {
   bucket: 'storage/storage_buckets.json',
@@ -17,83 +31,13 @@ const STACK_STATE = {
   firewallRule: 'security/firewall_rules.json',
 };
 
-const validateSchema = z.object({
-  project: z.string().optional(),
-  domain: z.string().optional(),
-  protocol: z.enum(['https', 'http']).default('https'),
-  path: z.string().default('/'),
-  timeoutMs: z.number().int().min(500).max(30000).default(5000),
-});
-
-type ValidateInput = z.infer<typeof validateSchema>;
-
-interface ToolResponse {
-  content: Array<{ type: 'text'; text: string }>;
-}
-
-interface ToolExecutionContext {
-  sessionId?: string;
-}
-
-interface CheckResult {
-  name: string;
-  ok: boolean;
-  detail: string;
-}
-
-interface UploadIndexFile {
-  files: Record<string, {
-    hash: string;
-    size: number;
-    objectPath: string;
-    updatedAt: string;
-    contentType?: string;
-    contentEncoding?: string;
-    sourcePath?: string;
-  }>;
-}
-
-interface StackValidationReport {
-  project?: string;
-  domain?: string;
-  protocol: string;
-  path: string;
-  startedAt: string;
-  finishedAt: string;
-  checks: CheckResult[];
-  http?: {
-    url: string;
-    status?: number;
-    ok: boolean;
-    durationMs: number;
-    error?: string;
-  };
-  gzipAssets?: string[];
-}
-
-const mimetypeValidationSchema = z.object({
-  extensions: z.array(z.string().startsWith('.')).default(['.html', '.css', '.js', '.svg', '.png', '.webp', '.json', '.map']),
-});
-
-const idempotencyValidationSchema = z.object({});
-
-const uploadLogInspectSchema = z.object({
-  limit: z.number().int().min(1).max(50).default(5),
-});
-
-const bucketConflictSchema = z.object({
-  bucketName: z.string().min(1),
-});
-
-const domainConflictSchema = z.object({
-  domainName: z.string().min(1),
-});
+type ValidateInput = z.infer<typeof stackValidateSchema>;
 
 async function readState<T>(relativePath: string): Promise<T | undefined> {
   return await readStateFile<T>(relativePath);
 }
 
-function summarizeState(checkName: string, exists: boolean, detail: string): CheckResult {
+function summarizeState(checkName: string, exists: boolean, detail: string): ValidationCheckResult {
   return {
     name: checkName,
     ok: exists,
@@ -111,7 +55,7 @@ function listIds<T extends { id: string }>(collection: Record<string, T> | undef
 
 async function validateStack(input: ValidateInput): Promise<StackValidationReport> {
   const startedAt = new Date();
-  const checks: CheckResult[] = [];
+  const checks: ValidationCheckResult[] = [];
 
   const bucketState = await readState<{ buckets: Record<string, { id: string }> }>(STACK_STATE.bucket);
   checks.push(
@@ -266,14 +210,14 @@ async function loadFirstUploadIndex(): Promise<{ bucketId: string; file: UploadI
   return { bucketId: ids[0], file: index, path: relativePath };
 }
 
-async function validateMimetypes(extensions: string[]): Promise<{ matches: number; mismatches: CheckResult[] }> {
+async function validateMimetypes(extensions: string[]): Promise<{ matches: number; mismatches: ValidationCheckResult[] }> {
   const uploadIndex = await loadFirstUploadIndex();
   if (!uploadIndex) {
     return { matches: 0, mismatches: [summarizeState('Upload index', false, 'Nenhum índice encontrado em .mcp-state/storage/uploads/.')] };
   }
 
   const expectedSet = new Set(extensions.map((ext) => ext.toLowerCase()));
-  const mismatches: CheckResult[] = [];
+  const mismatches: ValidationCheckResult[] = [];
   let matches = 0;
   for (const entry of Object.values(uploadIndex.file.files ?? {})) {
     const ext = extname(entry.objectPath).toLowerCase();
@@ -303,7 +247,7 @@ async function validateMimetypes(extensions: string[]): Promise<{ matches: numbe
   return { matches, mismatches };
 }
 
-async function validateIdempotencyFromIndex(): Promise<CheckResult[]> {
+async function validateIdempotencyFromIndex(): Promise<ValidationCheckResult[]> {
   const uploadIndex = await loadFirstUploadIndex();
   if (!uploadIndex) {
     return [summarizeState('Upload index', false, 'Nenhum índice encontrado para avaliar idempotência.')];
@@ -318,7 +262,7 @@ async function validateIdempotencyFromIndex(): Promise<CheckResult[]> {
     }
   }
 
-  const checks: CheckResult[] = [
+  const checks: ValidationCheckResult[] = [
     summarizeState('Objetos únicos', duplicateObjects.length === 0, duplicateObjects.length === 0 ? 'Sem duplicatas.' : `Duplicados: ${duplicateObjects.join(', ')}`),
   ];
 
@@ -334,7 +278,7 @@ async function validateIdempotencyFromIndex(): Promise<CheckResult[]> {
   return checks;
 }
 
-async function inspectUploadLogs(limit: number): Promise<CheckResult[]> {
+async function inspectUploadLogs(limit: number): Promise<ValidationCheckResult[]> {
   const logDir = '.mcp-state/storage/uploads/logs';
   try {
     const entries = await fs.readdir(logDir);
@@ -346,7 +290,7 @@ async function inspectUploadLogs(limit: number): Promise<CheckResult[]> {
     if (latest.length === 0) {
       return [summarizeState('Upload logs', false, 'Nenhum arquivo em storage/uploads/logs/.')];
     }
-    const results: CheckResult[] = [];
+    const results: ValidationCheckResult[] = [];
     for (const name of latest) {
       const content = JSON.parse(await fs.readFile(`${logDir}/${name}`, 'utf-8'));
       const totals = content?.totals ?? {};
@@ -363,7 +307,7 @@ async function inspectUploadLogs(limit: number): Promise<CheckResult[]> {
   }
 }
 
-async function checkBucketConflict(input: z.infer<typeof bucketConflictSchema>): Promise<CheckResult> {
+async function checkBucketConflict(input: z.infer<typeof bucketConflictSchema>): Promise<ValidationCheckResult> {
   const state = await readState<{ buckets: Record<string, { id: string }> }>(STACK_STATE.bucket);
   const match = state?.buckets?.[input.bucketName];
   return summarizeState(
@@ -373,7 +317,7 @@ async function checkBucketConflict(input: z.infer<typeof bucketConflictSchema>):
   );
 }
 
-async function checkDomainConflict(input: z.infer<typeof domainConflictSchema>): Promise<CheckResult> {
+async function checkDomainConflict(input: z.infer<typeof domainConflictSchema>): Promise<ValidationCheckResult> {
   const state = await readState<{ domains: Record<string, { id: string }> }>(STACK_STATE.domain);
   const match = state?.domains?.[input.domainName];
   return summarizeState(
@@ -389,10 +333,10 @@ export function registerValidationTools(server: McpServer): void {
     {
       title: 'Validar provisionamento completo',
       description: 'Confere presença dos artefatos em .mcp-state/ e testa acesso HTTP ao domínio.',
-      inputSchema: validateSchema,
+      inputSchema: stackValidateSchema,
     },
     async (args: unknown, extra: ToolExecutionContext = {}): Promise<ToolResponse> => {
-      const parsed = validateSchema.parse(args ?? {});
+      const parsed = stackValidateSchema.parse(args ?? {});
       const report = await validateStack(parsed);
 
       const okChecks = report.checks.filter((c) => c.ok).length;

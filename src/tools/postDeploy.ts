@@ -2,80 +2,24 @@ import { performance } from 'node:perf_hooks';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
 import { writeStateFile, statePath } from '../utils/state.js';
+import { ToolResponse } from '../models/toolResponse.js';
+import { ToolExecutionContext } from '../models/toolExecutionContext.js';
+import { PostDeployCheckResult } from '../models/postDeployCheckResult.js';
+import { PostDeployPathEntry } from '../models/postDeployPathEntry.js';
+import { PostDeployReport } from '../models/postDeployReport.js';
+import { pathCheckSchema, postDeployCheckSchema } from '../constants/postDeploySchemas.js';
 
 const POST_DEPLOY_DIR = 'post-deploy/checks';
 
-const pathCheckSchema = z.object({
-  path: z.string().startsWith('/'),
-  expectedStatus: z.number().int().min(100).max(599).optional(),
-  headers: z.record(z.string(), z.string()).optional(),
-  bodyIncludes: z.array(z.string()).optional(),
-});
-
-export const postDeployCheckSchema = z.object({
-  domain: z.string().min(3).describe('Domínio público já apontado para a Azion.'),
-  protocol: z.enum(['https', 'http']).default('https'),
-  paths: z.array(z.union([z.string().startsWith('/'), pathCheckSchema])).default(['/']),
-  expectedStatus: z.number().int().min(100).max(599).default(200),
-  timeoutMs: z.number().int().min(500).max(30000).default(5000),
-  headers: z.record(z.string(), z.string()).default({}),
-  assertions: z
-    .object({
-      headers: z.record(z.string(), z.string()).optional(),
-      bodyIncludes: z.array(z.string()).optional(),
-    })
-    .optional(),
-});
-
 export type PostDeployCheckInput = z.infer<typeof postDeployCheckSchema>;
-
-interface ToolResponse {
-  content: Array<{ type: 'text'; text: string }>;
-}
-
-interface ToolExecutionContext {
-  sessionId?: string;
-}
-
-interface CheckResult {
-  path: string;
-  status?: number;
-  ok: boolean;
-  durationMs: number;
-  error?: string;
-  issues?: string[];
-}
-
-interface PathEntry {
-  path: string;
-  expectedStatus: number;
-  headers: Record<string, string>;
-  bodyIncludes: string[];
-}
-
-interface CheckReport {
-  domain: string;
-  protocol: string;
-  expectedStatus: number;
-  startedAt: string;
-  finishedAt: string;
-  timeoutMs: number;
-  results: CheckResult[];
-  stats: {
-    avgMs: number;
-    minMs: number;
-    maxMs: number;
-    successRate: number;
-  };
-}
 
 export async function executePostDeployCheck(
   input: PostDeployCheckInput,
   server: McpServer,
   context: ToolExecutionContext,
-): Promise<CheckReport> {
+): Promise<PostDeployReport> {
   const { domain, protocol, expectedStatus, timeoutMs, headers, assertions } = input;
-  const pathEntries: PathEntry[] = (input.paths ?? ['/']).map((entry) => {
+  const pathEntries: PostDeployPathEntry[] = (input.paths ?? ['/']).map((entry) => {
     if (typeof entry === 'string') {
       return {
         path: entry,
@@ -93,7 +37,7 @@ export async function executePostDeployCheck(
   });
 
   const startedAt = new Date();
-  const results: CheckResult[] = [];
+  const results: PostDeployCheckResult[] = [];
 
   for (const entry of pathEntries) {
     const url = `${protocol}://${domain}${entry.path}`;
@@ -185,7 +129,7 @@ export async function executePostDeployCheck(
   const maxMs = durations.length ? Math.max(...durations) : 0;
   const successRate = results.length ? results.filter((r) => r.ok).length / results.length : 0;
 
-  return {
+  const report: PostDeployReport = {
     domain,
     protocol,
     expectedStatus,
@@ -200,9 +144,11 @@ export async function executePostDeployCheck(
       successRate,
     },
   };
+
+  return report;
 }
 
-export async function persistPostDeployReport(report: CheckReport): Promise<string> {
+export async function persistPostDeployReport(report: PostDeployReport): Promise<string> {
   const timestamp = report.finishedAt.replace(/[:.]/g, '-');
   const relativePath = `${POST_DEPLOY_DIR}/check-${report.domain}-${timestamp}.json`;
   await writeStateFile(relativePath, report);

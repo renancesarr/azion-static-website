@@ -7,7 +7,6 @@ import {
   type CreateBucketInput,
   type UploadDirInput,
   processUploadDir,
-  type UploadExecution,
 } from './storage.js';
 import {
   createEdgeApplicationInputSchema,
@@ -28,182 +27,31 @@ import {
   type CreateFirewallInput,
   type CreateWafRulesetInput,
   type ApplyWafRulesetInput,
+  type ConfigureWafInput,
 } from './security.js';
 import { writeStateFile, statePath } from '../utils/state.js';
 import {
-  postDeployCheckSchema,
   executePostDeployCheck,
   persistPostDeployReport,
   type PostDeployCheckInput,
 } from './postDeploy.js';
+import {
+  connectorOrchestratorSchema,
+  cacheRuleOrchestratorSchema,
+  uploadConfigSchema,
+  orchestrateSchema,
+} from '../constants/orchestratorSchemas.js';
+import { OrchestrationReport } from '../models/orchestrationReport.js';
+import { UploadExecution } from '../models/uploadExecution.js';
+import { ToolResponse } from '../models/toolResponse.js';
+import { ToolExecutionContext } from '../models/toolExecutionContext.js';
 
 const ORCHESTRATION_STATE_DIR = 'orchestration/runs';
-
-const connectorOrchestratorSchema = z.object({
-  name: z.string().min(3),
-  originPath: z.string().optional(),
-  bucketId: z.string().optional(),
-  bucketName: z.string().optional(),
-});
-
-const cacheRuleOrchestratorSchema = z.object({
-  phase: z.enum(['request', 'response']).default('request'),
-  behaviors: z
-    .array(
-      z.object({
-        name: z.string(),
-        target: z.unknown().optional(),
-      }),
-    )
-    .default([]),
-  criteria: z
-    .array(
-      z.object({
-        name: z.string(),
-        arguments: z.array(z.string()).default([]),
-        variable: z.string().optional(),
-        operator: z.string().optional(),
-        isNegated: z.boolean().optional(),
-      }),
-    )
-    .default([]),
-  description: z.string().optional(),
-  order: z.number().int().optional(),
-});
-
-const uploadConfigSchema = z.object({
-  localDir: z.string().min(1),
-  prefix: z.string().optional(),
-  concurrency: z.number().int().min(1).max(32).optional(),
-  dryRun: z.boolean().optional(),
-  stripGzipExtension: z.boolean().optional(),
-});
-
-const orchestrateSchema = z.object({
-  project: z.string().min(1),
-  bucket: createBucketInputSchema,
-  upload: uploadConfigSchema.optional(),
-  edgeApplication: createEdgeApplicationInputSchema,
-  connector: connectorOrchestratorSchema,
-  cacheRules: z.array(cacheRuleOrchestratorSchema).default([]),
-  domain: z.object({
-    name: z.string().min(3),
-    isActive: z.boolean().default(true),
-    cname: z.string().optional(),
-  }),
-  waf: z
-    .object({
-      enable: z.boolean().default(true),
-      mode: z.enum(['learning', 'blocking']).default('blocking'),
-      wafId: z.string().optional(),
-    })
-    .optional(),
-  firewall: z
-    .object({
-      name: z.string().min(3).max(128).optional(),
-      domainIds: z.array(z.string()).optional(),
-      domainNames: z.array(z.string()).optional(),
-      isActive: z.boolean().optional(),
-    })
-    .optional(),
-  wafRuleset: z
-    .object({
-      name: z.string().min(3).max(128).optional(),
-      mode: z.enum(['learning', 'blocking']).optional(),
-      description: z.string().optional(),
-    })
-    .optional(),
-  firewallRule: z
-    .object({
-      order: z.number().int().min(0).default(0),
-    })
-    .optional(),
-  postDeploy: postDeployCheckSchema.optional(),
-  dryRun: z.boolean().default(false),
-});
 
 type OrchestrateInput = z.infer<typeof orchestrateSchema>;
 type ConnectorConfig = z.infer<typeof connectorOrchestratorSchema>;
 type CacheRuleConfig = z.infer<typeof cacheRuleOrchestratorSchema>;
 type UploadConfig = z.infer<typeof uploadConfigSchema>;
-
-interface ToolResponse {
-  content: Array<{ type: 'text'; text: string }>;
-}
-
-interface ToolExecutionContext {
-  sessionId?: string;
-}
-
-interface OrchestrationReport {
-  project: string;
-  startedAt: string;
-  finishedAt: string;
-  bucket: {
-    name: string;
-    id: string;
-    created: boolean;
-  };
-  upload?: {
-    planned: number;
-    executed: number;
-    skipped: number;
-    logFile: string;
-  };
-  edgeApplication: {
-    id: string;
-    name: string;
-    created: boolean;
-  };
-  connector: {
-    id: string;
-    name: string;
-    created: boolean;
-  };
-  cacheRules: Array<{
-    id: string;
-    phase: string;
-    order: number;
-    created: boolean;
-  }>;
-  domain: {
-    id: string;
-    name: string;
-    created: boolean;
-  };
-  waf: {
-    id: string;
-    mode: string;
-    enabled: boolean;
-    created: boolean;
-  };
-  firewall: {
-    id: string;
-    name: string;
-    created: boolean;
-  };
-  wafRuleset: {
-    id: string;
-    name: string;
-    mode: string;
-    created: boolean;
-  };
-  firewallRule: {
-    id: string;
-    order: number;
-    created: boolean;
-  };
-  postDeploy?: {
-    success: number;
-    failures: number;
-    successRate: number;
-    avgMs: number;
-    minMs: number;
-    maxMs: number;
-    reportFile: string;
-  };
-  notes: string[];
-}
 
 function buildDryRunPlan(input: OrchestrateInput): string[] {
   const lines: string[] = [];
@@ -290,7 +138,7 @@ export function registerOrchestratorTools(server: McpServer): void {
       inputSchema: orchestrateSchema,
     },
     async (args: unknown, extra: ToolExecutionContext = {}): Promise<ToolResponse> => {
-      const parsed = orchestrateSchema.parse(args ?? {});
+      const parsed = orchestrateSchema.parse(args ?? {}) as OrchestrateInput;
       const sessionId = extra.sessionId;
 
       if (parsed.dryRun) {
@@ -325,15 +173,16 @@ export function registerOrchestratorTools(server: McpServer): void {
       await log('info', bucketResult.created ? `Bucket criado: ${summarizeRecord(bucketResult.record)}` : `Bucket reutilizado: ${summarizeRecord(bucketResult.record)}`);
 
       let uploadInfo: OrchestrationReport['upload'] | undefined;
-      if (parsed.upload) {
+      const uploadConfig = parsed.upload;
+      if (uploadConfig) {
         const uploadInput = {
           bucketId: bucketResult.record.id,
           bucketName: bucketResult.record.name,
-          localDir: parsed.upload.localDir,
-          prefix: parsed.upload.prefix,
-          concurrency: parsed.upload.concurrency,
-          dryRun: parsed.upload.dryRun ?? false,
-          stripGzipExtension: parsed.upload.stripGzipExtension ?? false,
+          localDir: uploadConfig.localDir,
+          prefix: uploadConfig.prefix,
+          concurrency: uploadConfig.concurrency,
+          dryRun: uploadConfig.dryRun ?? false,
+          stripGzipExtension: uploadConfig.stripGzipExtension ?? false,
         } satisfies UploadDirInput;
 
         const uploadExecution: UploadExecution = await processUploadDir(server, uploadInput, extra);
@@ -368,8 +217,9 @@ export function registerOrchestratorTools(server: McpServer): void {
           : `Connector reutilizado: ${summarizeRecord(connectorResult.record)}`,
       );
 
-      const ruleInputs = buildRuleInputs(parsed.cacheRules, edgeResult.record.id);
-      if (parsed.cacheRules.length === 0) {
+      const ruleConfigs = parsed.cacheRules as CacheRuleConfig[];
+      const ruleInputs = buildRuleInputs(ruleConfigs, edgeResult.record.id);
+      if (ruleConfigs.length === 0) {
         notes.push('Regra padrão de cache aplicada (behavior=cache, fase=request).');
       }
       const ruleResults = await Promise.all(ruleInputs.map(async (rule) => ensureCacheRule(rule)));
@@ -379,7 +229,11 @@ export function registerOrchestratorTools(server: McpServer): void {
         notes.push('Nenhuma regra de cache configurada via orquestração.');
       }
 
-      const domainInput: CreateDomainInput = { ...parsed.domain, edgeApplicationId: edgeResult.record.id };
+      const domainInput: CreateDomainInput = {
+        ...parsed.domain,
+        edgeApplicationId: edgeResult.record.id,
+        isActive: parsed.domain?.isActive ?? true,
+      };
       const domainResult = await ensureDomain(domainInput);
       await log(
         'info',
@@ -427,9 +281,12 @@ export function registerOrchestratorTools(server: McpServer): void {
           : `Ruleset ${firewallRuleInput.rulesetId} já estava aplicado ao firewall ${firewallRuleInput.firewallId}.`,
       );
 
-      const wafInput = {
+      const wafConfig = parsed.waf ?? {};
+      const wafInput: ConfigureWafInput = {
         edgeApplicationId: edgeResult.record.id,
-        ...(parsed.waf ?? { enable: true, mode: 'blocking' }),
+        enable: wafConfig.enable ?? true,
+        mode: wafConfig.mode ?? 'blocking',
+        wafId: wafConfig.wafId,
       };
       const wafResult = await ensureWaf(wafInput);
       await log(
@@ -441,7 +298,11 @@ export function registerOrchestratorTools(server: McpServer): void {
 
       let postDeployInfo: OrchestrationReport['postDeploy'] | undefined;
       if (parsed.postDeploy) {
-        const postDeployInput: PostDeployCheckInput = { ...parsed.postDeploy };
+        const postDeployConfig = parsed.postDeploy;
+        const postDeployInput: PostDeployCheckInput = {
+          ...postDeployConfig,
+          domain: postDeployConfig.domain ?? domainResult.record.name,
+        };
 
         const postDeployReport = await executePostDeployCheck(postDeployInput, server, extra);
         const postDeployPath = await persistPostDeployReport(postDeployReport);

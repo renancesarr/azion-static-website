@@ -4,71 +4,22 @@ import { azionApiBase } from '../utils/env.js';
 import { http, HttpError } from '../utils/http.js';
 import { readStateFile, writeStateFile, statePath } from '../utils/state.js';
 import type { EnsureResult } from '../utils/ensure.js';
+import { ToolResponse } from '../models/toolResponse.js';
+import { ToolExecutionContext } from '../models/toolExecutionContext.js';
+import { DomainRecord } from '../models/domainRecord.js';
+import { DomainState } from '../models/domainState.js';
+import { AzionDomain } from '../models/azionDomain.js';
+import { AzionDomainResponse } from '../models/azionDomainResponse.js';
+import { AzionDomainListResponse } from '../models/azionDomainListResponse.js';
+import { createDomainSchema, dnsInstructionsSchema } from '../constants/domainSchemas.js';
 
 const DOMAIN_STATE_FILE = 'edge/domains.json';
-
-const createDomainSchema = z.object({
-  name: z.string().min(3).max(255).regex(/^[a-z0-9.-]+$/i),
-  edgeApplicationId: z.string().min(1),
-  isActive: z.boolean().default(true),
-  cname: z.string().optional(),
-});
-
-const dnsInstructionsSchema = z.object({
-  domainName: z.string().min(3).max(255),
-  edgeApplicationId: z.string().min(1).optional(),
-});
 
 export const createDomainInputSchema = createDomainSchema;
 export const dnsInstructionsInputSchema = dnsInstructionsSchema;
 
 export type CreateDomainInput = z.infer<typeof createDomainSchema>;
 type DnsInstructionsInput = z.infer<typeof dnsInstructionsSchema>;
-
-interface ToolResponse {
-  content: Array<{ type: 'text'; text: string }>;
-}
-
-interface ToolExecutionContext {
-  sessionId?: string;
-}
-
-export interface DomainRecord {
-  id: string;
-  name: string;
-  edgeApplicationId: string;
-  isActive: boolean;
-  cname: string;
-  createdAt: string;
-  raw: unknown;
-}
-
-interface DomainState {
-  domains: Record<string, DomainRecord>;
-}
-
-interface AzionDomainResponse {
-  results?: AzionDomain;
-  data?: AzionDomain;
-}
-
-interface AzionDomainListResponse {
-  results?: AzionDomain[];
-}
-
-interface AzionDomain {
-  id: string;
-  name: string;
-  cname: string;
-  edge_application_id: string;
-  cnames: {
-    dns_name: string;
-    ttl: number;
-  }[];
-  active: boolean;
-  created_at?: string;
-  [key: string]: unknown;
-}
 
 function normalizeDomainState(state?: DomainState): DomainState {
   if (!state) {

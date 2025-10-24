@@ -4,46 +4,40 @@ import { azionApiBase } from '../utils/env.js';
 import { http, HttpError } from '../utils/http.js';
 import { readStateFile, writeStateFile, statePath } from '../utils/state.js';
 import type { EnsureResult } from '../utils/ensure.js';
+import { ToolResponse } from '../models/toolResponse.js';
+import { ToolExecutionContext } from '../models/toolExecutionContext.js';
+import { WafPolicyRecord } from '../models/wafPolicyRecord.js';
+import { WafState } from '../models/wafState.js';
+import { FirewallRecord } from '../models/firewallRecord.js';
+import { FirewallState } from '../models/firewallState.js';
+import { WafRulesetRecord } from '../models/wafRulesetRecord.js';
+import { WafRulesetState } from '../models/wafRulesetState.js';
+import { FirewallRuleBinding } from '../models/firewallRuleBinding.js';
+import { FirewallRuleState } from '../models/firewallRuleState.js';
+import { DomainState } from '../models/domainState.js';
+import { AzionWafResponse } from '../models/azionWafResponse.js';
+import { AzionWafPolicy } from '../models/azionWafPolicy.js';
+import { AzionFirewallResponse } from '../models/azionFirewallResponse.js';
+import { AzionFirewallListResponse } from '../models/azionFirewallListResponse.js';
+import { AzionFirewall } from '../models/azionFirewall.js';
+import { AzionWafRulesetResponse } from '../models/azionWafRulesetResponse.js';
+import { AzionWafRulesetListResponse } from '../models/azionWafRulesetListResponse.js';
+import { AzionWafRuleset } from '../models/azionWafRuleset.js';
+import { AzionFirewallRuleResponse } from '../models/azionFirewallRuleResponse.js';
+import { AzionFirewallRuleListResponse } from '../models/azionFirewallRuleListResponse.js';
+import { AzionFirewallRule } from '../models/azionFirewallRule.js';
+import {
+  configureWafSchema,
+  wafStatusSchema,
+  createFirewallSchema,
+  createWafRulesetSchema,
+  applyWafRulesetSchema,
+} from '../constants/securitySchemas.js';
 
 const WAF_STATE_FILE = 'security/waf_policies.json';
 const FIREWALL_STATE_FILE = 'security/firewalls.json';
 const WAF_RULESET_STATE_FILE = 'security/waf_rulesets.json';
 const FIREWALL_RULE_STATE_FILE = 'security/firewall_rules.json';
-
-const configureWafSchema = z.object({
-  edgeApplicationId: z.string().min(1),
-  wafId: z.string().optional(),
-  enable: z.boolean().default(true),
-  mode: z.enum(['learning', 'blocking']).default('blocking'),
-});
-
-const wafStatusSchema = z.object({
-  edgeApplicationId: z.string().min(1),
-});
-
-const createFirewallSchema = z
-  .object({
-    name: z.string().min(3).max(128),
-    domainIds: z.array(z.string()).optional(),
-    domainNames: z.array(z.string()).optional(),
-    isActive: z.boolean().default(true),
-  })
-  .refine((value) => (value.domainIds?.length ?? 0) > 0 || (value.domainNames?.length ?? 0) > 0, {
-    message: 'Informe ao menos um domainIds ou domainNames.',
-    path: ['domainIds'],
-  });
-
-const createWafRulesetSchema = z.object({
-  name: z.string().min(3).max(128),
-  mode: z.enum(['learning', 'blocking']).default('blocking'),
-  description: z.string().optional(),
-});
-
-const applyWafRulesetSchema = z.object({
-  firewallId: z.string().min(1),
-  rulesetId: z.string().min(1),
-  order: z.number().int().min(0).default(0),
-});
 
 export const configureWafInputSchema = configureWafSchema;
 
@@ -52,135 +46,6 @@ type WafStatusInput = z.infer<typeof wafStatusSchema>;
 export type CreateFirewallInput = z.infer<typeof createFirewallSchema>;
 export type CreateWafRulesetInput = z.infer<typeof createWafRulesetSchema>;
 export type ApplyWafRulesetInput = z.infer<typeof applyWafRulesetSchema>;
-
-interface ToolResponse {
-  content: Array<{ type: 'text'; text: string }>;
-}
-
-interface ToolExecutionContext {
-  sessionId?: string;
-}
-
-export interface WafPolicyRecord {
-  edgeApplicationId: string;
-  wafId: string;
-  mode: string;
-  enabled: boolean;
-  updatedAt: string;
-  raw: unknown;
-}
-
-interface WafState {
-  policies: Record<string, WafPolicyRecord>;
-}
-
-interface FirewallRecord {
-  id: string;
-  name: string;
-  domainIds: string[];
-  isActive: boolean;
-  createdAt: string;
-  raw: unknown;
-}
-
-interface FirewallState {
-  firewalls: Record<string, FirewallRecord>;
-}
-
-interface WafRulesetRecord {
-  id: string;
-  name: string;
-  mode: string;
-  createdAt: string;
-  raw: unknown;
-}
-
-interface WafRulesetState {
-  rulesets: Record<string, WafRulesetRecord>;
-}
-
-interface FirewallRuleBinding {
-  id: string;
-  firewallId: string;
-  rulesetId: string;
-  order: number;
-  createdAt: string;
-  raw: unknown;
-}
-
-interface FirewallRuleState {
-  bindings: Record<string, FirewallRuleBinding>;
-}
-
-interface DomainState {
-  domains: Record<string, { id: string }>;
-}
-
-interface AzionWafResponse {
-  results?: AzionWafPolicy;
-  data?: AzionWafPolicy;
-}
-
-interface AzionWafPolicy {
-  id: string;
-  edge_application_id: string;
-  mode: string;
-  enabled: boolean;
-  updated_at?: string;
-  [key: string]: unknown;
-}
-
-interface AzionFirewallResponse {
-  results?: AzionFirewall;
-  data?: AzionFirewall;
-}
-
-interface AzionFirewallListResponse {
-  results?: AzionFirewall[];
-}
-
-interface AzionFirewall {
-  id: string;
-  name: string;
-  domains?: string[];
-  is_active?: boolean;
-  created_at?: string;
-  [key: string]: unknown;
-}
-
-interface AzionWafRulesetResponse {
-  results?: AzionWafRuleset;
-  data?: AzionWafRuleset;
-}
-
-interface AzionWafRulesetListResponse {
-  results?: AzionWafRuleset[];
-}
-
-interface AzionWafRuleset {
-  id: string;
-  name: string;
-  mode: string;
-  created_at?: string;
-  [key: string]: unknown;
-}
-
-interface AzionFirewallRuleResponse {
-  results?: AzionFirewallRule;
-  data?: AzionFirewallRule;
-}
-
-interface AzionFirewallRuleListResponse {
-  results?: AzionFirewallRule[];
-}
-
-interface AzionFirewallRule {
-  id: string;
-  order: number;
-  behaviors: unknown[];
-  created_at?: string;
-  [key: string]: unknown;
-}
 
 function normalizeWafState(state?: WafState): WafState {
   if (!state) {

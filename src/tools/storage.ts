@@ -10,162 +10,34 @@ import { walkDirectory } from '../utils/fs.js';
 import { hashFileSHA256 } from '../utils/hash.js';
 import { runWithPool } from '../utils/concurrency.js';
 import { inferEncoding, lookupMimeType } from '../utils/mime.js';
+import { ToolResponse } from '../models/toolResponse.js';
+import { ToolExecutionContext } from '../models/toolExecutionContext.js';
+import { StorageBucketRecord } from '../models/storageBucketRecord.js';
+import { StorageBucketsState } from '../models/storageBucketsState.js';
+import { AzionBucketPayload } from '../models/azionBucketPayload.js';
+import { AzionCreateBucketResponse } from '../models/azionCreateBucketResponse.js';
+import { AzionListBucketsResponse } from '../models/azionListBucketsResponse.js';
+import { AzionBucketResponse } from '../models/azionBucketResponse.js';
+import { UploadIndexEntry } from '../models/uploadIndexEntry.js';
+import { UploadIndexFile } from '../models/uploadIndexFile.js';
+import { UploadCandidate } from '../models/uploadCandidate.js';
+import { UploadReportEntry } from '../models/uploadReportEntry.js';
+import { UploadRunReport } from '../models/uploadRunReport.js';
+import { UploadExecution } from '../models/uploadExecution.js';
+import { createBucketSchema, putObjectSchema, uploadDirSchema } from '../constants/storageSchemas.js';
 import type { EnsureResult } from '../utils/ensure.js';
 
 const STORAGE_STATE_FILE = 'storage/storage_buckets.json';
 const UPLOAD_STATE_DIR = 'storage/uploads';
 const UPLOAD_LOG_DIR = 'storage/uploads/logs';
 
-const createBucketSchema = z.object({
-  name: z
-    .string()
-    .min(3, 'Nome deve ter pelo menos 3 caracteres.')
-    .max(63, 'Nome deve ter no máximo 63 caracteres.')
-    .regex(/^[a-z0-9-]+$/, 'Use apenas letras minúsculas, números e hífens.'),
-  edgeAccess: z
-    .enum(['read_only', 'public', 'authenticated', 'private'])
-    .default('read_only')
-    .describe('Política de acesso padrão do bucket.'),
-  description: z.string().max(255, 'Descrição deve ter até 255 caracteres.').optional(),
-  region: z.string().optional(),
-});
-
 export const createBucketInputSchema = createBucketSchema;
-
-const putObjectSchema = z
-  .object({
-    bucketId: z.string().optional(),
-    bucketName: z.string().optional(),
-    objectPath: z.string().min(1, 'Informe o caminho do objeto no bucket.'),
-    contentBase64: z.string().min(1, 'Conteúdo base64 obrigatório.'),
-    contentType: z.string().optional(),
-    contentEncoding: z.string().optional(),
-    sha256: z.string().regex(/^[a-f0-9]{64}$/i, 'SHA256 deve ser hex de 64 caracteres.').optional(),
-  })
-  .refine((value) => value.bucketId || value.bucketName, {
-    message: 'Informe bucketId ou bucketName.',
-    path: ['bucketId'],
-  });
-
-const uploadDirSchema = z
-  .object({
-    bucketId: z.string().optional(),
-    bucketName: z.string().optional(),
-    localDir: z.string().min(1, 'Informe o diretório local a ser publicado.'),
-    prefix: z.string().optional(),
-    concurrency: z.number().int().min(1).max(32).optional(),
-    dryRun: z.boolean().default(false),
-    stripGzipExtension: z.boolean().default(false),
-  })
-  .refine((value) => value.bucketId || value.bucketName, {
-    message: 'Informe bucketId ou bucketName.',
-    path: ['bucketId'],
-  });
 
 export const uploadDirInputSchema = uploadDirSchema;
 
 export type CreateBucketInput = z.infer<typeof createBucketSchema>;
 type PutObjectInput = z.infer<typeof putObjectSchema>;
 export type UploadDirInput = z.infer<typeof uploadDirSchema>;
-
-export interface StorageBucketRecord {
-  id: string;
-  name: string;
-  edgeAccess?: string;
-  description?: string;
-  region?: string;
-  createdAt: string;
-  raw: unknown;
-}
-
-interface StorageBucketsState {
-  buckets: Record<string, StorageBucketRecord>;
-}
-
-interface AzionBucketPayload {
-  id: string;
-  name: string;
-  edge_access?: string;
-  description?: string;
-  region?: string;
-  created_at?: string;
-  [key: string]: unknown;
-}
-
-interface AzionCreateBucketResponse {
-  results?: AzionBucketPayload;
-  data?: AzionBucketPayload;
-}
-
-interface AzionListBucketsResponse {
-  results: AzionBucketPayload[];
-}
-
-interface AzionBucketResponse {
-  results?: AzionBucketPayload;
-  data?: AzionBucketPayload;
-}
-
-interface ToolResponse {
-  content: Array<{ type: 'text'; text: string }>;
-}
-
-interface ToolExecutionContext {
-  sessionId?: string;
-}
-
-interface UploadIndexEntry {
-  hash: string;
-  size: number;
-  objectPath: string;
-  updatedAt: string;
-  contentType?: string;
-  contentEncoding?: string;
-  sourcePath?: string;
-}
-
-interface UploadIndexFile {
-  bucketId: string;
-  bucketName: string;
-  files: Record<string, UploadIndexEntry>;
-  updatedAt: string;
-}
-
-interface UploadCandidate {
-  absolutePath: string;
-  relativePath: string;
-  objectPath: string;
-  hash: string;
-  size: number;
-  contentType: string;
-  contentEncoding?: string;
-}
-
-interface UploadReportEntry {
-  objectPath: string;
-  hash: string;
-  size: number;
-  status: 'uploaded' | 'skipped' | 'failed';
-  attempts: number;
-  error?: string;
-}
-
-export interface UploadRunReport {
-  bucketId: string;
-  bucketName: string;
-  prefix?: string;
-  dryRun: boolean;
-  totals: {
-    scanned: number;
-    skipped: number;
-    toUpload: number;
-    uploaded: number;
-    failed: number;
-  };
-  startedAt: string;
-  finishedAt: string;
-  entries: UploadReportEntry[];
-}
 
 function normalizeState(state?: StorageBucketsState): StorageBucketsState {
   if (!state) {
@@ -445,12 +317,6 @@ async function hashFileSHA256FromBuffer(buffer: Buffer): Promise<string> {
   const hash = createHash('sha256');
   hash.update(buffer);
   return hash.digest('hex');
-}
-
-export interface UploadExecution {
-  report: UploadRunReport;
-  summaryLines: string[];
-  logFilePath?: string;
 }
 
 export async function processUploadDir(server: McpServer, input: UploadDirInput, ctx: ToolExecutionContext): Promise<UploadExecution> {
