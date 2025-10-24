@@ -43,6 +43,7 @@ export class FetchHttpClient implements HttpClient {
       method: options.method,
       body: payload,
       headers,
+      signal: options.signal,
     });
 
     const responseText = await response.text();
