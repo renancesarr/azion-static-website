@@ -25,7 +25,7 @@ export async function createWafRulesetViaApi(
 
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionWafRuleset);
     return await persistWafRuleset(buildWafRulesetRecord(payload));
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await fetchWafRulesetByNameApi(input.name, deps);
       if (existing) {
