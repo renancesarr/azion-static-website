@@ -156,7 +156,7 @@ export function registerSecurityServices(
         }
         const record = await persistWaf(buildWafRecord(apiPolicy));
         return buildWafToolResponse('Status WAF (sincronizado com API).', record);
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof HttpError) {
           throw new Error(`Falha ao consultar WAF: ${error.message}`);
         }
