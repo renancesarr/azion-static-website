@@ -14,7 +14,7 @@ export async function fetchBucketByIdApi(
       url: `${deps.apiBase}/v4/storage/buckets/${encodeURIComponent(id)}`,
     });
     return response.data.results ?? response.data.data ?? (response.data as unknown as AzionBucketPayload);
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 404) {
       return undefined;
     }
