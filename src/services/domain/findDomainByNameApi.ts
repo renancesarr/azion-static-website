@@ -11,5 +11,5 @@ export async function findDomainByNameApi(
     method: 'GET',
     url: `${deps.apiBase}/v4/domains?name=${encodeURIComponent(name)}`,
   });
-  return response.data.results?.find((domain) => domain.name === name);
+  return response.data.results?.find((domain: AzionDomain) => domain.name === name);
 }
