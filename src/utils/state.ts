@@ -1,5 +1,6 @@
 import { promises as fs } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { StateRepository } from '../core/state/StateRepository.js';
 
 const STATE_ROOT = '.mcp-state';
 
@@ -29,3 +30,15 @@ export async function writeStateFile<T>(relativePath: string, data: T): Promise<
   await ensureDirectory(dirname(fullPath));
   await fs.writeFile(fullPath, JSON.stringify(data, null, 2), 'utf-8');
 }
+
+export class FileStateRepository implements StateRepository {
+  async read<T>(relativePath: string): Promise<T | undefined> {
+    return await readStateFile<T>(relativePath);
+  }
+
+  async write<T>(relativePath: string, data: T): Promise<void> {
+    await writeStateFile(relativePath, data);
+  }
+}
+
+export const fileStateRepository = new FileStateRepository();
