@@ -17,7 +17,7 @@ import {
   type CreateConnectorInput,
   type CreateRuleInput,
 } from './edge.js';
-import { createDomainInputSchema, ensureDomain, type CreateDomainInput } from './domain.js';
+import { createDomainInputSchema, ensureDomain, type CreateDomainInput } from './domain/index.js';
 import {
   configureWafInputSchema,
   ensureWaf,

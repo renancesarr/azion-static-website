@@ -3,7 +3,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/dist/esm/server/
 import { MissingEnvError, requiredEnv } from './utils/env.js';
 import { registerStorageTools } from './services/storage.js';
 import { registerEdgeTools } from './services/edge.js';
-import { registerDomainTools } from './services/domain.js';
+import { registerDomainServices } from './services/domain/index.js';
 import { registerSecurityTools } from './services/security.js';
 import { registerOrchestratorTools } from './services/orchestrator.js';
 import { registerPostDeployTools } from './services/postDeploy.js';
@@ -24,7 +24,7 @@ const server = new McpServer(
 
 registerStorageTools(server);
 registerEdgeTools(server);
-registerDomainTools(server);
+registerDomainServices(server);
 registerSecurityTools(server);
 registerOrchestratorTools(server);
 registerPostDeployTools(server);
