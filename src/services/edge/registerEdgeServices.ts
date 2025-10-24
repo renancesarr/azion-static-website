@@ -133,7 +133,7 @@ export function registerEdgeServices(
           result.created ? 'Regra criada com sucesso.' : 'Regra reaproveitada do cache local.',
           result.record,
         );
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof HttpError && error.status === 409) {
           const existing = await findRuleByOrder(parsed.edgeApplicationId, parsed.phase, parsed.order);
           if (existing) {
