@@ -11,5 +11,5 @@ export async function findEdgeApplicationByNameApi(
     method: 'GET',
     url: `${deps.apiBase}/v4/edge_applications?name=${encodeURIComponent(name)}`,
   });
-  return response.data.results?.find((app) => app.name === name);
+  return response.data.results?.find((app: AzionEdgeApplication) => app.name === name);
 }
