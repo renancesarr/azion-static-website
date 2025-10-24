@@ -31,7 +31,7 @@ export async function createFirewallViaApi(
 
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionFirewall);
     return await persistFirewall(buildFirewallRecord(payload));
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await fetchFirewallByNameApi(input.name, deps);
       if (existing) {
