@@ -24,7 +24,7 @@ export async function ensureEdgeConnector(
   try {
     const created = await createConnectorViaApi(input, deps);
     return { record: created, created: true };
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await findConnectorByNameApi(input.name, deps);
       if (existing) {
