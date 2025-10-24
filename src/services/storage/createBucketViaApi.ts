@@ -25,7 +25,7 @@ export async function createBucketViaApi(
     });
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionBucketPayload);
     return await persistBucket(buildBucketRecord(payload));
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await findBucketByNameApi(input.name, deps);
       if (existing) {
