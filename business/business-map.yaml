@@ -1,6 +1,0 @@
-map:
-  UC-001:
-    title: Autenticação via link mágico
-    related_insight: IN-001
-    related_todos:
-    - T001

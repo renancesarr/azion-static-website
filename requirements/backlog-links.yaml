@@ -1,5 +1,0 @@
-links:
-  - story: S-001
-    functionals: ["FR-001", "FR-002"]
-    non_functionals: ["NR-002"]
-    tasks: ["T001", "T002"]
