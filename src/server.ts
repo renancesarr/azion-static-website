@@ -4,10 +4,10 @@ import { MissingEnvError, requiredEnv } from './utils/env.js';
 import { registerStorageServices } from './services/storage/index.js';
 import { registerEdgeServices } from './services/edge/index.js';
 import { registerDomainServices } from './services/domain/index.js';
-import { registerSecurityTools } from './services/security.js';
-import { registerOrchestratorTools } from './services/orchestrator.js';
-import { registerPostDeployTools } from './services/postDeploy.js';
-import { registerValidationTools } from './services/validation.js';
+import { registerSecurityServices } from './services/security/index.js';
+import { registerOrchestratorServices } from './services/orchestrator/index.js';
+import { registerPostDeployServices } from './services/postDeploy/index.js';
+import { registerValidationServices } from './services/validation/index.js';
 
 const server = new McpServer(
   {
@@ -25,10 +25,10 @@ const server = new McpServer(
 registerStorageServices(server);
 registerEdgeServices(server);
 registerDomainServices(server);
-registerSecurityTools(server);
-registerOrchestratorTools(server);
-registerPostDeployTools(server);
-registerValidationTools(server);
+registerSecurityServices(server);
+registerOrchestratorServices(server);
+registerPostDeployServices(server);
+registerValidationServices(server);
 
 server.registerTool(
   'azion.health_check',

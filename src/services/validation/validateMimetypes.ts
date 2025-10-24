@@ -1,0 +1,56 @@
+import { extname } from 'node:path';
+import { ValidationCheckResult } from '../../models/validationCheckResult.js';
+import { lookupMimeType } from '../../utils/mime.js';
+import { loadFirstUploadIndex } from './loadFirstUploadIndex.js';
+
+export interface MimetypeValidationResult {
+  matches: number;
+  mismatches: ValidationCheckResult[];
+}
+
+export async function validateMimetypes(extensions: string[]): Promise<MimetypeValidationResult> {
+  const uploadIndex = await loadFirstUploadIndex();
+  if (!uploadIndex) {
+    return {
+      matches: 0,
+      mismatches: [
+        {
+          name: 'Upload index',
+          ok: false,
+          detail: 'Nenhum índice encontrado em .mcp-state/storage/uploads/.',
+        },
+      ],
+    };
+  }
+
+  const expectedSet = new Set(extensions.map((ext) => ext.toLowerCase()));
+  const mismatches: ValidationCheckResult[] = [];
+  let matches = 0;
+
+  for (const entry of Object.values(uploadIndex.file.files ?? {})) {
+    const ext = extname(entry.objectPath).toLowerCase();
+    if (!expectedSet.has(ext)) {
+      continue;
+    }
+    const expectedMime = lookupMimeType(entry.objectPath);
+    if (!entry.contentType) {
+      mismatches.push({
+        name: entry.objectPath,
+        ok: false,
+        detail: `Content-Type ausente. Esperado ~ ${expectedMime}`,
+      });
+      continue;
+    }
+    if (!entry.contentType.startsWith(expectedMime.split(';')[0])) {
+      mismatches.push({
+        name: entry.objectPath,
+        ok: false,
+        detail: `Content-Type "${entry.contentType}" diverge de "${expectedMime}"`,
+      });
+      continue;
+    }
+    matches += 1;
+  }
+
+  return { matches, mismatches };
+}
