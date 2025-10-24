@@ -1,8 +1,8 @@
-import { readStateFile } from '../../utils/state.js';
+import { StateRepository } from '../../core/state/StateRepository.js';
 import { ValidationCheckResult } from '../../models/validationCheckResult.js';
 
-export async function readState<T>(relativePath: string): Promise<T | undefined> {
-  return await readStateFile<T>(relativePath);
+export async function readState<T>(repository: StateRepository, relativePath: string): Promise<T | undefined> {
+  return await repository.read<T>(relativePath);
 }
 
 export function summarizeState(name: string, ok: boolean, detail: string): ValidationCheckResult {
