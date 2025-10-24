@@ -10,5 +10,5 @@ export async function fetchWafByEdgeAppApi(
     method: 'GET',
     url: `${deps.apiBase}/v4/waf/policies?edge_application_id=${encodeURIComponent(edgeApplicationId)}`,
   });
-  return response.data.results?.find((policy) => policy.edge_application_id === edgeApplicationId);
+  return response.data.results?.find((policy: AzionWafPolicy) => policy.edge_application_id === edgeApplicationId);
 }
