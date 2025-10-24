@@ -13,5 +13,5 @@ export async function findRuleByOrderApi(
     method: 'GET',
     url: `${deps.apiBase}/v4/edge_applications/${encodeURIComponent(edgeApplicationId)}/rules_engine/${encodeURIComponent(phase)}/rules`,
   });
-  return response.data.results?.find((rule) => rule.order === order);
+  return response.data.results?.find((rule: AzionRule) => rule.order === order);
 }
