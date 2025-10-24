@@ -11,5 +11,5 @@ export async function findConnectorByNameApi(
     method: 'GET',
     url: `${deps.apiBase}/v4/edge_applications/connectors?name=${encodeURIComponent(name)}`,
   });
-  return response.data.results?.find((connector) => connector.name === name);
+  return response.data.results?.find((connector: AzionConnector) => connector.name === name);
 }
