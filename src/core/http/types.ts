@@ -5,6 +5,7 @@ export interface HttpRequestOptions {
   url: string;
   body?: unknown;
   headers?: Record<string, string>;
+  signal?: AbortSignal;
 }
 
 export interface HttpSuccess<T> {
