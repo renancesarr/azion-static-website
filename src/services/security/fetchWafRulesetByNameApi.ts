@@ -11,5 +11,5 @@ export async function fetchWafRulesetByNameApi(
     method: 'GET',
     url: `${deps.apiBase}/v4/waf/rulesets?name=${encodeURIComponent(name)}`,
   });
-  return response.data.results?.find((ruleset) => ruleset.name === name);
+  return response.data.results?.find((ruleset: AzionWafRuleset) => ruleset.name === name);
 }
