@@ -2,14 +2,18 @@ import { extname } from 'node:path';
 import { ValidationCheckResult } from '../../models/validationCheckResult.js';
 import { lookupMimeType } from '../../utils/mime.js';
 import { loadFirstUploadIndex } from './loadFirstUploadIndex.js';
+import type { ValidationDependencies } from './types.js';
 
 export interface MimetypeValidationResult {
   matches: number;
   mismatches: ValidationCheckResult[];
 }
 
-export async function validateMimetypes(extensions: string[]): Promise<MimetypeValidationResult> {
-  const uploadIndex = await loadFirstUploadIndex();
+export async function validateMimetypes(
+  extensions: string[],
+  deps: ValidationDependencies,
+): Promise<MimetypeValidationResult> {
+  const uploadIndex = await loadFirstUploadIndex(deps.state);
   if (!uploadIndex) {
     return {
       matches: 0,
