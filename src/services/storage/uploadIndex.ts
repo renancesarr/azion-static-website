@@ -1,11 +1,11 @@
-import { readStateFile, writeStateFile } from '../../utils/state.js';
 import { UploadIndexFile } from '../../models/uploadIndexFile.js';
 import { StorageBucketRecord } from '../../models/storageBucketRecord.js';
 import { uploadIndexRelativePath } from './paths.js';
+import { StateRepository } from '../../core/state/StateRepository.js';
 
-export async function loadUploadIndex(bucket: StorageBucketRecord): Promise<UploadIndexFile> {
+export async function loadUploadIndex(state: StateRepository, bucket: StorageBucketRecord): Promise<UploadIndexFile> {
   const path = uploadIndexRelativePath(bucket);
-  const existing = await readStateFile<UploadIndexFile>(path);
+  const existing = await state.read<UploadIndexFile>(path);
   if (existing && existing.bucketId === bucket.id) {
     return existing;
   }
@@ -17,12 +17,12 @@ export async function loadUploadIndex(bucket: StorageBucketRecord): Promise<Uplo
   };
 }
 
-export async function saveUploadIndex(bucket: StorageBucketRecord, index: UploadIndexFile): Promise<void> {
+export async function saveUploadIndex(state: StateRepository, bucket: StorageBucketRecord, index: UploadIndexFile): Promise<void> {
   const safeIndex: UploadIndexFile = {
     bucketId: bucket.id,
     bucketName: bucket.name,
     files: index.files,
     updatedAt: new Date().toISOString(),
   };
-  await writeStateFile(uploadIndexRelativePath(bucket), safeIndex);
+  await state.write(uploadIndexRelativePath(bucket), safeIndex);
 }
