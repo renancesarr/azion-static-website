@@ -10,7 +10,7 @@ export async function ensureFirewallRule(
   input: ApplyWafRulesetInput,
   deps: SecurityDependencies = defaultSecurityDependencies,
 ): Promise<EnsureResult<FirewallRuleBinding>> {
-  const cached = await findFirewallRuleBindingFromState(input.firewallId, input.rulesetId);
+  const cached = await findFirewallRuleBindingFromState(deps.state, input.firewallId, input.rulesetId);
   if (cached) {
     return { record: cached, created: false };
   }

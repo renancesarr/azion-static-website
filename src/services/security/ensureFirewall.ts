@@ -10,7 +10,7 @@ export async function ensureFirewall(
   input: CreateFirewallInput,
   deps: SecurityDependencies = defaultSecurityDependencies,
 ): Promise<EnsureResult<FirewallRecord>> {
-  const cached = await findFirewallByName(input.name);
+  const cached = await findFirewallByName(deps.state, input.name);
   if (cached) {
     return { record: cached, created: false };
   }

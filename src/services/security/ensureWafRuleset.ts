@@ -10,7 +10,7 @@ export async function ensureWafRuleset(
   input: CreateWafRulesetInput,
   deps: SecurityDependencies = defaultSecurityDependencies,
 ): Promise<EnsureResult<WafRulesetRecord>> {
-  const cached = await findWafRulesetByName(input.name);
+  const cached = await findWafRulesetByName(deps.state, input.name);
   if (cached) {
     return { record: cached, created: false };
   }

@@ -10,7 +10,7 @@ export async function ensureWaf(
   input: ConfigureWafInput,
   deps: SecurityDependencies = defaultSecurityDependencies,
 ): Promise<EnsureResult<WafPolicyRecord>> {
-  const cached = await findWaf(input.edgeApplicationId);
+  const cached = await findWaf(deps.state, input.edgeApplicationId);
   if (cached) {
     return { record: cached, created: false };
   }
