@@ -19,7 +19,7 @@ export async function executeUploadBatch(
     return async (): Promise<UploadBatchResult['uploaded'][number]> => {
       const buffer = await fs.readFile(candidate.absolutePath);
 
-      await deps.http({
+      await deps.http.request({
         method: 'PUT',
         url: buildObjectUrl(deps.apiBase, bucket.id, candidate.objectPath),
         body: buffer,
@@ -58,6 +58,9 @@ export async function executeUploadBatch(
     if (result.error) {
       failed.push(buildUploadReportEntry(candidate, 'failed', result.attempts, result.error));
       delete nextIndexFiles[candidate.objectPath];
+      deps.logger.error(
+        `Falha ao enviar ${candidate.objectPath}: ${result.error.message ?? result.error}. tentativas=${result.attempts}`,
+      );
       return;
     }
 
