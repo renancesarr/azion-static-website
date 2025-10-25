@@ -10,7 +10,7 @@ export async function ensureBucket(
   input: CreateBucketInput,
   deps: StorageDependencies = defaultStorageDependencies,
 ): Promise<EnsureResult<StorageBucketRecord>> {
-  const existing = await lookupBucketByName(input.name);
+  const existing = await lookupBucketByName(deps.state, input.name);
   if (existing) {
     return { record: existing, created: false };
   }
