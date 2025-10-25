@@ -36,7 +36,7 @@ export async function handlePutObject(
         }
       : inferEncoding(objectPath);
 
-  await deps.http({
+  await deps.http.request({
     method: 'PUT',
     url: buildObjectUrl(deps.apiBase, bucket.id, objectPath),
     body: buffer,
@@ -47,7 +47,7 @@ export async function handlePutObject(
     },
   });
 
-  const index = await loadUploadIndex(bucket);
+  const index = await loadUploadIndex(deps.state, bucket);
   index.files[objectPath] = {
     hash,
     size: buffer.length,
@@ -56,7 +56,7 @@ export async function handlePutObject(
     contentType: encodingInfo.contentType,
     contentEncoding: encodingInfo.contentEncoding,
   };
-  await saveUploadIndex(bucket, index);
+  await saveUploadIndex(deps.state, bucket, index);
 
   await server.sendLoggingMessage(
     {
