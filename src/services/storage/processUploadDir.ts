@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import { resolve } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
-import { writeStateFile, statePath } from '../../utils/state.js';
+import { statePath } from '../../utils/state.js';
 import { walkDirectory } from '../../utils/fs.js';
 import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
 import { UploadExecution } from '../../models/uploadExecution.js';
@@ -33,6 +33,7 @@ export async function processUploadDir(
   }
 
   const startedAt = new Date();
+  deps.logger.info(`Scan iniciado em ${localDir} para bucket ${bucket.name}.`);
   await server.sendLoggingMessage(
     {
       level: 'info',
@@ -55,13 +56,14 @@ export async function processUploadDir(
       startedAt,
       finishedAt,
     );
+    deps.logger.info(`Diretório ${localDir} vazio para bucket ${bucket.name}; nenhuma ação necessária.`);
     return {
       report,
       summaryLines: [`Diretório ${localDir} não possui arquivos. Nada a fazer.`],
     };
   }
 
-  const index = await loadUploadIndex(bucket);
+  const index = await loadUploadIndex(deps.state, bucket);
   const plan = await planUploadCandidates(entries, index, input);
 
   const plannedUploads = plan.candidates.length;
@@ -82,7 +84,9 @@ export async function processUploadDir(
       finishedAt,
     );
     const logFileName = uploadLogRelativePath(finishedAt.toISOString());
-    await writeStateFile(logFileName, report);
+    await deps.state.write(logFileName, report);
+
+    deps.logger.info(`Dry-run concluído para bucket ${bucket.name}; uploads planejados=${plannedUploads}.`);
 
     return {
       report,
@@ -119,15 +123,17 @@ export async function processUploadDir(
     finishedAt,
   );
   const logFileName = uploadLogRelativePath(finishedAt.toISOString());
-  await writeStateFile(logFileName, report);
+  await deps.state.write(logFileName, report);
 
   index.files = plan.nextIndexFiles;
-  await saveUploadIndex(bucket, index);
+  await saveUploadIndex(deps.state, bucket, index);
 
+  const summaryLog = `Upload para ${bucket.name}: enviados=${uploaded.length}, reaproveitados=${plan.skipped.length}, falhas=${failed.length}.`;
+  deps.logger[failed.length > 0 ? 'error' : 'info'](summaryLog);
   await server.sendLoggingMessage(
     {
       level: failed.length > 0 ? 'error' : 'info',
-      data: `Upload concluído: ${uploaded.length} enviados, ${plan.skipped.length} reaproveitados, ${failed.length} falharam.`,
+      data: summaryLog,
     },
     ctx.sessionId,
   );
