@@ -7,7 +7,7 @@ export async function fetchFirewallByNameApi(
   name: string,
   deps: SecurityDependencies = defaultSecurityDependencies,
 ): Promise<AzionFirewall | undefined> {
-  const response = await deps.http<AzionFirewallListResponse>({
+  const response = await deps.http.request<AzionFirewallListResponse>({
     method: 'GET',
     url: `${deps.apiBase}/v4/edge_firewall/firewalls?name=${encodeURIComponent(name)}`,
   });

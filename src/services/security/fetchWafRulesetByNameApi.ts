@@ -7,7 +7,7 @@ export async function fetchWafRulesetByNameApi(
   name: string,
   deps: SecurityDependencies = defaultSecurityDependencies,
 ): Promise<AzionWafRuleset | undefined> {
-  const response = await deps.http<AzionWafRulesetListResponse>({
+  const response = await deps.http.request<AzionWafRulesetListResponse>({
     method: 'GET',
     url: `${deps.apiBase}/v4/waf/rulesets?name=${encodeURIComponent(name)}`,
   });

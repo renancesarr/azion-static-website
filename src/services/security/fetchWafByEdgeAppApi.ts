@@ -6,7 +6,7 @@ export async function fetchWafByEdgeAppApi(
   edgeApplicationId: string,
   deps: SecurityDependencies = defaultSecurityDependencies,
 ): Promise<AzionWafPolicy | undefined> {
-  const response = await deps.http<{ results?: AzionWafPolicy[] }>({
+  const response = await deps.http.request<{ results?: AzionWafPolicy[] }>({
     method: 'GET',
     url: `${deps.apiBase}/v4/waf/policies?edge_application_id=${encodeURIComponent(edgeApplicationId)}`,
   });
