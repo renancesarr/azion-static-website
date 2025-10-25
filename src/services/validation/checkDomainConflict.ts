@@ -1,9 +1,13 @@
 import { summarizeState, readState } from './stateUtils.js';
 import { STACK_STATE } from './constants.js';
 import { type DomainConflictInput } from './schemas.js';
+import type { ValidationDependencies } from './types.js';
 
-export async function checkDomainConflict(input: DomainConflictInput) {
-  const state = await readState<{ domains: Record<string, { id: string }> }>(STACK_STATE.domain);
+export async function checkDomainConflict(
+  input: DomainConflictInput,
+  deps: ValidationDependencies,
+) {
+  const state = await readState<{ domains: Record<string, { id: string }> }>(deps.state, STACK_STATE.domain);
   const match = state?.domains?.[input.domainName];
   return summarizeState(
     'Domain existente',
