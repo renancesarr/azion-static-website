@@ -15,8 +15,12 @@ import { validateUploadIdempotency } from './validateUploadIdempotency.js';
 import { inspectUploadLogs } from './inspectUploadLogs.js';
 import { checkBucketConflict } from './checkBucketConflict.js';
 import { checkDomainConflict } from './checkDomainConflict.js';
+import { defaultValidationDependencies } from './dependencies.js';
+import type { ValidationDependencies } from './types.js';
 
 export function registerValidationServices(server: McpServer): void {
+  const deps: ValidationDependencies = defaultValidationDependencies;
+
   server.registerTool(
     'azion.validate_stack',
     {
@@ -25,7 +29,7 @@ export function registerValidationServices(server: McpServer): void {
       inputSchema: stackValidateInputSchema,
     },
     async (args: unknown, extra: ToolExecutionContext = {}): Promise<ToolResponse> => {
-      const report = await runStackValidation(args);
+      const report = await runStackValidation(args, deps);
 
       const okChecks = report.checks.filter((c) => c.ok).length;
       const httpSummary = report.http
@@ -70,7 +74,7 @@ export function registerValidationServices(server: McpServer): void {
     },
     async (args: unknown): Promise<ToolResponse> => {
       const input = mimetypeValidationInputSchema.parse(args ?? {});
-      const result = await validateMimetypes(input.extensions);
+      const result = await validateMimetypes(input.extensions, deps);
       const summary: string[] = [
         `Extensões auditadas: ${input.extensions.join(', ')}`,
         `Objetos válidos: ${result.matches}`,
@@ -102,7 +106,7 @@ export function registerValidationServices(server: McpServer): void {
       inputSchema: idempotencyValidationInputSchema,
     },
     async (): Promise<ToolResponse> => {
-      const checks = await validateUploadIdempotency();
+      const checks = await validateUploadIdempotency(deps);
       const summary = checks.map((check) => `- ${check.name}: ${check.ok ? 'OK' : 'FALHA'} (${check.detail})`);
       return {
         content: [
@@ -146,7 +150,7 @@ export function registerValidationServices(server: McpServer): void {
     },
     async (args: unknown): Promise<ToolResponse> => {
       const input = bucketConflictInputSchema.parse(args ?? {});
-      const result = await checkBucketConflict(input);
+      const result = await checkBucketConflict(input, deps);
       return {
         content: [
           {
@@ -167,7 +171,7 @@ export function registerValidationServices(server: McpServer): void {
     },
     async (args: unknown): Promise<ToolResponse> => {
       const input = domainConflictInputSchema.parse(args ?? {});
-      const result = await checkDomainConflict(input);
+      const result = await checkDomainConflict(input, deps);
       return {
         content: [
           {
