@@ -12,7 +12,7 @@ export async function resolveBucketReference(
   deps: StorageDependencies = defaultStorageDependencies,
 ): Promise<StorageBucketRecord> {
   if (ref.bucketId) {
-    const cached = await lookupBucketById(ref.bucketId);
+    const cached = await lookupBucketById(deps.state, ref.bucketId);
     if (cached) {
       return cached;
     }
@@ -20,11 +20,11 @@ export async function resolveBucketReference(
     if (!apiBucket) {
       throw new Error(`Bucket com id ${ref.bucketId} não localizado na API Azion.`);
     }
-    return await persistBucket(buildBucketRecord(apiBucket));
+    return await persistBucket(deps.state, buildBucketRecord(apiBucket));
   }
 
   if (ref.bucketName) {
-    const cached = await lookupBucketByName(ref.bucketName);
+    const cached = await lookupBucketByName(deps.state, ref.bucketName);
     if (cached) {
       return cached;
     }
@@ -32,7 +32,7 @@ export async function resolveBucketReference(
     if (!apiBucket) {
       throw new Error(`Bucket com nome ${ref.bucketName} não localizado na API Azion.`);
     }
-    return await persistBucket(buildBucketRecord(apiBucket));
+    return await persistBucket(deps.state, buildBucketRecord(apiBucket));
   }
 
   throw new Error('Referência de bucket ausente.');
