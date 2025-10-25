@@ -14,7 +14,7 @@ export async function ensureCacheRule(
   input: CreateRuleInput,
   deps: EdgeDependencies = defaultEdgeDependencies,
 ): Promise<EnsureResult<EdgeRuleRecord>> {
-  const cached = await findRuleByOrder(input.edgeApplicationId, input.phase, input.order);
+  const cached = await findRuleByOrder(deps.state, input.edgeApplicationId, input.phase, input.order);
   if (cached) {
     return { record: cached, created: false };
   }
@@ -26,7 +26,7 @@ export async function ensureCacheRule(
     if (error instanceof HttpError && error.status === 409) {
       const existing = await findRuleByOrderApi(input.edgeApplicationId, input.phase, input.order, deps);
       if (existing) {
-        const record = await persistRule(buildRuleRecord(existing, input.edgeApplicationId));
+        const record = await persistRule(deps.state, buildRuleRecord(existing, input.edgeApplicationId));
         return { record, created: false };
       }
     }

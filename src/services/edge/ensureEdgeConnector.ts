@@ -16,7 +16,7 @@ export async function ensureEdgeConnector(
   input: ConnectorInputWithBucket,
   deps: EdgeDependencies = defaultEdgeDependencies,
 ): Promise<EnsureResult<EdgeConnectorRecord>> {
-  const cached = await findConnectorByName(input.name);
+  const cached = await findConnectorByName(deps.state, input.name);
   if (cached) {
     return { record: cached, created: false };
   }
@@ -28,7 +28,7 @@ export async function ensureEdgeConnector(
     if (error instanceof HttpError && error.status === 409) {
       const existing = await findConnectorByNameApi(input.name, deps);
       if (existing) {
-        const record = await persistConnector(buildConnectorRecord(existing, input.bucketId, input.bucketName));
+        const record = await persistConnector(deps.state, buildConnectorRecord(existing, input.bucketId, input.bucketName));
         return { record, created: false };
       }
     }

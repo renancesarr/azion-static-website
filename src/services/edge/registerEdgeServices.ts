@@ -65,7 +65,7 @@ export function registerEdgeServices(
       const parsed = createConnectorInputSchema.parse(args ?? {});
       const sessionId = extra.sessionId;
 
-      const cached = await findConnectorByName(parsed.name);
+      const cached = await findConnectorByName(deps.state, parsed.name);
       if (cached) {
         await server.sendLoggingMessage(
           {
@@ -135,13 +135,13 @@ export function registerEdgeServices(
         );
       } catch (error: unknown) {
         if (error instanceof HttpError && error.status === 409) {
-          const existing = await findRuleByOrder(parsed.edgeApplicationId, parsed.phase, parsed.order);
+          const existing = await findRuleByOrder(deps.state, parsed.edgeApplicationId, parsed.phase, parsed.order);
           if (existing) {
             return buildEdgeRuleToolResponse('Regra já existia no cache local.', existing);
           }
           const apiRule = await findRuleByOrderApi(parsed.edgeApplicationId, parsed.phase, parsed.order, deps);
           if (apiRule) {
-            const record = await persistRule(buildRuleRecord(apiRule, parsed.edgeApplicationId));
+            const record = await persistRule(deps.state, buildRuleRecord(apiRule, parsed.edgeApplicationId));
             return buildEdgeRuleToolResponse('Regra já existia na Azion e foi sincronizada.', record);
           }
         }

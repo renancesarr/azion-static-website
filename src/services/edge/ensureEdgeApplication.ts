@@ -10,7 +10,7 @@ export async function ensureEdgeApplication(
   input: CreateEdgeAppInput,
   deps: EdgeDependencies = defaultEdgeDependencies,
 ): Promise<EnsureResult<EdgeApplicationRecord>> {
-  const cached = await findEdgeApplicationByName(input.name);
+  const cached = await findEdgeApplicationByName(deps.state, input.name);
   if (cached) {
     return { record: cached, created: false };
   }
