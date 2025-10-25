@@ -25,7 +25,7 @@ export function registerStorageServices(
       const parsed = createBucketSchema.parse(args ?? {});
       const sessionId = extra.sessionId;
 
-      const existing = await lookupBucketByName(parsed.name);
+      const existing = await lookupBucketByName(deps.state, parsed.name);
       if (existing) {
         await server.sendLoggingMessage(
           {
