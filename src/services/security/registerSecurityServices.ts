@@ -144,7 +144,7 @@ export function registerSecurityServices(
     async (args: unknown) => {
       const parsed = wafStatusInputSchema.parse(args ?? {});
 
-      const cached = await findWaf(parsed.edgeApplicationId);
+      const cached = await findWaf(deps.state, parsed.edgeApplicationId);
       if (cached) {
         return buildWafToolResponse('Status WAF (cache local).', cached);
       }
@@ -154,7 +154,7 @@ export function registerSecurityServices(
         if (!apiPolicy) {
           throw new Error(`Nenhuma política WAF encontrada para edgeApp=${parsed.edgeApplicationId}.`);
         }
-        const record = await persistWaf(buildWafRecord(apiPolicy));
+        const record = await persistWaf(deps.state, buildWafRecord(apiPolicy));
         return buildWafToolResponse('Status WAF (sincronizado com API).', record);
       } catch (error: unknown) {
         if (error instanceof HttpError) {
