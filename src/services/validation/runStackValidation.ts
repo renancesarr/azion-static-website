@@ -1,5 +1,3 @@
-import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
-import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
 import { StackValidationReport } from '../../models/stackValidationReport.js';
 import { ValidationCheckResult } from '../../models/validationCheckResult.js';
 import { UploadIndexFile } from '../../models/uploadIndexFile.js';
@@ -11,12 +9,15 @@ import {
 import { readState, summarizeState, listIds } from './stateUtils.js';
 import { defaultValidationDependencies } from './dependencies.js';
 import type { ValidationDependencies } from './types.js';
+import { HttpError } from '../../utils/http.js';
 
-async function summarizeGzipAssets(): Promise<
+async function summarizeGzipAssets(
+  deps: ValidationDependencies,
+): Promise<
   { check: ValidationCheckResult; assets: string[] }
   | undefined
 > {
-  const bucketState = await readState<{ buckets: Record<string, { id: string }> }>(STACK_STATE.bucket);
+  const bucketState = await readState<{ buckets: Record<string, { id: string }> }>(deps.state, STACK_STATE.bucket);
   const bucketIds = bucketState ? Object.values(bucketState.buckets ?? {}).map((b) => b.id) : [];
   if (bucketIds.length === 0) {
     return undefined;
@@ -24,7 +25,7 @@ async function summarizeGzipAssets(): Promise<
 
   const sanitize = (value: string) => value.replace(/[^a-zA-Z0-9._-]/g, '_');
   const indexPath = `storage/uploads/index-${sanitize(bucketIds[0])}.json`;
-  const uploadIndex = await readState<UploadIndexFile>(indexPath);
+  const uploadIndex = await readState<UploadIndexFile>(deps.state, indexPath);
   if (!uploadIndex) {
     return undefined;
   }
@@ -51,7 +52,7 @@ export async function runStackValidation(
   const startedAt = new Date();
   const checks: ValidationCheckResult[] = [];
 
-  const bucketState = await readState<{ buckets: Record<string, { id: string }> }>(STACK_STATE.bucket);
+  const bucketState = await readState<{ buckets: Record<string, { id: string }> }>(deps.state, STACK_STATE.bucket);
   checks.push(
     summarizeState(
       'Bucket',
@@ -60,7 +61,7 @@ export async function runStackValidation(
     ),
   );
 
-  const edgeAppState = await readState<{ applications: Record<string, { id: string }> }>(STACK_STATE.edgeApp);
+  const edgeAppState = await readState<{ applications: Record<string, { id: string }> }>(deps.state, STACK_STATE.edgeApp);
   checks.push(
     summarizeState(
       'Edge Application',
@@ -69,7 +70,7 @@ export async function runStackValidation(
     ),
   );
 
-  const connectorState = await readState<{ connectors: Record<string, { id: string }> }>(STACK_STATE.connector);
+  const connectorState = await readState<{ connectors: Record<string, { id: string }> }>(deps.state, STACK_STATE.connector);
   checks.push(
     summarizeState(
       'Edge Connector',
@@ -78,7 +79,7 @@ export async function runStackValidation(
     ),
   );
 
-  const cacheState = await readState<{ rules: Record<string, { id: string }> }>(STACK_STATE.cacheRule);
+  const cacheState = await readState<{ rules: Record<string, { id: string }> }>(deps.state, STACK_STATE.cacheRule);
   checks.push(
     summarizeState(
       'Cache Rule',
@@ -87,7 +88,7 @@ export async function runStackValidation(
     ),
   );
 
-  const domainState = await readState<{ domains: Record<string, { id: string; name?: string }> }>(STACK_STATE.domain);
+  const domainState = await readState<{ domains: Record<string, { id: string; name?: string }> }>(deps.state, STACK_STATE.domain);
   const domainNames = domainState ? Object.keys(domainState.domains ?? {}) : [];
   checks.push(
     summarizeState(
@@ -97,7 +98,7 @@ export async function runStackValidation(
     ),
   );
 
-  const firewallState = await readState<{ firewalls: Record<string, { id: string }> }>(STACK_STATE.firewall);
+  const firewallState = await readState<{ firewalls: Record<string, { id: string }> }>(deps.state, STACK_STATE.firewall);
   checks.push(
     summarizeState(
       'Firewall',
@@ -106,7 +107,7 @@ export async function runStackValidation(
     ),
   );
 
-  const rulesetState = await readState<{ rulesets: Record<string, { id: string }> }>(STACK_STATE.wafRuleset);
+  const rulesetState = await readState<{ rulesets: Record<string, { id: string }> }>(deps.state, STACK_STATE.wafRuleset);
   checks.push(
     summarizeState(
       'WAF Ruleset',
@@ -115,7 +116,7 @@ export async function runStackValidation(
     ),
   );
 
-  const firewallRuleState = await readState<{ bindings: Record<string, { id: string }> }>(STACK_STATE.firewallRule);
+  const firewallRuleState = await readState<{ bindings: Record<string, { id: string }> }>(deps.state, STACK_STATE.firewallRule);
   checks.push(
     summarizeState(
       'Firewall Rule',
@@ -124,7 +125,7 @@ export async function runStackValidation(
     ),
   );
 
-  const gzipResult = await summarizeGzipAssets();
+  const gzipResult = await summarizeGzipAssets(deps);
   if (gzipResult) {
     checks.push(gzipResult.check);
   }
@@ -135,26 +136,28 @@ export async function runStackValidation(
     const url = `${input.protocol}://${domainToTest}${input.path}`;
     const controller = new AbortController();
     const timer = deps.setTimeout(() => controller.abort(), input.timeoutMs);
-    const start = deps.now();
+    const start = deps.clock.now();
     try {
-      const response = await deps.fetch(url, { method: 'GET', signal: controller.signal });
-      const duration = deps.now() - start;
+      const response = await deps.http.request<string>({ method: 'GET', url, signal: controller.signal });
+      const duration = deps.clock.now() - start;
       httpResult = {
         url,
         status: response.status,
-        ok: response.ok,
+        ok: true,
         durationMs: duration,
-        error: response.ok ? undefined : `Status ${response.status}`,
+        error: undefined,
       };
+      deps.logger.info(`${url} -> ${response.status} (${duration.toFixed(1)}ms)`);
     } catch (error) {
-      const duration = deps.now() - start;
-      const message = error instanceof Error ? error.message : String(error);
+      const duration = deps.clock.now() - start;
+      const message = error instanceof HttpError ? error.message : error instanceof Error ? error.message : String(error);
       httpResult = {
         url,
         ok: false,
         durationMs: duration,
         error: message,
       };
+      deps.logger.error(`${url} falhou: ${message}`);
     } finally {
       deps.clearTimeout(timer);
     }
