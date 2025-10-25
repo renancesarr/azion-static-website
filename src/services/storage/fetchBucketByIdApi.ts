@@ -9,7 +9,7 @@ export async function fetchBucketByIdApi(
   deps: StorageDependencies = defaultStorageDependencies,
 ): Promise<AzionBucketPayload | undefined> {
   try {
-    const response = await deps.http<AzionBucketResponse>({
+    const response = await deps.http.request<AzionBucketResponse>({
       method: 'GET',
       url: `${deps.apiBase}/v4/storage/buckets/${encodeURIComponent(id)}`,
     });
