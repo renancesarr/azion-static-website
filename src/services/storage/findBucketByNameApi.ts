@@ -9,7 +9,7 @@ export async function findBucketByNameApi(
   deps: StorageDependencies = defaultStorageDependencies,
 ): Promise<AzionBucketPayload | undefined> {
   try {
-    const response = await deps.http<AzionListBucketsResponse>({
+    const response = await deps.http.request<AzionListBucketsResponse>({
       method: 'GET',
       url: `${deps.apiBase}/v4/storage/buckets?name=${encodeURIComponent(name)}`,
     });
