@@ -13,7 +13,7 @@ export async function createBucketViaApi(
   deps: StorageDependencies = defaultStorageDependencies,
 ) {
   try {
-    const response = await deps.http<AzionCreateBucketResponse>({
+    const response = await deps.http.request<AzionCreateBucketResponse>({
       method: 'POST',
       url: `${deps.apiBase}/v4/storage/buckets`,
       body: {
@@ -24,12 +24,12 @@ export async function createBucketViaApi(
       },
     });
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionBucketPayload);
-    return await persistBucket(buildBucketRecord(payload));
+    return await persistBucket(deps.state, buildBucketRecord(payload));
   } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await findBucketByNameApi(input.name, deps);
       if (existing) {
-        return await persistBucket(buildBucketRecord(existing));
+        return await persistBucket(deps.state, buildBucketRecord(existing));
       }
     }
     throw error;
