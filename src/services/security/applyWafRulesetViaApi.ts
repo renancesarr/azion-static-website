@@ -13,7 +13,7 @@ export async function applyWafRulesetViaApi(
   deps: SecurityDependencies = defaultSecurityDependencies,
 ) {
   try {
-    const response = await deps.http<AzionFirewallRuleResponse>({
+    const response = await deps.http.request<AzionFirewallRuleResponse>({
       method: 'POST',
       url: `${deps.apiBase}/v4/edge_firewall/firewalls/${encodeURIComponent(input.firewallId)}/rules`,
       body: {
@@ -36,13 +36,13 @@ export async function applyWafRulesetViaApi(
     });
 
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionFirewallRule);
-    return await persistFirewallRule(buildFirewallRuleBinding(payload, input.firewallId, input.rulesetId));
+    return await persistFirewallRule(deps.state, buildFirewallRuleBinding(payload, input.firewallId, input.rulesetId));
   } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existingRules = await fetchFirewallRulesApi(input.firewallId, deps);
       const match = existingRules.find((rule) => JSON.stringify(rule.behaviors).includes(input.rulesetId));
       if (match) {
-        return await persistFirewallRule(buildFirewallRuleBinding(match, input.firewallId, input.rulesetId));
+        return await persistFirewallRule(deps.state, buildFirewallRuleBinding(match, input.firewallId, input.rulesetId));
       }
     }
     throw error;

@@ -7,7 +7,7 @@ export async function fetchFirewallRulesApi(
   firewallId: string,
   deps: SecurityDependencies = defaultSecurityDependencies,
 ): Promise<AzionFirewallRule[]> {
-  const response = await deps.http<AzionFirewallRuleListResponse>({
+  const response = await deps.http.request<AzionFirewallRuleListResponse>({
     method: 'GET',
     url: `${deps.apiBase}/v4/edge_firewall/firewalls/${encodeURIComponent(firewallId)}/rules`,
   });

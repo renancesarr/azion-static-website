@@ -16,7 +16,7 @@ export async function createFirewallViaApi(
   const domainIds = await resolveDomainIds(input);
 
   try {
-    const response = await deps.http<AzionFirewallResponse>({
+    const response = await deps.http.request<AzionFirewallResponse>({
       method: 'POST',
       url: `${deps.apiBase}/v4/edge_firewall/firewalls`,
       body: {
@@ -30,12 +30,12 @@ export async function createFirewallViaApi(
     });
 
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionFirewall);
-    return await persistFirewall(buildFirewallRecord(payload));
+    return await persistFirewall(deps.state, buildFirewallRecord(payload));
   } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await fetchFirewallByNameApi(input.name, deps);
       if (existing) {
-        return await persistFirewall(buildFirewallRecord(existing));
+        return await persistFirewall(deps.state, buildFirewallRecord(existing));
       }
     }
     throw error;

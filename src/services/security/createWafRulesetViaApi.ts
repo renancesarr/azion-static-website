@@ -13,7 +13,7 @@ export async function createWafRulesetViaApi(
   deps: SecurityDependencies = defaultSecurityDependencies,
 ) {
   try {
-    const response = await deps.http<AzionWafRulesetResponse>({
+    const response = await deps.http.request<AzionWafRulesetResponse>({
       method: 'POST',
       url: `${deps.apiBase}/v4/waf/rulesets`,
       body: {
@@ -24,12 +24,12 @@ export async function createWafRulesetViaApi(
     });
 
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionWafRuleset);
-    return await persistWafRuleset(buildWafRulesetRecord(payload));
+    return await persistWafRuleset(deps.state, buildWafRulesetRecord(payload));
   } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await fetchWafRulesetByNameApi(input.name, deps);
       if (existing) {
-        return await persistWafRuleset(buildWafRulesetRecord(existing));
+        return await persistWafRuleset(deps.state, buildWafRulesetRecord(existing));
       }
     }
     throw error;

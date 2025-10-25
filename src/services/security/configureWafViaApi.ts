@@ -13,7 +13,7 @@ export async function configureWafViaApi(
   deps: SecurityDependencies = defaultSecurityDependencies,
 ) {
   try {
-    const response = await deps.http<AzionWafResponse>({
+    const response = await deps.http.request<AzionWafResponse>({
       method: 'POST',
       url: `${deps.apiBase}/v4/waf/policies`,
       body: {
@@ -25,12 +25,12 @@ export async function configureWafViaApi(
     });
 
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionWafPolicy);
-    return await persistWaf(buildWafRecord(payload));
+    return await persistWaf(deps.state, buildWafRecord(payload));
   } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await fetchWafByEdgeAppApi(input.edgeApplicationId, deps);
       if (existing) {
-        return await persistWaf(buildWafRecord(existing));
+        return await persistWaf(deps.state, buildWafRecord(existing));
       }
     }
     throw error;
