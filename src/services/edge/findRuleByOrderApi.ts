@@ -9,7 +9,7 @@ export async function findRuleByOrderApi(
   order: number,
   deps: EdgeDependencies = defaultEdgeDependencies,
 ): Promise<AzionRule | undefined> {
-  const response = await deps.http<AzionRuleListResponse>({
+  const response = await deps.http.request<AzionRuleListResponse>({
     method: 'GET',
     url: `${deps.apiBase}/v4/edge_applications/${encodeURIComponent(edgeApplicationId)}/rules_engine/${encodeURIComponent(phase)}/rules`,
   });

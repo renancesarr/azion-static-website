@@ -7,7 +7,7 @@ export async function findEdgeApplicationByNameApi(
   name: string,
   deps: EdgeDependencies = defaultEdgeDependencies,
 ): Promise<AzionEdgeApplication | undefined> {
-  const response = await deps.http<AzionEdgeApplicationListResponse>({
+  const response = await deps.http.request<AzionEdgeApplicationListResponse>({
     method: 'GET',
     url: `${deps.apiBase}/v4/edge_applications?name=${encodeURIComponent(name)}`,
   });

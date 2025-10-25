@@ -7,7 +7,7 @@ export async function findConnectorByNameApi(
   name: string,
   deps: EdgeDependencies = defaultEdgeDependencies,
 ): Promise<AzionConnector | undefined> {
-  const response = await deps.http<AzionConnectorListResponse>({
+  const response = await deps.http.request<AzionConnectorListResponse>({
     method: 'GET',
     url: `${deps.apiBase}/v4/edge_applications/connectors?name=${encodeURIComponent(name)}`,
   });
