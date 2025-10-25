@@ -1,8 +1,10 @@
-import type { HttpRequestOptions, HttpSuccess } from '../../utils/http.js';
-
-export type HttpFn = <T>(options: HttpRequestOptions) => Promise<HttpSuccess<T>>;
+import { HttpClient } from '../../core/http/HttpClient.js';
+import { StateRepository } from '../../core/state/StateRepository.js';
+import { Logger } from '../../core/logging/Logger.js';
 
 export interface EdgeDependencies {
   apiBase: string;
-  http: HttpFn;
+  http: HttpClient;
+  state: StateRepository;
+  logger: Logger;
 }
