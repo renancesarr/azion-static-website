@@ -10,7 +10,7 @@ export async function createRuleViaApi(
   input: CreateRuleInput,
   deps: EdgeDependencies = defaultEdgeDependencies,
 ) {
-  const response = await deps.http<AzionRuleResponse>({
+  const response = await deps.http.request<AzionRuleResponse>({
     method: 'POST',
     url: `${deps.apiBase}/v4/edge_applications/${encodeURIComponent(input.edgeApplicationId)}/rules_engine/${encodeURIComponent(input.phase)}/rules`,
     body: {
@@ -23,5 +23,5 @@ export async function createRuleViaApi(
     },
   });
   const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionRule);
-  return await persistRule(buildRuleRecord(payload, input.edgeApplicationId));
+  return await persistRule(deps.state, buildRuleRecord(payload, input.edgeApplicationId));
 }

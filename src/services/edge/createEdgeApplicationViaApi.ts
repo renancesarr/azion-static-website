@@ -13,7 +13,7 @@ export async function createEdgeApplicationViaApi(
   deps: EdgeDependencies = defaultEdgeDependencies,
 ) {
   try {
-    const response = await deps.http<AzionEdgeApplicationResponse>({
+    const response = await deps.http.request<AzionEdgeApplicationResponse>({
       method: 'POST',
       url: `${deps.apiBase}/v4/edge_applications`,
       body: {
@@ -27,12 +27,12 @@ export async function createEdgeApplicationViaApi(
       },
     });
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionEdgeApplication);
-    return await persistEdgeApplication(buildEdgeApplicationRecord(payload));
+    return await persistEdgeApplication(deps.state, buildEdgeApplicationRecord(payload));
   } catch (error: unknown) {
     if (error instanceof HttpError && error.status === 409) {
       const existing = await findEdgeApplicationByNameApi(input.name, deps);
       if (existing) {
-        return await persistEdgeApplication(buildEdgeApplicationRecord(existing));
+        return await persistEdgeApplication(deps.state, buildEdgeApplicationRecord(existing));
       }
     }
     throw error;

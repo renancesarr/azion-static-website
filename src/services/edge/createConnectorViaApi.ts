@@ -10,7 +10,7 @@ export async function createConnectorViaApi(
   input: CreateConnectorInput & { bucketId: string; bucketName?: string },
   deps: EdgeDependencies = defaultEdgeDependencies,
 ) {
-  const response = await deps.http<AzionConnectorResponse>({
+  const response = await deps.http.request<AzionConnectorResponse>({
     method: 'POST',
     url: `${deps.apiBase}/v4/edge_applications/connectors`,
     body: {
@@ -21,5 +21,5 @@ export async function createConnectorViaApi(
     },
   });
   const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionConnector);
-  return await persistConnector(buildConnectorRecord(payload, input.bucketId, input.bucketName));
+  return await persistConnector(deps.state, buildConnectorRecord(payload, input.bucketId, input.bucketName));
 }
