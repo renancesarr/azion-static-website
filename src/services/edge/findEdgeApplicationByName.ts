@@ -1,6 +1,6 @@
 import { EDGE_APP_STATE_FILE } from './constants.js';
-import { EdgeAppState } from '../../models/edgeAppState.js';
-import { EdgeApplicationRecord } from '../../models/edgeApplicationRecord.js';
+import type { EdgeAppState } from '../../models/shared/edgeAppState.js';
+import { EdgeApplicationRecord } from '../../models/entities/edgeApplicationRecord.js';
 import { normalizeEdgeApplicationState } from './normalizeEdgeApplicationState.js';
 import { StateRepository } from '../../core/state/StateRepository.js';
 
@@ -9,5 +9,9 @@ export async function findEdgeApplicationByName(
   name: string,
 ): Promise<EdgeApplicationRecord | undefined> {
   const current = normalizeEdgeApplicationState(await state.read<EdgeAppState>(EDGE_APP_STATE_FILE));
-  return current.applications[name];
+  const record = current.applications[name];
+  if (!record) {
+    return undefined;
+  }
+  return EdgeApplicationRecord.hydrate(record);
 }
