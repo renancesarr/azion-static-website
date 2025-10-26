@@ -1,5 +1,5 @@
-import { AzionRule } from '../../models/azionRule.js';
-import { AzionRuleResponse } from '../../models/azionRuleResponse.js';
+import type { AzionRule } from '../../models/dto/azionRule.js';
+import type { AzionRuleResponse } from '../../models/dto/azionRuleResponse.js';
 import { CreateRuleInput } from './schemas.js';
 import { defaultEdgeDependencies } from './dependencies.js';
 import type { EdgeDependencies } from './types.js';
