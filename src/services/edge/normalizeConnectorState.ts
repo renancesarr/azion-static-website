@@ -1,4 +1,4 @@
-import { EdgeConnectorState } from '../../models/edgeConnectorState.js';
+import type { EdgeConnectorState } from '../../models/shared/edgeConnectorState.js';
 
 export function normalizeConnectorState(state?: EdgeConnectorState): EdgeConnectorState {
   if (!state) {
