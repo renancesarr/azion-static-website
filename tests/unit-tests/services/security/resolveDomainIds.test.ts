@@ -18,7 +18,19 @@ beforeEach(() => {
 
 describe('resolveDomainIds', () => {
   it('retorna ids existentes e resolve nomes', async () => {
-    readStateFileMock.mockResolvedValue({ domains: { 'example.com': { id: 'dom-1' } } });
+    readStateFileMock.mockResolvedValue({
+      domains: {
+        'example.com': {
+          id: 'dom-1',
+          name: 'example.com',
+          edgeApplicationId: 'edge-1',
+          isActive: true,
+          cname: 'example.com.azioncdn.net',
+          createdAt: '2024-01-01T00:00:00Z',
+          raw: {},
+        },
+      },
+    });
 
     const ids = await resolveDomainIds({ domainIds: ['dom-2'], domainNames: ['example.com'] } as any);
 

@@ -1,5 +1,5 @@
-import { AzionDomain } from '../../models/azionDomain.js';
-import { AzionDomainResponse } from '../../models/azionDomainResponse.js';
+import type { AzionDomain } from '../../models/dto/azionDomain.js';
+import type { AzionDomainResponse } from '../../models/dto/azionDomainResponse.js';
 import { CreateDomainInput } from './schemas.js';
 import { buildDomainRecord } from './buildDomainRecord.js';
 import { persistDomain } from './persistDomain.js';

@@ -1,4 +1,4 @@
-export interface DomainRecord {
+export interface DomainRecordData {
   id: string;
   name: string;
   edgeApplicationId: string;
@@ -7,3 +7,4 @@ export interface DomainRecord {
   createdAt: string;
   raw: unknown;
 }
+

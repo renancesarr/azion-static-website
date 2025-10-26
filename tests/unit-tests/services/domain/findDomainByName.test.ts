@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { DomainRecord } from '../../../../src/models/entities/domainRecord.js';
 
 const readStateFileMock = jest.fn();
 
@@ -20,13 +21,30 @@ describe('findDomainByName', () => {
   it('retorna domínio armazenado em state', async () => {
     readStateFileMock.mockResolvedValue({
       domains: {
-        'example.com': { id: 'dom-1', name: 'example.com' },
+        'example.com': {
+          id: 'dom-1',
+          name: 'example.com',
+          edgeApplicationId: 'edge-1',
+          isActive: true,
+          cname: 'example.com.azioncdn.net',
+          createdAt: '2024-01-01T00:00:00Z',
+          raw: {},
+        },
       },
     });
 
     const result = await findDomainByName('example.com');
 
-    expect(result).toEqual({ id: 'dom-1', name: 'example.com' });
+    expect(result).toBeInstanceOf(DomainRecord);
+    expect(result?.toJSON()).toEqual({
+      id: 'dom-1',
+      name: 'example.com',
+      edgeApplicationId: 'edge-1',
+      isActive: true,
+      cname: 'example.com.azioncdn.net',
+      createdAt: '2024-01-01T00:00:00Z',
+      raw: {},
+    });
     expect(readStateFileMock).toHaveBeenCalled();
   });
 

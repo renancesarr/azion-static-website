@@ -1,4 +1,5 @@
 import { buildDomainRecord } from '../../../../src/services/domain/buildDomainRecord.js';
+import { DomainRecord } from '../../../../src/models/entities/domainRecord.js';
 
 describe('buildDomainRecord', () => {
   it('mapeia payload Azion para DomainRecord', () => {
@@ -13,7 +14,8 @@ describe('buildDomainRecord', () => {
       created_at: now,
     });
 
-    expect(record).toEqual({
+    expect(record).toBeInstanceOf(DomainRecord);
+    expect(record.toJSON()).toEqual({
       id: 'dom-1',
       name: 'site.example.com',
       edgeApplicationId: 'edge-1',

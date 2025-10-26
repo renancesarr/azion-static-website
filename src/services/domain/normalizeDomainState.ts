@@ -1,4 +1,4 @@
-import { DomainState } from '../../models/domainState.js';
+import type { DomainState } from '../../models/dto/domainState.js';
 
 export function normalizeDomainState(state?: DomainState): DomainState {
   if (!state) {

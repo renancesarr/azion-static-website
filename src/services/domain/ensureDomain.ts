@@ -1,5 +1,5 @@
 import type { EnsureResult } from '../../utils/ensure.js';
-import { DomainRecord } from '../../models/domainRecord.js';
+import { DomainRecord } from '../../models/entities/domainRecord.js';
 import { CreateDomainInput } from './schemas.js';
 import { findDomainByName } from './findDomainByName.js';
 import { createDomainViaApi } from './createDomainViaApi.js';

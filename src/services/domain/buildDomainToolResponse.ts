@@ -1,6 +1,6 @@
 import { statePath } from '../../utils/state.js';
 import { ToolResponse } from '../../models/toolResponse.js';
-import { DomainRecord } from '../../models/domainRecord.js';
+import { DomainRecord } from '../../models/entities/domainRecord.js';
 import { DOMAIN_STATE_FILE } from './constants.js';
 
 export function buildDomainToolResponse(prefix: string, record: DomainRecord): ToolResponse {

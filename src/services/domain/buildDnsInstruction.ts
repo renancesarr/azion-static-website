@@ -1,4 +1,4 @@
-import { AzionDomain } from '../../models/azionDomain.js';
+import type { AzionDomain } from '../../models/dto/azionDomain.js';
 
 export function buildDnsInstruction(domain: AzionDomain): string[] {
   const lines: string[] = [];

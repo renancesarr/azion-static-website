@@ -1,5 +1,5 @@
-import { AzionDomain } from '../../models/azionDomain.js';
-import { AzionDomainListResponse } from '../../models/azionDomainListResponse.js';
+import type { AzionDomain } from '../../models/dto/azionDomain.js';
+import type { AzionDomainListResponse } from '../../models/dto/azionDomainListResponse.js';
 import type { DomainDependencies } from './types.js';
 import { defaultDomainDependencies } from './dependencies.js';
 

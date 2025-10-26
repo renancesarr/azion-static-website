@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { DomainRecord } from '../../../../src/models/entities/domainRecord.js';
 
 const readStateFileMock = jest.fn();
 const writeStateFileMock = jest.fn();
@@ -24,7 +25,7 @@ describe('persistDomain', () => {
     readStateFileMock.mockResolvedValue({ domains: {} });
     writeStateFileMock.mockResolvedValue(undefined);
 
-    const record = {
+    const record = DomainRecord.hydrate({
       id: 'dom-1',
       name: 'example.com',
       edgeApplicationId: 'edge-1',
@@ -32,12 +33,12 @@ describe('persistDomain', () => {
       isActive: true,
       createdAt: '2024-01-01T00:00:00Z',
       raw: {},
-    };
+    });
 
     const result = await persistDomain(record);
 
     expect(writeStateFileMock).toHaveBeenCalledWith('edge/domains.json', {
-      domains: { 'example.com': record },
+      domains: { 'example.com': record.toJSON() },
     });
     expect(result).toBe(record);
   });
