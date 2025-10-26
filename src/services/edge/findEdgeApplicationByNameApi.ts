@@ -1,5 +1,5 @@
-import { AzionEdgeApplication } from '../../models/azionEdgeApplication.js';
-import { AzionEdgeApplicationListResponse } from '../../models/azionEdgeApplicationListResponse.js';
+import type { AzionEdgeApplication } from '../../models/dto/azionEdgeApplication.js';
+import type { AzionEdgeApplicationListResponse } from '../../models/dto/azionEdgeApplicationListResponse.js';
 import { defaultEdgeDependencies } from './dependencies.js';
 import type { EdgeDependencies } from './types.js';
 
