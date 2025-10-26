@@ -24,8 +24,7 @@
         "node_modules/@modelcontextprotocol/sdk/dist/esm/server/*"
       ]
     },
-    "isolatedModules": true,
-    "allowImportingTsExtensions": true
+    "isolatedModules": true
   },
   "include": [
     "src/**/*",
