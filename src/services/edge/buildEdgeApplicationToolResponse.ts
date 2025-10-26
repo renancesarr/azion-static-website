@@ -1,5 +1,5 @@
 import { ToolResponse } from '../../models/toolResponse.js';
-import { EdgeApplicationRecord } from '../../models/edgeApplicationRecord.js';
+import { EdgeApplicationRecord } from '../../models/entities/edgeApplicationRecord.js';
 import { statePath } from '../../utils/state.js';
 import { EDGE_APP_STATE_FILE } from './constants.js';
 
