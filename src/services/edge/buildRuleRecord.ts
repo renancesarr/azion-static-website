@@ -1,13 +1,6 @@
-import { AzionRule } from '../../models/azionRule.js';
-import { EdgeRuleRecord } from '../../models/edgeRuleRecord.js';
+import type { AzionRule } from '../../models/dto/azionRule.js';
+import { EdgeRuleRecord } from '../../models/entities/edgeRuleRecord.js';
 
 export function buildRuleRecord(payload: AzionRule, edgeApplicationId: string): EdgeRuleRecord {
-  return {
-    id: payload.id,
-    edgeApplicationId,
-    phase: payload.phase,
-    order: payload.order,
-    createdAt: payload.created_at ?? new Date().toISOString(),
-    raw: payload,
-  };
+  return EdgeRuleRecord.fromAzionPayload(payload, edgeApplicationId);
 }
