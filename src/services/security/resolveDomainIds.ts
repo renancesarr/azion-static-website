@@ -1,5 +1,5 @@
 import { readStateFile } from '../../utils/state.js';
-import type { DomainState } from '../../models/dto/domainState.js';
+import type { DomainState } from '../../models/shared/domainState.js';
 import { CreateFirewallInput } from './schemas.js';
 
 export async function resolveDomainIds(input: CreateFirewallInput): Promise<string[]> {
