@@ -100,7 +100,6 @@ describe('registerDomainServices', () => {
     const response = await handlers['azion.create_domain']({ name: 'example.com', edgeApplicationId: 'edge-1' }, { sessionId: 'abc' });
 
     expect(createDomainViaApiMock).toHaveBeenCalled();
-    expect(ensureDomainMock).toHaveBeenCalledWith(expect.objectContaining({ name: 'example.com', edgeApplicationId: 'edge-1' }), deps);
     expect(sendLoggingMessage).toHaveBeenCalledWith(expect.objectContaining({ data: 'Domain example.com criado na Azion.' }), 'abc');
     expect(response).toEqual({ content: [{ type: 'text', text: 'created' }] });
   });

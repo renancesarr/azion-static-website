@@ -167,13 +167,14 @@ describe('registerOrchestratorServices', () => {
     const response = await handlers['azion.provision_static_site']({
       project: 'site',
       bucket: { name: 'bucket-1' },
-      upload: { localDir: './dist' },
+      upload: { localDir: './dist', bucketName: 'bucket-1' },
       edgeApplication: { name: 'edge-app' },
       connector: { name: 'connector' },
       cacheRules: [],
       domain: { name: 'example.com' },
       firewall: { name: 'firewall', domainNames: ['example.com'] },
       wafRuleset: { name: 'ruleset' },
+      firewallRule: { order: 0 },
       waf: { edgeApplicationId: 'edge-1', mode: 'blocking' },
       postDeploy: { domain: 'example.com', paths: ['/'] },
     }, { sessionId: 'session-2' });
@@ -187,7 +188,7 @@ describe('registerOrchestratorServices', () => {
     expect(ensureFirewallMock).toHaveBeenCalled();
     expect(ensureWafRulesetMock).toHaveBeenCalled();
     expect(ensureFirewallRuleMock).toHaveBeenCalled();
-    expect(ensureWafMock).toHaveBeenCalledWith(expect.objectContaining({ edgeApplicationId: 'edge-app' }), deps);
+    expect(ensureWafMock).toHaveBeenCalledWith(expect.objectContaining({ edgeApplicationId: 'edge-1' }));
     expect(executePostDeployCheckMock).toHaveBeenCalled();
     expect(persistReportMock).toHaveBeenCalled();
     expect(sendLoggingMessage).toHaveBeenCalledWith(

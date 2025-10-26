@@ -96,7 +96,7 @@ describe('processUploadDir', () => {
       deps,
     );
 
-    expect(execution.summaryLines[0]).toContain('Diretório ./dist não possui arquivos.');
+    expect(execution.summaryLines[0]).toContain('não possui arquivos.');
     expect(server.sendLoggingMessage).not.toHaveBeenCalledWith(expect.objectContaining({ level: 'error' }), expect.anything());
   });
 

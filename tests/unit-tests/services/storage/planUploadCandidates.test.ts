@@ -64,12 +64,12 @@ describe('planUploadCandidates', () => {
       objectPath: 'public/style.css',
       contentEncoding: undefined,
     });
-    expect(result.nextIndexFiles['index.html']).toMatchObject({
+    expect(result.nextIndexFiles['public/index.html']).toMatchObject({
       hash: 'hash-index',
       sourcePath: 'index.html',
     });
     expect(buildUploadReportEntryMock).toHaveBeenCalledWith(
-      expect.objectContaining({ objectPath: 'index.html' }),
+      expect.objectContaining({ objectPath: 'public/index.html' }),
       'skipped',
       0,
     );
