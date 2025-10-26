@@ -45,6 +45,7 @@ jest.unstable_mockModule('../../../../src/services/storage/buildUploadReport.js'
 
 jest.unstable_mockModule('../../../../src/utils/state.js', () => ({
   statePath: statePathMock,
+  fileStateRepository: {},
 }));
 
 jest.unstable_mockModule('../../../../src/services/storage/paths.js', () => ({

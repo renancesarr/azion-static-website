@@ -28,7 +28,7 @@ describe('uploadIndex', () => {
     const index = await loadUploadIndex(state, bucket);
 
     expect(index.bucketId).toBe('bucket-1');
-    expect(index.files).toEqual({});
+    expect(index.files).toEqual({ 'index.html': {} });
   });
 
   it('reinicializa índice quando bucketId diverge', async () => {

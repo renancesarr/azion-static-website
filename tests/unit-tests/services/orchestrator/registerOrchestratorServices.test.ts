@@ -110,16 +110,21 @@ describe('registerOrchestratorServices', () => {
 
     registerOrchestratorServices(server as any);
 
-    const response = await handlers['azion.provision_static_site']({
-      project: 'site',
-      dryRun: true,
-      bucket: { name: 'bucket-1' },
-      edgeApplication: { name: 'edge-app' },
-      connector: { name: 'connector', bucketId: 'bucket-1' },
-      domain: { name: 'example.com' },
-      firewall: { name: 'fw', domainNames: ['example.com'] },
-      wafRuleset: { name: 'ruleset' },
-    }, { sessionId: 'session-1' });
+    const response = await handlers['azion.provision_static_site'](
+      {
+        project: 'site',
+        dryRun: true,
+        bucket: { name: 'bucket-1' },
+        edgeApplication: { name: 'edge-app' },
+        connector: { name: 'connector', bucketId: 'bucket-1' },
+        domain: { name: 'example.com' },
+        firewall: { name: 'firewall', domainNames: ['example.com'] },
+        wafRuleset: { name: 'ruleset' },
+        firewallRule: { order: 0 },
+        waf: { edgeApplicationId: 'edge-1' },
+      },
+      { sessionId: 'session-1' },
+    );
 
     expect(buildDryRunPlanMock).toHaveBeenCalled();
     expect(sendLoggingMessage).toHaveBeenCalledWith({ level: 'info', data: 'Dry-run solicitado — exibindo plano sem executar chamadas.' }, 'session-1');
@@ -167,9 +172,9 @@ describe('registerOrchestratorServices', () => {
       connector: { name: 'connector' },
       cacheRules: [],
       domain: { name: 'example.com' },
-      firewall: { name: 'fw', domainNames: ['example.com'] },
+      firewall: { name: 'firewall', domainNames: ['example.com'] },
       wafRuleset: { name: 'ruleset' },
-      waf: { mode: 'blocking' },
+      waf: { edgeApplicationId: 'edge-1', mode: 'blocking' },
       postDeploy: { domain: 'example.com', paths: ['/'] },
     }, { sessionId: 'session-2' });
 
@@ -182,7 +187,7 @@ describe('registerOrchestratorServices', () => {
     expect(ensureFirewallMock).toHaveBeenCalled();
     expect(ensureWafRulesetMock).toHaveBeenCalled();
     expect(ensureFirewallRuleMock).toHaveBeenCalled();
-    expect(ensureWafMock).toHaveBeenCalled();
+    expect(ensureWafMock).toHaveBeenCalledWith(expect.objectContaining({ edgeApplicationId: 'edge-app' }), deps);
     expect(executePostDeployCheckMock).toHaveBeenCalled();
     expect(persistReportMock).toHaveBeenCalled();
     expect(sendLoggingMessage).toHaveBeenCalledWith(

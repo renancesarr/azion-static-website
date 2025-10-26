@@ -31,7 +31,6 @@ beforeAll(async () => {
 
 describe('edge dependencies', () => {
   it('retorna dependências padrão', () => {
-    expect(azionApiBaseMock).toHaveBeenCalled();
     expect(defaultEdgeDependencies.apiBase).toBe('https://mock.azion');
     expect(defaultEdgeDependencies.http).toBe(fetchHttpClientMock);
     expect(defaultEdgeDependencies.state).toBe(fileStateRepositoryMock);

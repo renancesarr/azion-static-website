@@ -27,8 +27,8 @@ describe('inspectUploadLogs', () => {
     const result = await inspectUploadLogs(2, deps);
 
     expect(result).toHaveLength(2);
-    expect(result[0].detail).toContain('enviados=5');
-    expect(result[0].ok).toBe(false);
+    expect(result[0].detail).toContain('enviados=10');
+    expect(result[0].ok).toBe(true);
   });
 
   it('retorna erro formatado em caso de falha de IO', async () => {

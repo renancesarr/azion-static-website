@@ -77,7 +77,10 @@ describe('registerDomainServices', () => {
       expect.any(Function),
     );
 
-    const response = await handlers['azion.create_domain']({ name: 'example.com', edge_application_id: 'edge-1' }, { sessionId: '123' });
+    const response = await handlers['azion.create_domain'](
+      { name: 'example.com', edgeApplicationId: 'edge-1' },
+      { sessionId: '123' },
+    );
 
     expect(sendLoggingMessage).toHaveBeenCalledWith(
       expect.objectContaining({ data: 'Domain example.com reaproveitado do cache.' }),
@@ -94,16 +97,11 @@ describe('registerDomainServices', () => {
 
     registerDomainServices(server as any, { apiBase: 'https://api.azion.com', http: jest.fn() });
 
-    const response = await handlers['azion.create_domain'](
-      { name: 'example.com', edge_application_id: 'edge-1' },
-      { sessionId: 'abc' },
-    );
+    const response = await handlers['azion.create_domain']({ name: 'example.com', edgeApplicationId: 'edge-1' }, { sessionId: 'abc' });
 
     expect(createDomainViaApiMock).toHaveBeenCalled();
-    expect(sendLoggingMessage).toHaveBeenCalledWith(
-      expect.objectContaining({ data: 'Domain example.com criado na Azion.' }),
-      'abc',
-    );
+    expect(ensureDomainMock).toHaveBeenCalledWith(expect.objectContaining({ name: 'example.com', edgeApplicationId: 'edge-1' }), deps);
+    expect(sendLoggingMessage).toHaveBeenCalledWith(expect.objectContaining({ data: 'Domain example.com criado na Azion.' }), 'abc');
     expect(response).toEqual({ content: [{ type: 'text', text: 'created' }] });
   });
 

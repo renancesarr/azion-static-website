@@ -49,7 +49,7 @@ describe('planUploadCandidates', () => {
 
     const index = {
       files: {
-        'index.html': { hash: 'hash-index', size: 10, updatedAt: 'old' },
+        'public/index.html': { hash: 'hash-index', size: 10, updatedAt: 'old' },
       },
     };
 
