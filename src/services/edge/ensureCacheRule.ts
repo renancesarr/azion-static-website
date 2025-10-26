@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http.js';
 import type { EnsureResult } from '../../utils/ensure.js';
-import { EdgeRuleRecord } from '../../models/edgeRuleRecord.js';
+import { EdgeRuleRecord } from '../../models/entities/edgeRuleRecord.js';
 import { CreateRuleInput } from './schemas.js';
 import { findRuleByOrder } from './findRuleByOrder.js';
 import { createRuleViaApi } from './createRuleViaApi.js';
