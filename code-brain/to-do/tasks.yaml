@@ -2568,3 +2568,15 @@ tasks:
   prioridade: ''
   status: ''
   estimativa: ''
+- id: T-445
+  epico: Qualidade
+  tarefa: Revisar isolamento dos testes de serviços
+  descricao: Auditar suites unitárias recentes (storage, edge, security, validation) para garantir que dependências externas sejam mockadas e evitar chamadas reais a HTTP/HTTPS ou outros recursos.
+  ca: docs/test-reports/test-results-20251026-162212.json.
+  dep: ''
+  area: Testes
+  inputs: 'src/services/**/*.ts, tests/unit-tests/services/**'
+  prioridade: P1
+  status: Novo
+  estimativa: 4h
+  related_use_case: UC-AZION-PROVISIONING

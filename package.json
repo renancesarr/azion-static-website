@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand --reporters=default --json --outputFile=docs/test-reports/test-results-$(date +%Y%m%d-%H%M%S).json"
   },
   "engines": {
     "node": ">=18.18.0"
@@ -19,7 +20,10 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.9.1",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.5",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }

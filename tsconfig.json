@@ -15,14 +15,17 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     "baseUrl": ".",
     "paths": {
       "@modelcontextprotocol/sdk/server/*": [
         "node_modules/@modelcontextprotocol/sdk/dist/esm/server/*"
       ]
-    }
+    },
+    "isolatedModules": true,
+    "allowImportingTsExtensions": true
   },
   "include": [
     "src/**/*",
