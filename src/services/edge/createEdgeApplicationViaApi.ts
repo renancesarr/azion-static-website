@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http.js';
-import { AzionEdgeApplication } from '../../models/azionEdgeApplication.js';
-import { AzionEdgeApplicationResponse } from '../../models/azionEdgeApplicationResponse.js';
+import type { AzionEdgeApplication } from '../../models/dto/azionEdgeApplication.js';
+import type { AzionEdgeApplicationResponse } from '../../models/dto/azionEdgeApplicationResponse.js';
 import { CreateEdgeAppInput } from './schemas.js';
 import { buildEdgeApplicationRecord } from './buildEdgeApplicationRecord.js';
 import { persistEdgeApplication } from './persistEdgeApplication.js';
