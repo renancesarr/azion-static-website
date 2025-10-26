@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { findFirewallByName } from '../../../../src/services/security/findFirewallByName.js';
 import { findWaf } from '../../../../src/services/security/findWaf.js';
 import { findWafRulesetByName } from '../../../../src/services/security/findWafRulesetByName.js';

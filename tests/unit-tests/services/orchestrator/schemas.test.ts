@@ -30,7 +30,10 @@ describe('orchestrator schemas', () => {
       edgeApplication: { name: 'edge-app' },
       connector: { name: 'connector', bucketId: 'bucket-1' },
       domain: { name: 'example.com' },
-      firewall: {},
+      firewall: { name: 'fw', domainNames: ['example.com'] },
+      wafRuleset: { name: 'ruleset' },
+      firewallRule: { order: 0 },
+      waf: { edgeApplicationId: 'edge-app' },
     });
 
     expect(parsed.dryRun).toBe(false);

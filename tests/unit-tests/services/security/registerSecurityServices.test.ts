@@ -93,9 +93,9 @@ describe('registerSecurityServices', () => {
 
     registerSecurityServices(server as any, deps);
 
-    const response = await handlers['azion.create_firewall']({ name: 'firewall' }, { sessionId: 'session-1' });
+    const response = await handlers['azion.create_firewall']({ name: 'firewall', domainNames: ['example.com'] }, { sessionId: 'session-1' });
 
-    expect(ensureFirewallMock).toHaveBeenCalledWith({ name: 'firewall' }, deps);
+    expect(ensureFirewallMock).toHaveBeenCalledWith({ name: 'firewall', domainNames: ['example.com'] }, deps);
     expect(sendLoggingMessage).toHaveBeenCalledWith(
       expect.objectContaining({ data: 'Firewall firewall criado.' }),
       'session-1',

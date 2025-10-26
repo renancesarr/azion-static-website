@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { findDomainByNameApi } from '../../../../src/services/domain/findDomainByNameApi.js';
 
 describe('findDomainByNameApi', () => {

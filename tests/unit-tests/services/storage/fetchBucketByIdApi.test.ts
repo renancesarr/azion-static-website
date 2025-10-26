@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { fetchBucketByIdApi } from '../../../../src/services/storage/fetchBucketByIdApi.js';
 import { HttpError } from '../../../../src/utils/http.js';
 

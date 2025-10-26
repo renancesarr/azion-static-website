@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { loadFirstUploadIndex } from '../../../../src/services/validation/loadFirstUploadIndex.js';
 
 describe('loadFirstUploadIndex', () => {

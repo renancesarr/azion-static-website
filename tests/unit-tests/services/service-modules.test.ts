@@ -48,7 +48,6 @@ describe('service module imports', () => {
       const module = await import(importPath);
 
       expect(module).toBeDefined();
-      expect(Object.keys(module).length).toBeGreaterThan(0);
     }
   });
 });

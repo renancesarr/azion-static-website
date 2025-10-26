@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { persistEdgeApplication } from '../../../../src/services/edge/persistEdgeApplication.js';
 import { persistConnector } from '../../../../src/services/edge/persistConnector.js';
 import { persistRule } from '../../../../src/services/edge/persistRule.js';

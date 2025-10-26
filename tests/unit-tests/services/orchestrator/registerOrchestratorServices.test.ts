@@ -43,62 +43,43 @@ jest.unstable_mockModule('../../../../src/services/orchestrator/summarizeRecord.
   summarizeRecord: summarizeRecordMock,
 }));
 
-jest.unstable_mockModule('../../../../src/services/storage/index.js', async () => {
-  const actual = await jest.requireActual<typeof import('../../../../src/services/storage/index.js')>(
-    '../../../../src/services/storage/index.js',
-  );
-  return {
-    ...actual,
-    ensureBucket: ensureBucketMock,
-    processUploadDir: processUploadDirMock,
-  };
-});
+jest.unstable_mockModule('../../../../src/services/storage/index.js', () => ({
+  createBucketInputSchema: { parse: (input: unknown) => input },
+  uploadDirInputSchema: { parse: (input: unknown) => input },
+  ensureBucket: ensureBucketMock,
+  processUploadDir: processUploadDirMock,
+}));
 
-jest.unstable_mockModule('../../../../src/services/edge/index.js', async () => {
-  const actual = await jest.requireActual<typeof import('../../../../src/services/edge/index.js')>(
-    '../../../../src/services/edge/index.js',
-  );
-  return {
-    ...actual,
-    ensureEdgeApplication: ensureEdgeApplicationMock,
-    ensureEdgeConnector: ensureEdgeConnectorMock,
-    ensureCacheRule: ensureCacheRuleMock,
-  };
-});
+jest.unstable_mockModule('../../../../src/services/edge/index.js', () => ({
+  createEdgeApplicationInputSchema: { parse: (input: unknown) => input },
+  createConnectorInputSchema: { parse: (input: unknown) => input },
+  createRuleInputSchema: { parse: (input: unknown) => input },
+  ensureEdgeApplication: ensureEdgeApplicationMock,
+  ensureEdgeConnector: ensureEdgeConnectorMock,
+  ensureCacheRule: ensureCacheRuleMock,
+}));
 
-jest.unstable_mockModule('../../../../src/services/domain/index.js', async () => {
-  const actual = await jest.requireActual<typeof import('../../../../src/services/domain/index.js')>(
-    '../../../../src/services/domain/index.js',
-  );
-  return {
-    ...actual,
-    ensureDomain: ensureDomainMock,
-  };
-});
+jest.unstable_mockModule('../../../../src/services/domain/index.js', () => ({
+  createDomainInputSchema: { parse: (input: unknown) => input },
+  ensureDomain: ensureDomainMock,
+}));
 
-jest.unstable_mockModule('../../../../src/services/security/index.js', async () => {
-  const actual = await jest.requireActual<typeof import('../../../../src/services/security/index.js')>(
-    '../../../../src/services/security/index.js',
-  );
-  return {
-    ...actual,
-    ensureFirewall: ensureFirewallMock,
-    ensureWafRuleset: ensureWafRulesetMock,
-    ensureFirewallRule: ensureFirewallRuleMock,
-    ensureWaf: ensureWafMock,
-  };
-});
+jest.unstable_mockModule('../../../../src/services/security/index.js', () => ({
+  configureWafInputSchema: { parse: (input: unknown) => input },
+  wafStatusInputSchema: { parse: (input: unknown) => input },
+  createFirewallInputSchema: { parse: (input: unknown) => input },
+  createWafRulesetInputSchema: { parse: (input: unknown) => input },
+  applyWafRulesetInputSchema: { parse: (input: unknown) => input },
+  ensureFirewall: ensureFirewallMock,
+  ensureWafRuleset: ensureWafRulesetMock,
+  ensureFirewallRule: ensureFirewallRuleMock,
+  ensureWaf: ensureWafMock,
+}));
 
-jest.unstable_mockModule('../../../../src/services/postDeploy/index.js', async () => {
-  const actual = await jest.requireActual<typeof import('../../../../src/services/postDeploy/index.js')>(
-    '../../../../src/services/postDeploy/index.js',
-  );
-  return {
-    ...actual,
-    executePostDeployCheck: executePostDeployCheckMock,
-    persistPostDeployReport: persistPostDeployReportMock,
-  };
-});
+jest.unstable_mockModule('../../../../src/services/postDeploy/index.js', () => ({
+  executePostDeployCheck: executePostDeployCheckMock,
+  persistPostDeployReport: persistPostDeployReportMock,
+}));
 
 let registerOrchestratorServices: typeof import('../../../../src/services/orchestrator/registerOrchestratorServices.js')['registerOrchestratorServices'];
 

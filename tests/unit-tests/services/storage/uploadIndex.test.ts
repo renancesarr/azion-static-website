@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { loadUploadIndex, saveUploadIndex } from '../../../../src/services/storage/uploadIndex.js';
 
 describe('uploadIndex', () => {

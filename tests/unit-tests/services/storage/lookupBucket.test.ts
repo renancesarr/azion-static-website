@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { lookupBucketByName, lookupBucketById } from '../../../../src/services/storage/lookupBucket.js';
 
 describe('lookupBucket', () => {

@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { persistFirewall } from '../../../../src/services/security/persistFirewall.js';
 import { persistWaf } from '../../../../src/services/security/persistWaf.js';
 import { persistWafRuleset } from '../../../../src/services/security/persistWafRuleset.js';

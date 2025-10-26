@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { persistBucket } from '../../../../src/services/storage/persistBucket.js';
 
 describe('persistBucket', () => {

@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { findEdgeApplicationByName } from '../../../../src/services/edge/findEdgeApplicationByName.js';
 import { findConnectorByName } from '../../../../src/services/edge/findConnectorByName.js';
 import { findRuleByOrder } from '../../../../src/services/edge/findRuleByOrder.js';

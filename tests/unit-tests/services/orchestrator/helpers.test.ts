@@ -2,15 +2,10 @@ import { jest } from '@jest/globals';
 
 const writeStateFileMock = jest.fn();
 
-jest.unstable_mockModule('../../../../src/utils/state.js', async () => {
-  const actual = await jest.requireActual<typeof import('../../../../src/utils/state.js')>(
-    '../../../../src/utils/state.js',
-  );
-  return {
-    ...actual,
-    writeStateFile: writeStateFileMock,
-  };
-});
+jest.unstable_mockModule('../../../../src/utils/state.js', () => ({
+  writeStateFile: writeStateFileMock,
+  statePath: (value: string) => value,
+}));
 
 type DryRunModule = typeof import('../../../../src/services/orchestrator/buildDryRunPlan.js');
 type ConnectorModule = typeof import('../../../../src/services/orchestrator/buildConnectorInput.js');

@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { fetchWafByEdgeAppApi } from '../../../../src/services/security/fetchWafByEdgeAppApi.js';
 import { fetchFirewallByNameApi } from '../../../../src/services/security/fetchFirewallByNameApi.js';
 import { fetchWafRulesetByNameApi } from '../../../../src/services/security/fetchWafRulesetByNameApi.js';

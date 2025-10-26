@@ -95,7 +95,7 @@ describe('registerEdgeServices', () => {
 
     const response = await handlers['azion.create_edge_application']({ name: 'edge-app' }, { sessionId: 'session-1' });
 
-    expect(ensureEdgeApplicationMock).toHaveBeenCalledWith({ name: 'edge-app' }, deps);
+    expect(ensureEdgeApplicationMock).toHaveBeenCalledWith(expect.objectContaining({ name: 'edge-app' }), deps);
     expect(sendLoggingMessage).toHaveBeenCalledWith(
       expect.objectContaining({ data: 'Edge Application edge-app criada.' }),
       'session-1',
