@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http.js';
 import type { EnsureResult } from '../../utils/ensure.js';
-import { EdgeConnectorRecord } from '../../models/edgeConnectorRecord.js';
+import { EdgeConnectorRecord } from '../../models/entities/edgeConnectorRecord.js';
 import { CreateConnectorInput } from './schemas.js';
 import { findConnectorByName } from './findConnectorByName.js';
 import { createConnectorViaApi } from './createConnectorViaApi.js';
