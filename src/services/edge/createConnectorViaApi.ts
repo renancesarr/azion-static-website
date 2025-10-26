@@ -1,5 +1,5 @@
-import { AzionConnector } from '../../models/azionConnector.js';
-import { AzionConnectorResponse } from '../../models/azionConnectorResponse.js';
+import type { AzionConnector } from '../../models/dto/azionConnector.js';
+import type { AzionConnectorResponse } from '../../models/dto/azionConnectorResponse.js';
 import { CreateConnectorInput } from './schemas.js';
 import { defaultEdgeDependencies } from './dependencies.js';
 import type { EdgeDependencies } from './types.js';
