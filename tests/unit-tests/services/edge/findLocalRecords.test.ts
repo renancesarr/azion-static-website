@@ -1,4 +1,7 @@
 import { jest } from '@jest/globals';
+import { EdgeApplicationRecord } from '../../../../src/models/entities/edgeApplicationRecord.js';
+import { EdgeConnectorRecord } from '../../../../src/models/entities/edgeConnectorRecord.js';
+import { EdgeRuleRecord } from '../../../../src/models/entities/edgeRuleRecord.js';
 import { findEdgeApplicationByName } from '../../../../src/services/edge/findEdgeApplicationByName.js';
 import { findConnectorByName } from '../../../../src/services/edge/findConnectorByName.js';
 import { findRuleByOrder } from '../../../../src/services/edge/findRuleByOrder.js';
@@ -17,7 +20,8 @@ describe('edge local finders', () => {
 
     const result = await findEdgeApplicationByName(state, 'app');
 
-    expect(result).toEqual({ id: 'app-1' });
+    expect(result).toBeInstanceOf(EdgeApplicationRecord);
+    expect(result).toMatchObject({ id: 'app-1' });
   });
 
   it('localiza connector por nome', async () => {
@@ -25,7 +29,8 @@ describe('edge local finders', () => {
 
     const result = await findConnectorByName(state, 'connector');
 
-    expect(result).toEqual({ id: 'conn-1' });
+    expect(result).toBeInstanceOf(EdgeConnectorRecord);
+    expect(result).toMatchObject({ id: 'conn-1' });
   });
 
   it('localiza regra por order', async () => {
@@ -33,6 +38,7 @@ describe('edge local finders', () => {
 
     const result = await findRuleByOrder(state, 'app', 'request', 1);
 
-    expect(result).toEqual({ id: 'rule-1', edgeApplicationId: 'app', phase: 'request', order: 1 });
+    expect(result).toBeInstanceOf(EdgeRuleRecord);
+    expect(result).toMatchObject({ id: 'rule-1', edgeApplicationId: 'app', phase: 'request', order: 1 });
   });
 });
