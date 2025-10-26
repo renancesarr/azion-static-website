@@ -1,5 +1,5 @@
 import type { EnsureResult } from '../../utils/ensure.js';
-import { EdgeApplicationRecord } from '../../models/edgeApplicationRecord.js';
+import { EdgeApplicationRecord } from '../../models/entities/edgeApplicationRecord.js';
 import { CreateEdgeAppInput } from './schemas.js';
 import { findEdgeApplicationByName } from './findEdgeApplicationByName.js';
 import { createEdgeApplicationViaApi } from './createEdgeApplicationViaApi.js';
