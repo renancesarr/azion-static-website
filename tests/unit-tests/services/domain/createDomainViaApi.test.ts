@@ -36,6 +36,7 @@ describe('createDomainViaApi', () => {
       active: true,
       cname: 'example.com.azioncdn.net',
       cnames: [],
+      created_at: '2024-01-01T00:00:00Z',
     };
     deps.http.mockResolvedValue({ data: { results: payload } });
     const record = DomainRecord.fromAzionPayload(payload as any);
@@ -70,6 +71,7 @@ describe('createDomainViaApi', () => {
       active: true,
       cname: 'example.com.azioncdn.net',
       cnames: [],
+      created_at: '2024-01-02T00:00:00Z',
     };
     deps.http.mockResolvedValueOnce({ data: { results: [existing] } });
     const record = DomainRecord.fromAzionPayload(existing as any);
