@@ -2,23 +2,19 @@ import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
 import { createDomainSchema, dnsInstructionsSchema } from '../../constants/domainSchemas.js';
 import { ToolExecutionContext } from '../../models/shared/toolExecutionContext.js';
 import { ToolResponse } from '../../models/shared/toolResponse.js';
-import type { AzionDomain } from '../../models/dto/azionDomain.js';
-import { DomainRecord } from '../../models/entities/domainRecord.js';
 import { buildDomainToolResponse } from './buildDomainToolResponse.js';
-import { findDomainByName } from './findDomainByName.js';
-import { createDomainViaApi } from './createDomainViaApi.js';
-import { persistDomain } from './persistDomain.js';
-import { findDomainByNameApi } from './findDomainByNameApi.js';
-import { buildDnsInstruction } from './buildDnsInstruction.js';
 import { defaultDomainDependencies } from './dependencies.js';
 import type { DomainDependencies } from './types.js';
 import { statePath } from '../../utils/state.js';
 import { DOMAIN_STATE_FILE } from './constants.js';
+import { createDomainService } from './domainService.js';
 
 export function registerDomainServices(
   server: McpServer,
   deps: DomainDependencies = defaultDomainDependencies,
 ): void {
+  const service = createDomainService({ dependencies: deps });
+
   server.registerTool(
     'azion.create_domain',
     {
@@ -30,8 +26,8 @@ export function registerDomainServices(
       const parsed = createDomainSchema.parse(args ?? {});
       const sessionId = extra.sessionId;
 
-      const cached = await findDomainByName(parsed.name);
-      if (cached) {
+      const ensured = await service.ensureDomain(parsed);
+      if (!ensured.created) {
         await server.sendLoggingMessage(
           {
             level: 'info',
@@ -39,18 +35,17 @@ export function registerDomainServices(
           },
           sessionId,
         );
-        return buildDomainToolResponse('Domain reutilizado de .mcp-state.', cached);
+        return buildDomainToolResponse('Domain reutilizado de .mcp-state.', ensured.record);
       }
 
-      const record = await createDomainViaApi(parsed, deps);
       await server.sendLoggingMessage(
         {
           level: 'info',
-          data: `Domain ${record.name} criado na Azion.`,
+          data: `Domain ${ensured.record.name} criado na Azion.`,
         },
         sessionId,
       );
-      return buildDomainToolResponse('Domain criado com sucesso.', record);
+      return buildDomainToolResponse('Domain criado com sucesso.', ensured.record);
     },
   );
 
@@ -64,51 +59,24 @@ export function registerDomainServices(
     async (args: unknown): Promise<ToolResponse> => {
       const parsed = dnsInstructionsSchema.parse(args ?? {});
 
-      const cached = await findDomainByName(parsed.domainName);
-      if (!cached) {
-        const apiDomain = await findDomainByNameApi(parsed.domainName, deps);
-        if (!apiDomain) {
-          throw new Error(`Domain ${parsed.domainName} não encontrado (cache ou API).`);
-        }
-        const record = DomainRecord.fromAzionPayload(apiDomain);
-        await persistDomain(record);
-        return {
-          content: [
-            {
-              type: 'text',
-              text: buildDnsInstruction(apiDomain).join('\n'),
-            },
-            {
-              type: 'text',
-              text: `Estado sincronizado em ${statePath(DOMAIN_STATE_FILE)}.`,
-            },
-          ],
-        };
-      }
+      const { instructions, stateSynced } = await service.getDnsInstructions(parsed.domainName);
 
-      const apiDomain = await findDomainByNameApi(parsed.domainName, deps);
-      if (apiDomain) {
-        const record = DomainRecord.fromAzionPayload(apiDomain);
-        await persistDomain(record);
-        return {
-          content: [
-            {
-              type: 'text',
-              text: buildDnsInstruction(apiDomain).join('\n'),
-            },
-          ],
-        };
-      }
+      const content: ToolResponse['content'] = [
+        {
+          type: 'text',
+          text: instructions.join('\n'),
+        },
+      ];
 
-      const payloadFromRecord: AzionDomain = cached.toAzionPayload();
+      if (stateSynced) {
+        content.push({
+          type: 'text',
+          text: `Estado sincronizado em ${statePath(DOMAIN_STATE_FILE)}.`,
+        });
+      }
 
       return {
-        content: [
-          {
-            type: 'text',
-            text: buildDnsInstruction(payloadFromRecord).join('\n'),
-          },
-        ],
+        content,
       };
     },
   );

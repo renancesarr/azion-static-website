@@ -2,9 +2,11 @@ import { jest } from '@jest/globals';
 import { DomainRecord } from '../../../../src/models/entities/domainRecord.js';
 
 const readStateFileMock = jest.fn();
+const writeStateFileMock = jest.fn();
 
 jest.unstable_mockModule('../../../../src/utils/state.js', () => ({
   readStateFile: readStateFileMock,
+  writeStateFile: writeStateFileMock,
 }));
 
 let findDomainByName: typeof import('../../../../src/services/domain/findDomainByName.js')['findDomainByName'];

@@ -1,15 +1,13 @@
 import { jest } from '@jest/globals';
 import { DomainRecord } from '../../../../src/models/entities/domainRecord.js';
 
-const persistDomainMock = jest.fn();
-const findDomainByNameApiMock = jest.fn();
+const cacheRepositoryMock = {
+  getByName: jest.fn(),
+  save: jest.fn(),
+};
 
-jest.unstable_mockModule('../../../../src/services/domain/persistDomain.js', () => ({
-  persistDomain: persistDomainMock,
-}));
-
-jest.unstable_mockModule('../../../../src/services/domain/findDomainByNameApi.js', () => ({
-  findDomainByNameApi: findDomainByNameApiMock,
+jest.unstable_mockModule('../../../../src/services/domain/repositories/domainCacheRepository.js', () => ({
+  createDomainCacheRepository: jest.fn(() => cacheRepositoryMock),
 }));
 
 let createDomainViaApi: typeof import('../../../../src/services/domain/createDomainViaApi.js')['createDomainViaApi'];
@@ -20,6 +18,8 @@ beforeAll(async () => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  cacheRepositoryMock.getByName.mockResolvedValue(undefined);
+  cacheRepositoryMock.save.mockImplementation(async (record: DomainRecord) => record);
 });
 
 describe('createDomainViaApi', () => {
@@ -39,7 +39,7 @@ describe('createDomainViaApi', () => {
     };
     deps.http.mockResolvedValue({ data: { results: payload } });
     const record = DomainRecord.fromAzionPayload(payload as any);
-    persistDomainMock.mockResolvedValue(record);
+    cacheRepositoryMock.save.mockResolvedValue(record);
 
     const result = await createDomainViaApi(
       { name: 'example.com', edgeApplicationId: 'edge-1', isActive: true },
@@ -56,13 +56,13 @@ describe('createDomainViaApi', () => {
         cname: undefined,
       },
     });
-    expect(persistDomainMock).toHaveBeenCalledWith(expect.any(DomainRecord));
-    expect(result).toBe(record);
+    expect(cacheRepositoryMock.save).toHaveBeenCalledWith(expect.any(DomainRecord));
+    expect(result.toJSON()).toEqual(record.toJSON());
   });
 
   it('reaproveita domain existente quando API retorna 409', async () => {
     const conflictError = Object.assign(new Error('conflict'), { status: 409 });
-    deps.http.mockRejectedValue(conflictError);
+    deps.http.mockRejectedValueOnce(conflictError);
     const existing = {
       id: 'dom-2',
       name: 'example.com',
@@ -71,24 +71,27 @@ describe('createDomainViaApi', () => {
       cname: 'example.com.azioncdn.net',
       cnames: [],
     };
-    findDomainByNameApiMock.mockResolvedValue(existing);
+    deps.http.mockResolvedValueOnce({ data: { results: [existing] } });
     const record = DomainRecord.fromAzionPayload(existing as any);
-    persistDomainMock.mockResolvedValue(record);
+    cacheRepositoryMock.save.mockResolvedValue(record);
 
     const result = await createDomainViaApi(
       { name: 'example.com', edgeApplicationId: 'edge-2', isActive: true },
       deps,
     );
 
-    expect(findDomainByNameApiMock).toHaveBeenCalledWith('example.com', deps);
-    expect(persistDomainMock).toHaveBeenCalledWith(expect.any(DomainRecord));
-    expect(result).toBe(record);
+    expect(deps.http).toHaveBeenCalledTimes(2);
+    expect(deps.http).toHaveBeenNthCalledWith(2, {
+      method: 'GET',
+      url: 'https://api.azion.com/v4/domains?name=example.com',
+    });
+    expect(cacheRepositoryMock.save).toHaveBeenCalledWith(expect.any(DomainRecord));
+    expect(result.toJSON()).toEqual(record.toJSON());
   });
 
   it('propaga erro diferente de conflito', async () => {
     const genericError = Object.assign(new Error('boom'), { status: 500 });
-    deps.http.mockRejectedValue(genericError);
-    findDomainByNameApiMock.mockResolvedValue(undefined);
+    deps.http.mockRejectedValueOnce(genericError);
 
     await expect(
       createDomainViaApi({ name: 'example.com', edgeApplicationId: 'edge-1', isActive: true }, deps),

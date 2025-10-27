@@ -1,36 +1,19 @@
 import { jest } from '@jest/globals';
-import { DomainRecord } from '../../../../src/models/entities/domainRecord.js';
-
 const buildDomainToolResponseMock = jest.fn();
-const findDomainByNameMock = jest.fn();
-const createDomainViaApiMock = jest.fn();
-const persistDomainMock = jest.fn();
-const findDomainByNameApiMock = jest.fn();
-const buildDnsInstructionMock = jest.fn();
+const ensureDomainMock = jest.fn();
+const getDnsInstructionsMock = jest.fn();
+const createDomainServiceMock = jest.fn(() => ({
+  ensureDomain: ensureDomainMock,
+  getDnsInstructions: getDnsInstructionsMock,
+}));
 const statePathMock = jest.fn((value: string) => `/state/${value}`);
 
 jest.unstable_mockModule('../../../../src/services/domain/buildDomainToolResponse.js', () => ({
   buildDomainToolResponse: buildDomainToolResponseMock,
 }));
 
-jest.unstable_mockModule('../../../../src/services/domain/findDomainByName.js', () => ({
-  findDomainByName: findDomainByNameMock,
-}));
-
-jest.unstable_mockModule('../../../../src/services/domain/createDomainViaApi.js', () => ({
-  createDomainViaApi: createDomainViaApiMock,
-}));
-
-jest.unstable_mockModule('../../../../src/services/domain/persistDomain.js', () => ({
-  persistDomain: persistDomainMock,
-}));
-
-jest.unstable_mockModule('../../../../src/services/domain/findDomainByNameApi.js', () => ({
-  findDomainByNameApi: findDomainByNameApiMock,
-}));
-
-jest.unstable_mockModule('../../../../src/services/domain/buildDnsInstruction.js', () => ({
-  buildDnsInstruction: buildDnsInstructionMock,
+jest.unstable_mockModule('../../../../src/services/domain/domainService.js', () => ({
+  createDomainService: createDomainServiceMock,
 }));
 
 jest.unstable_mockModule('../../../../src/utils/state.js', () => ({
@@ -47,6 +30,9 @@ beforeAll(async () => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  ensureDomainMock.mockReset();
+  getDnsInstructionsMock.mockReset();
+  createDomainServiceMock.mockReturnValue({ ensureDomain: ensureDomainMock, getDnsInstructions: getDnsInstructionsMock });
 });
 
 function setupServer() {
@@ -63,7 +49,7 @@ describe('registerDomainServices', () => {
   it('registra tools e reutiliza domínio cacheado', async () => {
     const { server, handlers, sendLoggingMessage } = setupServer();
     buildDomainToolResponseMock.mockReturnValue({ content: [{ type: 'text', text: 'cached' }] });
-    findDomainByNameMock.mockResolvedValue({ id: 'dom-1', name: 'example.com' });
+    ensureDomainMock.mockResolvedValue({ record: { id: 'dom-1', name: 'example.com' }, created: false });
 
     registerDomainServices(server as any);
 
@@ -78,6 +64,9 @@ describe('registerDomainServices', () => {
       { sessionId: '123' },
     );
 
+    expect(ensureDomainMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'example.com', edgeApplicationId: 'edge-1' }),
+    );
     expect(sendLoggingMessage).toHaveBeenCalledWith(
       expect.objectContaining({ data: 'Domain example.com reaproveitado do cache.' }),
       '123',
@@ -87,42 +76,34 @@ describe('registerDomainServices', () => {
 
   it('cria domínio via API quando ausente em cache', async () => {
     const { server, handlers, sendLoggingMessage } = setupServer();
-    findDomainByNameMock.mockResolvedValueOnce(undefined);
-    createDomainViaApiMock.mockResolvedValue({ id: 'dom-2', name: 'example.com' });
+    ensureDomainMock.mockResolvedValue({ record: { id: 'dom-2', name: 'example.com' }, created: true });
     buildDomainToolResponseMock.mockReturnValue({ content: [{ type: 'text', text: 'created' }] });
 
     registerDomainServices(server as any, { apiBase: 'https://api.azion.com', http: jest.fn() });
 
     const response = await handlers['azion.create_domain']({ name: 'example.com', edgeApplicationId: 'edge-1' }, { sessionId: 'abc' });
 
-    expect(createDomainViaApiMock).toHaveBeenCalled();
+    expect(ensureDomainMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'example.com', edgeApplicationId: 'edge-1' }),
+    );
     expect(sendLoggingMessage).toHaveBeenCalledWith(expect.objectContaining({ data: 'Domain example.com criado na Azion.' }), 'abc');
     expect(response).toEqual({ content: [{ type: 'text', text: 'created' }] });
   });
 
   it('gera instruções DNS sincronizando estado quando domínio não estiver em cache', async () => {
     const { server, handlers } = setupServer();
-    findDomainByNameMock.mockResolvedValue(undefined);
-    const apiDomain = {
-      id: 'dom-3',
-      name: 'example.com',
-      cname: 'example.com.azioncdn.net',
-      edge_application_id: 'edge-1',
-      cnames: [],
-      active: true,
-      created_at: '2024-01-01T00:00:00Z',
-    };
-    findDomainByNameApiMock.mockResolvedValue(apiDomain);
-    const record = DomainRecord.fromAzionPayload(apiDomain as any);
-    persistDomainMock.mockResolvedValue(record);
-    buildDnsInstructionMock.mockReturnValue(['line-1', 'line-2']);
+    getDnsInstructionsMock.mockResolvedValue({
+      record: { id: 'dom-3', name: 'example.com' },
+      instructions: ['line-1', 'line-2'],
+      source: 'api',
+      stateSynced: true,
+    });
 
     registerDomainServices(server as any);
 
     const response = (await handlers['azion.dns_instructions']({ domainName: 'example.com' })) as any;
 
-    expect(findDomainByNameApiMock).toHaveBeenCalledWith('example.com', expect.any(Object));
-    expect(persistDomainMock).toHaveBeenCalledWith(expect.any(DomainRecord));
+    expect(getDnsInstructionsMock).toHaveBeenCalledWith('example.com');
     expect(response.content[0].text).toBe('line-1\nline-2');
     expect(response.content[1].text).toContain('/state/edge/domains.json');
     expect(statePathMock).toHaveBeenCalledWith('edge/domains.json');
@@ -130,32 +111,18 @@ describe('registerDomainServices', () => {
 
   it('gera instruções usando domínio cacheado quando API não retorna dados', async () => {
     const { server, handlers } = setupServer();
-    const cached = DomainRecord.hydrate({
-      id: 'dom-4',
-      name: 'example.com',
-      edgeApplicationId: 'edge-1',
-      isActive: true,
-      cname: 'example.com.azioncdn.net',
-      createdAt: '2024-01-01T00:00:00Z',
-      raw: {
-        id: 'dom-4',
-        name: 'example.com',
-        edge_application_id: 'edge-1',
-        active: true,
-        cname: 'example.com.azioncdn.net',
-        cnames: [],
-        created_at: '2024-01-01T00:00:00Z',
-      },
+    getDnsInstructionsMock.mockResolvedValue({
+      record: { id: 'dom-4', name: 'example.com' },
+      instructions: ['cached-line'],
+      source: 'cache',
+      stateSynced: false,
     });
-    findDomainByNameMock.mockResolvedValue(cached);
-    findDomainByNameApiMock.mockResolvedValue(undefined);
-    buildDnsInstructionMock.mockReturnValue(['cached-line']);
 
     registerDomainServices(server as any);
 
     const response = (await handlers['azion.dns_instructions']({ domainName: 'example.com' })) as any;
 
     expect(response.content[0].text).toContain('cached-line');
-    expect(persistDomainMock).not.toHaveBeenCalled();
+    expect(response.content).toHaveLength(1);
   });
 });
