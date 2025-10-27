@@ -1,4 +1,4 @@
-export interface PostDeployCheckResult {
+export interface PostDeployCheckResultData {
   path: string;
   status?: number;
   ok: boolean;

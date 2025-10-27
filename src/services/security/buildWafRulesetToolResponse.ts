@@ -1,4 +1,4 @@
-import { ToolResponse } from '../../models/toolResponse.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
 import { WafRulesetRecord } from '../../models/entities/wafRulesetRecord.js';
 import { statePath } from '../../utils/state.js';
 import { WAF_RULESET_STATE_FILE } from './constants.js';

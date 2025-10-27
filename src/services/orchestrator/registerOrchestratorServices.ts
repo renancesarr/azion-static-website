@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
-import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
-import { ToolResponse } from '../../models/toolResponse.js';
-import { UploadExecution } from '../../models/uploadExecution.js';
+import { ToolExecutionContext } from '../../models/shared/toolExecutionContext.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
+import { UploadExecution } from '../../models/shared/uploadExecutionData.js';
 import { OrchestrationReport } from '../../models/entities/orchestrationReport.js';
 import type {
   OrchestrationPostDeploySummary,

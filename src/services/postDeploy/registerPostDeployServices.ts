@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
-import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
-import { ToolResponse } from '../../models/toolResponse.js';
+import { ToolExecutionContext } from '../../models/shared/toolExecutionContext.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
 import { defaultPostDeployDependencies } from './dependencies.js';
 import type { PostDeployDependencies } from './types.js';
 import { postDeployCheckInputSchema } from './schemas.js';

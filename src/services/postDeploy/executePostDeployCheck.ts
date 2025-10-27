@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
-import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
-import { PostDeployCheckResult } from '../../models/postDeployCheckResult.js';
-import { PostDeployReport } from '../../models/postDeployReport.js';
+import { ToolExecutionContext } from '../../models/shared/toolExecutionContext.js';
+import { PostDeployCheckResult } from '../../models/entities/postDeployCheckResult.js';
+import { PostDeployReport } from '../../models/entities/postDeployReport.js';
 import { PostDeployCheckInput } from './schemas.js';
 import { buildPathEntries } from './buildPathEntries.js';
 import { calculateStats } from './calculateStats.js';
@@ -72,14 +72,16 @@ export async function executePostDeployCheck(
       }
 
       const ok = issues.length === 0;
-      results.push({
-        path: entry.path,
-        status: response.status,
-        ok,
-        durationMs,
-        error: ok ? undefined : issues[0],
-        issues: ok ? undefined : issues,
-      });
+      results.push(
+        PostDeployCheckResult.create({
+          path: entry.path,
+          status: response.status,
+          ok,
+          durationMs,
+          error: ok ? undefined : issues[0],
+          issues: ok ? undefined : issues,
+        }),
+      );
 
       const logMessage = ok
         ? `${url} -> ${response.status} (${Math.round(durationMs)}ms)`
@@ -95,13 +97,15 @@ export async function executePostDeployCheck(
     } catch (error) {
       const durationMs = deps.clock.now() - start;
       const message = error instanceof HttpError ? `${error.message}` : error instanceof Error ? error.message : String(error);
-      results.push({
-        path: entry.path,
-        ok: false,
-        durationMs,
-        error: message,
-        issues: [message],
-      });
+      results.push(
+        PostDeployCheckResult.create({
+          path: entry.path,
+          ok: false,
+          durationMs,
+          error: message,
+          issues: [message],
+        }),
+      );
       deps.logger.error(`${url} falhou: ${message}`);
       await server.sendLoggingMessage(
         {
@@ -118,14 +122,14 @@ export async function executePostDeployCheck(
   const finishedAt = new Date();
   const stats = calculateStats(results);
 
-  return {
+  return PostDeployReport.create({
     domain,
     protocol,
     expectedStatus,
     startedAt: startedAt.toISOString(),
     finishedAt: finishedAt.toISOString(),
     timeoutMs,
-    results,
+    results: results.map((result) => result.toJSON()),
     stats,
-  };
+  });
 }

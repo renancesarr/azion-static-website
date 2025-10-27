@@ -1,4 +1,4 @@
-import { AzionBucketPayload } from '../../models/azionBucketPayload.js';
+import { AzionBucketPayload } from '../../models/dto/azionBucketPayload.js';
 import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 
 export function buildBucketRecord(payload: AzionBucketPayload): StorageBucketRecord {

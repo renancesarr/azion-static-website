@@ -1,4 +1,4 @@
-import { ToolResponse } from '../../models/toolResponse.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
 import { FirewallRuleBinding } from '../../models/entities/firewallRuleBinding.js';
 import { statePath } from '../../utils/state.js';
 import { FIREWALL_RULE_STATE_FILE } from './constants.js';

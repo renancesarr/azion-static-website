@@ -1,4 +1,4 @@
-import { PostDeployCheckResult } from '../../models/postDeployCheckResult.js';
+import { PostDeployCheckResult } from '../../models/entities/postDeployCheckResult.js';
 
 export function calculateStats(results: PostDeployCheckResult[]) {
   const durations = results.map((r) => r.durationMs);

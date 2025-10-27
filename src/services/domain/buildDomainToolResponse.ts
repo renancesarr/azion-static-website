@@ -1,5 +1,5 @@
 import { statePath } from '../../utils/state.js';
-import { ToolResponse } from '../../models/toolResponse.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
 import { DomainRecord } from '../../models/entities/domainRecord.js';
 import { DOMAIN_STATE_FILE } from './constants.js';
 

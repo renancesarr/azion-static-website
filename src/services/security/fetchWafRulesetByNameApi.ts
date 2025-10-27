@@ -1,5 +1,5 @@
-import { AzionWafRuleset } from '../../models/azionWafRuleset.js';
-import { AzionWafRulesetListResponse } from '../../models/azionWafRulesetListResponse.js';
+import { AzionWafRuleset } from '../../models/dto/azionWafRuleset.js';
+import { AzionWafRulesetListResponse } from '../../models/dto/azionWafRulesetListResponse.js';
 import type { SecurityDependencies } from './types.js';
 import { defaultSecurityDependencies } from './dependencies.js';
 

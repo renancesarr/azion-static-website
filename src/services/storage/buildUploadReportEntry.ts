@@ -1,5 +1,5 @@
-import { UploadCandidate } from '../../models/uploadCandidate.js';
-import { UploadReportEntry } from '../../models/uploadReportEntry.js';
+import { UploadCandidate } from '../../models/shared/uploadCandidateData.js';
+import { UploadReportEntry } from '../../models/shared/uploadReportEntryData.js';
 
 export function buildUploadReportEntry(
   candidate: UploadCandidate,

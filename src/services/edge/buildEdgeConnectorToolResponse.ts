@@ -1,4 +1,4 @@
-import { ToolResponse } from '../../models/toolResponse.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
 import { EdgeConnectorRecord } from '../../models/entities/edgeConnectorRecord.js';
 import { statePath } from '../../utils/state.js';
 import { EDGE_CONNECTOR_STATE_FILE } from './constants.js';

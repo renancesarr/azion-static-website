@@ -1,4 +1,4 @@
-import { UploadReportEntry } from './uploadReportEntry.js';
+import { UploadReportEntry } from './uploadReportEntryData.js';
 
 export interface UploadRunReport {
   bucketId: string;

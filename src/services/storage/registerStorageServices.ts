@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
 import { createBucketSchema, putObjectSchema, uploadDirSchema } from '../../constants/storageSchemas.js';
-import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
-import { ToolResponse } from '../../models/toolResponse.js';
+import { ToolExecutionContext } from '../../models/shared/toolExecutionContext.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
 import { defaultStorageDependencies } from './dependencies.js';
 import type { StorageDependencies } from './types.js';
 import { lookupBucketByName } from './lookupBucket.js';

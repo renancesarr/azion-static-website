@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http.js';
-import { AzionFirewall } from '../../models/azionFirewall.js';
-import { AzionFirewallResponse } from '../../models/azionFirewallResponse.js';
+import { AzionFirewall } from '../../models/dto/azionFirewall.js';
+import { AzionFirewallResponse } from '../../models/dto/azionFirewallResponse.js';
 import { CreateFirewallInput } from './schemas.js';
 import { resolveDomainIds } from './resolveDomainIds.js';
 import { buildFirewallRecord } from './buildFirewallRecord.js';

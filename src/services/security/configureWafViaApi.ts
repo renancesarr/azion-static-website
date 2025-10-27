@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http.js';
-import { AzionWafPolicy } from '../../models/azionWafPolicy.js';
-import { AzionWafResponse } from '../../models/azionWafResponse.js';
+import { AzionWafPolicy } from '../../models/dto/azionWafPolicy.js';
+import { AzionWafResponse } from '../../models/dto/azionWafResponse.js';
 import { ConfigureWafInput } from './schemas.js';
 import { buildWafRecord } from './buildWafRecord.js';
 import { persistWaf } from './persistWaf.js';

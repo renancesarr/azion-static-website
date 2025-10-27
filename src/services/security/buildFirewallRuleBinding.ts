@@ -1,4 +1,4 @@
-import { AzionFirewallRule } from '../../models/azionFirewallRule.js';
+import { AzionFirewallRule } from '../../models/dto/azionFirewallRule.js';
 import { FirewallRuleBinding } from '../../models/entities/firewallRuleBinding.js';
 
 export function buildFirewallRuleBinding(

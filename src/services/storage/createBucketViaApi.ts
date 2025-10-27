@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http.js';
-import { AzionBucketPayload } from '../../models/azionBucketPayload.js';
-import { AzionCreateBucketResponse } from '../../models/azionCreateBucketResponse.js';
+import { AzionBucketPayload } from '../../models/dto/azionBucketPayload.js';
+import { AzionCreateBucketResponse } from '../../models/dto/azionCreateBucketResponse.js';
 import { CreateBucketInput } from './schemas.js';
 import { persistBucket } from './persistBucket.js';
 import { buildBucketRecord } from './buildBucketRecord.js';

@@ -1,6 +1,6 @@
-import { UploadCandidate } from '../../models/uploadCandidate.js';
-import { UploadIndexEntry } from '../../models/uploadIndexEntry.js';
-import { UploadReportEntry } from '../../models/uploadReportEntry.js';
+import { UploadCandidate } from '../../models/shared/uploadCandidateData.js';
+import { UploadIndexEntry } from '../../models/shared/uploadIndexEntryData.js';
+import { UploadReportEntry } from '../../models/shared/uploadReportEntryData.js';
 import { HttpClient } from '../../core/http/HttpClient.js';
 import { StateRepository } from '../../core/state/StateRepository.js';
 import { Logger } from '../../core/logging/Logger.js';

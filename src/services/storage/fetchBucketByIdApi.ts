@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http.js';
-import { AzionBucketPayload } from '../../models/azionBucketPayload.js';
-import { AzionBucketResponse } from '../../models/azionBucketResponse.js';
+import { AzionBucketPayload } from '../../models/dto/azionBucketPayload.js';
+import { AzionBucketResponse } from '../../models/dto/azionBucketResponse.js';
 import type { StorageDependencies } from './types.js';
 import { defaultStorageDependencies } from './dependencies.js';
 

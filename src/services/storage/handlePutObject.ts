@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
-import { ToolResponse } from '../../models/toolResponse.js';
-import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
+import { ToolExecutionContext } from '../../models/shared/toolExecutionContext.js';
 import { inferEncoding, lookupMimeType } from '../../utils/mime.js';
 import { statePath } from '../../utils/state.js';
 import { defaultStorageDependencies } from './dependencies.js';

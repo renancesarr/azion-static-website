@@ -1,4 +1,4 @@
-import { UploadRunReport } from './uploadRunReport.js';
+import { UploadRunReport } from './uploadRunReportData.js';
 
 export interface UploadExecution {
   report: UploadRunReport;

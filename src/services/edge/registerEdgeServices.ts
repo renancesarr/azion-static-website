@@ -1,5 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
-import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
+import { ToolExecutionContext } from '../../models/shared/toolExecutionContext.js';
 import { defaultEdgeDependencies } from './dependencies.js';
 import type { EdgeDependencies } from './types.js';
 import {

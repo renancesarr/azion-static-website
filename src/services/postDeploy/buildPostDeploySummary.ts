@@ -1,5 +1,5 @@
 import { statePath } from '../../utils/state.js';
-import { PostDeployReport } from '../../models/postDeployReport.js';
+import { PostDeployReport } from '../../models/entities/postDeployReport.js';
 
 export function buildPostDeploySummary(report: PostDeployReport, reportPath: string): string[] {
   const okCount = report.results.filter((r) => r.ok).length;

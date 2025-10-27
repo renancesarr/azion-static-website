@@ -1,4 +1,4 @@
-import { UploadCandidate } from '../../models/uploadCandidate.js';
+import { UploadCandidate } from '../../models/shared/uploadCandidateData.js';
 import { UploadIndexFile } from '../../models/entities/uploadIndexFile.js';
 import { WalkEntry } from '../../utils/fs.js';
 import { hashFileSHA256 } from '../../utils/hash.js';

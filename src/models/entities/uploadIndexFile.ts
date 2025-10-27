@@ -1,5 +1,5 @@
-import { UploadIndexEntry } from '../uploadIndexEntry.js';
 import type { UploadIndexFileData } from '../shared/uploadIndexFileData.js';
+import { UploadIndexEntry } from '../shared/uploadIndexEntryData.js';
 
 function cloneFiles(files: Record<string, UploadIndexEntry>): Record<string, UploadIndexEntry> {
   const cloned: Record<string, UploadIndexEntry> = {};

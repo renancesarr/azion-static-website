@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs';
-import { UploadCandidate } from '../../models/uploadCandidate.js';
-import { UploadIndexEntry } from '../../models/uploadIndexEntry.js';
+import { UploadCandidate } from '../../models/shared/uploadCandidateData.js';
+import { UploadIndexEntry } from '../../models/shared/uploadIndexEntryData.js';
 import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 import { runWithPool } from '../../utils/concurrency.js';
 import { defaultStorageDependencies } from './dependencies.js';

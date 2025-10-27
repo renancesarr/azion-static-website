@@ -1,6 +1,6 @@
 import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
-import { UploadRunReport } from '../../models/uploadRunReport.js';
-import { UploadReportEntry } from '../../models/uploadReportEntry.js';
+import { UploadRunReport } from '../../models/shared/uploadRunReportData.js';
+import { UploadReportEntry } from '../../models/shared/uploadReportEntryData.js';
 import { UploadDirInput } from './schemas.js';
 
 export function buildUploadReport(

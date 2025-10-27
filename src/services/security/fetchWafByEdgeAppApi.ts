@@ -1,4 +1,4 @@
-import { AzionWafPolicy } from '../../models/azionWafPolicy.js';
+import { AzionWafPolicy } from '../../models/dto/azionWafPolicy.js';
 import type { SecurityDependencies } from './types.js';
 import { defaultSecurityDependencies } from './dependencies.js';
 

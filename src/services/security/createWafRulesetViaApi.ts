@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http.js';
-import { AzionWafRuleset } from '../../models/azionWafRuleset.js';
-import { AzionWafRulesetResponse } from '../../models/azionWafRulesetResponse.js';
+import { AzionWafRuleset } from '../../models/dto/azionWafRuleset.js';
+import { AzionWafRulesetResponse } from '../../models/dto/azionWafRulesetResponse.js';
 import { CreateWafRulesetInput } from './schemas.js';
 import { buildWafRulesetRecord } from './buildWafRulesetRecord.js';
 import { persistWafRuleset } from './persistWafRuleset.js';

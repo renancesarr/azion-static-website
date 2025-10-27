@@ -1,5 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
-import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
+import { ToolExecutionContext } from '../../models/shared/toolExecutionContext.js';
 import { defaultSecurityDependencies } from './dependencies.js';
 import type { SecurityDependencies } from './types.js';
 import {

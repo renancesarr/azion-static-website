@@ -1,4 +1,4 @@
-import { AzionWafRuleset } from '../../models/azionWafRuleset.js';
+import { AzionWafRuleset } from '../../models/dto/azionWafRuleset.js';
 import { WafRulesetRecord } from '../../models/entities/wafRulesetRecord.js';
 
 export function buildWafRulesetRecord(payload: AzionWafRuleset): WafRulesetRecord {

@@ -1,4 +1,4 @@
-import { ToolResponse } from '../../models/toolResponse.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
 import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 import { statePath } from '../../utils/state.js';
 import { STORAGE_STATE_FILE } from './constants.js';

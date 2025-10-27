@@ -1,5 +1,5 @@
-import { AzionFirewall } from '../../models/azionFirewall.js';
-import { AzionFirewallListResponse } from '../../models/azionFirewallListResponse.js';
+import { AzionFirewall } from '../../models/dto/azionFirewall.js';
+import { AzionFirewallListResponse } from '../../models/dto/azionFirewallListResponse.js';
 import type { SecurityDependencies } from './types.js';
 import { defaultSecurityDependencies } from './dependencies.js';
 

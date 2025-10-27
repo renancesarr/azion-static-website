@@ -1,4 +1,4 @@
-import { AzionFirewall } from '../../models/azionFirewall.js';
+import { AzionFirewall } from '../../models/dto/azionFirewall.js';
 import { FirewallRecord } from '../../models/entities/firewallRecord.js';
 
 export function buildFirewallRecord(payload: AzionFirewall): FirewallRecord {

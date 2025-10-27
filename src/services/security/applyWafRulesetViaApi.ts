@@ -1,6 +1,6 @@
 import { HttpError } from '../../utils/http.js';
-import { AzionFirewallRule } from '../../models/azionFirewallRule.js';
-import { AzionFirewallRuleResponse } from '../../models/azionFirewallRuleResponse.js';
+import { AzionFirewallRule } from '../../models/dto/azionFirewallRule.js';
+import { AzionFirewallRuleResponse } from '../../models/dto/azionFirewallRuleResponse.js';
 import { ApplyWafRulesetInput } from './schemas.js';
 import { buildFirewallRuleBinding } from './buildFirewallRuleBinding.js';
 import { persistFirewallRule } from './persistFirewallRule.js';

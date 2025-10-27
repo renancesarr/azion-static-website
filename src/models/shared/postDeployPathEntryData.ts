@@ -1,4 +1,4 @@
-export interface PostDeployPathEntry {
+export interface PostDeployPathEntryData {
   path: string;
   expectedStatus: number;
   headers: Record<string, string>;

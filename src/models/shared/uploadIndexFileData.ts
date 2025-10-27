@@ -1,4 +1,4 @@
-import { UploadIndexEntry } from '../uploadIndexEntry.js';
+import { UploadIndexEntry } from './uploadIndexEntryData.js';
 
 export interface UploadIndexFileData {
   bucketId: string;

@@ -1,4 +1,4 @@
-import { AzionWafPolicy } from '../../models/azionWafPolicy.js';
+import { AzionWafPolicy } from '../../models/dto/azionWafPolicy.js';
 import { WafPolicyRecord } from '../../models/entities/wafPolicyRecord.js';
 
 export function buildWafRecord(payload: AzionWafPolicy): WafPolicyRecord {

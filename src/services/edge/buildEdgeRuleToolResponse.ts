@@ -1,4 +1,4 @@
-import { ToolResponse } from '../../models/toolResponse.js';
+import { ToolResponse } from '../../models/shared/toolResponse.js';
 import { EdgeRuleRecord } from '../../models/entities/edgeRuleRecord.js';
 import { statePath } from '../../utils/state.js';
 import { EDGE_RULE_STATE_FILE } from './constants.js';

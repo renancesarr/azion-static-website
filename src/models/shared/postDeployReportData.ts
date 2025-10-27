@@ -1,13 +1,13 @@
-import { PostDeployCheckResult } from './postDeployCheckResult.js';
+import type { PostDeployCheckResultData } from './postDeployCheckResultData.js';
 
-export interface PostDeployReport {
+export interface PostDeployReportData {
   domain: string;
   protocol: string;
   expectedStatus: number;
   startedAt: string;
   finishedAt: string;
   timeoutMs: number;
-  results: PostDeployCheckResult[];
+  results: PostDeployCheckResultData[];
   stats: {
     avgMs: number;
     minMs: number;
