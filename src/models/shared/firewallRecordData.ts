@@ -1,4 +1,4 @@
-export interface FirewallRecord {
+export interface FirewallRecordData {
   id: string;
   name: string;
   domainIds: string[];

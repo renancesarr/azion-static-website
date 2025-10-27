@@ -1,4 +1,4 @@
-export interface WafRulesetRecord {
+export interface WafRulesetRecordData {
   id: string;
   name: string;
   mode: string;

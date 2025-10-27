@@ -1,5 +1,5 @@
 import { ToolResponse } from '../../models/toolResponse.js';
-import { WafRulesetRecord } from '../../models/wafRulesetRecord.js';
+import { WafRulesetRecord } from '../../models/entities/wafRulesetRecord.js';
 import { statePath } from '../../utils/state.js';
 import { WAF_RULESET_STATE_FILE } from './constants.js';
 

@@ -1,4 +1,4 @@
-import { FirewallState } from '../../models/firewallState.js';
+import type { FirewallState } from '../../models/shared/firewallState.js';
 
 export function normalizeFirewallState(state?: FirewallState): FirewallState {
   if (!state) {

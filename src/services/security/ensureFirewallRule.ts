@@ -1,5 +1,5 @@
 import type { EnsureResult } from '../../utils/ensure.js';
-import { FirewallRuleBinding } from '../../models/firewallRuleBinding.js';
+import { FirewallRuleBinding } from '../../models/entities/firewallRuleBinding.js';
 import { ApplyWafRulesetInput } from './schemas.js';
 import { findFirewallRuleBindingFromState } from './persistFirewallRule.js';
 import { applyWafRulesetViaApi } from './applyWafRulesetViaApi.js';

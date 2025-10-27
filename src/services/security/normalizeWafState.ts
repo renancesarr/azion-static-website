@@ -1,4 +1,4 @@
-import { WafState } from '../../models/wafState.js';
+import type { WafState } from '../../models/shared/wafState.js';
 
 export function normalizeWafState(state?: WafState): WafState {
   if (!state) {

@@ -1,4 +1,4 @@
-export interface WafPolicyRecord {
+export interface WafPolicyRecordData {
   edgeApplicationId: string;
   wafId: string;
   mode: string;

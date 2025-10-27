@@ -1,5 +1,5 @@
 import type { EnsureResult } from '../../utils/ensure.js';
-import { WafPolicyRecord } from '../../models/wafPolicyRecord.js';
+import { WafPolicyRecord } from '../../models/entities/wafPolicyRecord.js';
 import { ConfigureWafInput } from './schemas.js';
 import { findWaf } from './findWaf.js';
 import { configureWafViaApi } from './configureWafViaApi.js';

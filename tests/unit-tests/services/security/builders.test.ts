@@ -1,8 +1,12 @@
+import { jest } from '@jest/globals';
+import { FirewallRecord } from '../../../../src/models/entities/firewallRecord.js';
+import { WafPolicyRecord } from '../../../../src/models/entities/wafPolicyRecord.js';
+import { WafRulesetRecord } from '../../../../src/models/entities/wafRulesetRecord.js';
+import { FirewallRuleBinding } from '../../../../src/models/entities/firewallRuleBinding.js';
 import { buildFirewallRecord } from '../../../../src/services/security/buildFirewallRecord.js';
 import { buildWafRecord } from '../../../../src/services/security/buildWafRecord.js';
 import { buildWafRulesetRecord } from '../../../../src/services/security/buildWafRulesetRecord.js';
 import { buildFirewallRuleBinding } from '../../../../src/services/security/buildFirewallRuleBinding.js';
-import { jest } from '@jest/globals';
 
 const statePathMock = jest.fn((value: string) => `/state/${value}`);
 
@@ -32,6 +36,7 @@ describe('security builders', () => {
       created_at: 'now',
     } as any);
 
+    expect(record).toBeInstanceOf(FirewallRecord);
     expect(record).toMatchObject({
       id: 'fw-1',
       name: 'firewall',
@@ -49,6 +54,7 @@ describe('security builders', () => {
       enabled: true,
       updated_at: 'now',
     } as any);
+    expect(waf).toBeInstanceOf(WafPolicyRecord);
     expect(waf).toMatchObject({
       wafId: 'waf-1',
       edgeApplicationId: 'edge-1',
@@ -63,6 +69,7 @@ describe('security builders', () => {
       mode: 'blocking',
       created_at: 'now',
     } as any);
+    expect(ruleset).toBeInstanceOf(WafRulesetRecord);
     expect(ruleset).toMatchObject({
       id: 'ruleset-1',
       name: 'default',
@@ -82,6 +89,7 @@ describe('security builders', () => {
       'ruleset-1',
     );
 
+    expect(binding).toBeInstanceOf(FirewallRuleBinding);
     expect(binding).toMatchObject({
       id: 'rule-1',
       firewallId: 'firewall-1',
@@ -92,43 +100,47 @@ describe('security builders', () => {
   });
 
   it('monta respostas textuais incluindo statePath', () => {
-    const fwResponse = buildFirewallToolResponse('Firewall', {
+    const firewall = FirewallRecord.create({
       id: 'fw-1',
       name: 'firewall',
       domainIds: ['dom-1'],
+      isActive: true,
       createdAt: 'now',
       raw: {},
-      isActive: true,
-    } as any);
+    });
+    const fwResponse = buildFirewallToolResponse('Firewall', firewall);
     expect(fwResponse.content[0].text).toContain('/state/security/firewalls.json');
 
-    const wafResponse = buildWafToolResponse('WAF', {
-      wafId: 'waf-1',
+    const wafRecord = WafPolicyRecord.create({
       edgeApplicationId: 'edge-1',
+      wafId: 'waf-1',
       mode: 'blocking',
       enabled: true,
       updatedAt: 'now',
       raw: {},
-    } as any);
+    });
+    const wafResponse = buildWafToolResponse('WAF', wafRecord);
     expect(wafResponse.content[0].text).toContain('/state/security/waf_policies.json');
 
-    const rulesetResponse = buildWafRulesetToolResponse('Ruleset', {
+    const rulesetRecord = WafRulesetRecord.create({
       id: 'ruleset-1',
       name: 'default',
       mode: 'blocking',
       createdAt: 'now',
       raw: {},
-    } as any);
+    });
+    const rulesetResponse = buildWafRulesetToolResponse('Ruleset', rulesetRecord);
     expect(rulesetResponse.content[0].text).toContain('/state/security/waf_rulesets.json');
 
-    const ruleResponse = buildFirewallRuleToolResponse('Binding', {
+    const ruleBinding = FirewallRuleBinding.create({
       id: 'rule-1',
       firewallId: 'firewall-1',
       rulesetId: 'ruleset-1',
       order: 1,
       createdAt: 'now',
       raw: {},
-    } as any);
+    });
+    const ruleResponse = buildFirewallRuleToolResponse('Binding', ruleBinding);
     expect(ruleResponse.content[0].text).toContain('/state/security/firewall_rules.json');
   });
 });

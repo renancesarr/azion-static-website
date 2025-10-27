@@ -1,4 +1,4 @@
-export interface FirewallRuleBinding {
+export interface FirewallRuleBindingData {
   id: string;
   firewallId: string;
   rulesetId: string;

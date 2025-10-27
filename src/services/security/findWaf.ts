@@ -1,5 +1,5 @@
-import { WafState } from '../../models/wafState.js';
-import { WafPolicyRecord } from '../../models/wafPolicyRecord.js';
+import type { WafState } from '../../models/shared/wafState.js';
+import { WafPolicyRecord } from '../../models/entities/wafPolicyRecord.js';
 import { WAF_STATE_FILE } from './constants.js';
 import { normalizeWafState } from './normalizeWafState.js';
 import { StateRepository } from '../../core/state/StateRepository.js';
@@ -9,5 +9,9 @@ export async function findWaf(
   edgeApplicationId: string,
 ): Promise<WafPolicyRecord | undefined> {
   const current = normalizeWafState(await state.read<WafState>(WAF_STATE_FILE));
-  return current.policies[edgeApplicationId];
+  const record = current.policies[edgeApplicationId];
+  if (!record) {
+    return undefined;
+  }
+  return WafPolicyRecord.hydrate(record);
 }

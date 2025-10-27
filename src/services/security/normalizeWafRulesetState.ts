@@ -1,4 +1,4 @@
-import { WafRulesetState } from '../../models/wafRulesetState.js';
+import type { WafRulesetState } from '../../models/shared/wafRulesetState.js';
 
 export function normalizeWafRulesetState(state?: WafRulesetState): WafRulesetState {
   if (!state) {

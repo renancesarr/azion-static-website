@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import {
   configureWafSchema,
   wafStatusSchema,
@@ -6,6 +5,13 @@ import {
   createWafRulesetSchema,
   applyWafRulesetSchema,
 } from '../../constants/securitySchemas.js';
+import type {
+  ConfigureWafInputDto,
+  WafStatusInputDto,
+  CreateFirewallInputDto,
+  CreateWafRulesetInputDto,
+  ApplyWafRulesetInputDto,
+} from '../../models/dto/securityInputs.js';
 
 export const configureWafInputSchema = configureWafSchema;
 export const wafStatusInputSchema = wafStatusSchema;
@@ -13,8 +19,8 @@ export const createFirewallInputSchema = createFirewallSchema;
 export const createWafRulesetInputSchema = createWafRulesetSchema;
 export const applyWafRulesetInputSchema = applyWafRulesetSchema;
 
-export type ConfigureWafInput = z.infer<typeof configureWafSchema>;
-export type WafStatusInput = z.infer<typeof wafStatusSchema>;
-export type CreateFirewallInput = z.infer<typeof createFirewallSchema>;
-export type CreateWafRulesetInput = z.infer<typeof createWafRulesetSchema>;
-export type ApplyWafRulesetInput = z.infer<typeof applyWafRulesetSchema>;
+export type ConfigureWafInput = ConfigureWafInputDto;
+export type WafStatusInput = WafStatusInputDto;
+export type CreateFirewallInput = CreateFirewallInputDto;
+export type CreateWafRulesetInput = CreateWafRulesetInputDto;
+export type ApplyWafRulesetInput = ApplyWafRulesetInputDto;

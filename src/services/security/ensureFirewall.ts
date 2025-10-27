@@ -1,5 +1,5 @@
 import type { EnsureResult } from '../../utils/ensure.js';
-import { FirewallRecord } from '../../models/firewallRecord.js';
+import { FirewallRecord } from '../../models/entities/firewallRecord.js';
 import { CreateFirewallInput } from './schemas.js';
 import { findFirewallByName } from './findFirewallByName.js';
 import { createFirewallViaApi } from './createFirewallViaApi.js';

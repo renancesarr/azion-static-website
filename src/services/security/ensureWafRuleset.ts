@@ -1,5 +1,5 @@
 import type { EnsureResult } from '../../utils/ensure.js';
-import { WafRulesetRecord } from '../../models/wafRulesetRecord.js';
+import { WafRulesetRecord } from '../../models/entities/wafRulesetRecord.js';
 import { CreateWafRulesetInput } from './schemas.js';
 import { findWafRulesetByName } from './findWafRulesetByName.js';
 import { createWafRulesetViaApi } from './createWafRulesetViaApi.js';

@@ -1,5 +1,5 @@
-import { FirewallRecord } from '../../models/firewallRecord.js';
-import { FirewallState } from '../../models/firewallState.js';
+import { FirewallRecord } from '../../models/entities/firewallRecord.js';
+import type { FirewallState } from '../../models/shared/firewallState.js';
 import { FIREWALL_STATE_FILE } from './constants.js';
 import { normalizeFirewallState } from './normalizeFirewallState.js';
 import { StateRepository } from '../../core/state/StateRepository.js';
@@ -9,5 +9,9 @@ export async function findFirewallByName(
   name: string,
 ): Promise<FirewallRecord | undefined> {
   const current = normalizeFirewallState(await state.read<FirewallState>(FIREWALL_STATE_FILE));
-  return current.firewalls[name];
+  const record = current.firewalls[name];
+  if (!record) {
+    return undefined;
+  }
+  return FirewallRecord.hydrate(record);
 }
