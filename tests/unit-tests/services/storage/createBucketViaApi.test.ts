@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 
 const persistBucketMock = jest.fn();
 const buildBucketRecordMock = jest.fn();
@@ -43,8 +44,10 @@ describe('createBucketViaApi', () => {
   it('persiste bucket retornado pela API', async () => {
     const payload = { id: 'bucket-1', name: 'assets' };
     deps.http.request.mockResolvedValue({ data: { results: payload } });
-    buildBucketRecordMock.mockReturnValue({ id: 'bucket-1' });
-    persistBucketMock.mockResolvedValue({ id: 'bucket-1', name: 'assets' });
+    const now = new Date().toISOString();
+    const entity = StorageBucketRecord.create({ id: 'bucket-1', name: 'assets', createdAt: now, raw: payload });
+    buildBucketRecordMock.mockReturnValue(entity);
+    persistBucketMock.mockResolvedValue(entity);
 
     const result = await createBucketViaApi({ name: 'assets' }, deps);
 
@@ -59,22 +62,24 @@ describe('createBucketViaApi', () => {
       },
     });
     expect(buildBucketRecordMock).toHaveBeenCalledWith(payload);
-    expect(persistBucketMock).toHaveBeenCalledWith(deps.state, { id: 'bucket-1' });
-    expect(result).toEqual({ id: 'bucket-1', name: 'assets' });
+    expect(persistBucketMock).toHaveBeenCalledWith(deps.state, entity);
+    expect(result).toBe(entity);
   });
 
   it('reutiliza bucket existente quando API retorna 409', async () => {
     const conflict = new HttpError('conflict', 409, 'Conflict', null, { method: 'POST', url: 'x' });
     deps.http.request.mockRejectedValue(conflict);
-    const existing = { id: 'bucket-2', name: 'assets' };
-    findBucketByNameApiMock.mockResolvedValue(existing);
-    buildBucketRecordMock.mockReturnValue({ id: 'bucket-2' });
-    persistBucketMock.mockResolvedValue({ id: 'bucket-2' });
+    const existingPayload = { id: 'bucket-2', name: 'assets' };
+    const existingEntity = StorageBucketRecord.create({ id: 'bucket-2', name: 'assets', createdAt: 'now', raw: {} });
+    findBucketByNameApiMock.mockResolvedValue(existingPayload);
+    buildBucketRecordMock.mockReturnValue(existingEntity);
+    persistBucketMock.mockResolvedValue(existingEntity);
 
     const result = await createBucketViaApi({ name: 'assets' }, deps);
 
     expect(findBucketByNameApiMock).toHaveBeenCalledWith('assets', deps);
-    expect(result).toEqual({ id: 'bucket-2' });
+    expect(buildBucketRecordMock).toHaveBeenCalledWith(existingPayload);
+    expect(result).toBe(existingEntity);
   });
 
   it('propaga erro que não seja conflito', async () => {

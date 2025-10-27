@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 
 const statePathMock = jest.fn((value: string) => `/state/${value}`);
 
@@ -14,12 +15,13 @@ beforeAll(async () => {
 
 describe('buildBucketToolResponse', () => {
   it('compõe mensagem com dados do bucket', () => {
-    const response = buildBucketToolResponse('Bucket criado.', {
+    const record = StorageBucketRecord.create({
       id: 'bucket-1',
       name: 'assets',
       createdAt: '2024-01-01T00:00:00Z',
       raw: {},
     });
+    const response = buildBucketToolResponse('Bucket criado.', record);
 
     expect(response.content[0].text).toContain('Bucket criado.');
     expect(response.content[0].text).toContain('- Bucket: assets');

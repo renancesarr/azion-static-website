@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 
 const lookupBucketByNameMock = jest.fn();
 const createBucketViaApiMock = jest.fn();
@@ -49,7 +50,7 @@ function setupServer() {
 describe('registerStorageServices', () => {
   it('reutiliza bucket do cache', async () => {
     const { server, handlers, sendLoggingMessage } = setupServer();
-    lookupBucketByNameMock.mockResolvedValue({ id: 'bucket-1', name: 'assets' });
+    lookupBucketByNameMock.mockResolvedValue(StorageBucketRecord.create({ id: 'bucket-1', name: 'assets', createdAt: 'now', raw: {} }));
     buildBucketToolResponseMock.mockReturnValue({ content: [{ type: 'text', text: 'cached' }] });
 
     registerStorageServices(server as any, { state: {}, logger: {}, http: {}, uploadConcurrency: () => 4 } as any);
@@ -67,7 +68,7 @@ describe('registerStorageServices', () => {
   it('cria bucket quando inexistente', async () => {
     const { server, handlers, sendLoggingMessage } = setupServer();
     lookupBucketByNameMock.mockResolvedValueOnce(undefined);
-    createBucketViaApiMock.mockResolvedValue({ id: 'bucket-2', name: 'assets' });
+    createBucketViaApiMock.mockResolvedValue(StorageBucketRecord.create({ id: 'bucket-2', name: 'assets', createdAt: 'now', raw: {} }));
     buildBucketToolResponseMock.mockReturnValue({ content: [{ type: 'text', text: 'created' }] });
 
     registerStorageServices(server as any, { state: {}, logger: {}, http: {}, uploadConcurrency: () => 4 } as any);

@@ -1,5 +1,5 @@
 import type { EnsureResult } from '../../utils/ensure.js';
-import { StorageBucketRecord } from '../../models/storageBucketRecord.js';
+import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 import { CreateBucketInput } from './schemas.js';
 import { lookupBucketByName } from './lookupBucket.js';
 import { createBucketViaApi } from './createBucketViaApi.js';

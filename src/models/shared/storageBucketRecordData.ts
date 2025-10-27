@@ -1,4 +1,4 @@
-export interface StorageBucketRecord {
+export interface StorageBucketRecordData {
   id: string;
   name: string;
   edgeAccess?: string;

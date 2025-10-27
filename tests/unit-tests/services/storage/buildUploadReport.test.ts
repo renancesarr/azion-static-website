@@ -1,8 +1,9 @@
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 import { buildUploadReport } from '../../../../src/services/storage/buildUploadReport.js';
 
 describe('buildUploadReport', () => {
   it('agrega métricas do upload', () => {
-    const bucket = { id: 'bucket-1', name: 'assets' } as any;
+    const bucket = StorageBucketRecord.create({ id: 'bucket-1', name: 'assets', createdAt: 'now', raw: {} });
     const started = new Date('2024-01-01T10:00:00Z');
     const finished = new Date('2024-01-01T10:05:00Z');
 

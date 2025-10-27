@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 
 const readFileMock = jest.fn();
 const runWithPoolMock = jest.fn();
@@ -25,7 +26,7 @@ beforeEach(() => {
 });
 
 describe('executeUploadBatch', () => {
-  const bucket = { id: 'bucket-1', name: 'assets' } as any;
+  const bucket = StorageBucketRecord.create({ id: 'bucket-1', name: 'assets', createdAt: 'now', raw: {} });
   const candidates = [
     {
       absolutePath: '/tmp/index.html',

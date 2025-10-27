@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 
 const resolveBucketReferenceMock = jest.fn();
 const hashBufferSHA256Mock = jest.fn();
@@ -53,7 +54,9 @@ describe('handlePutObject', () => {
   } as any;
 
   it('envia objeto calculando hash automaticamente', async () => {
-    resolveBucketReferenceMock.mockResolvedValue({ id: 'bucket-1', name: 'assets' });
+    resolveBucketReferenceMock.mockResolvedValue(
+      StorageBucketRecord.create({ id: 'bucket-1', name: 'assets', createdAt: 'now', raw: {} }),
+    );
     hashBufferSHA256Mock.mockReturnValue('mock-hash');
     inferEncodingMock.mockReturnValue({ contentType: 'text/html; charset=utf-8', contentEncoding: undefined });
     loadUploadIndexMock.mockResolvedValue({ files: {} });

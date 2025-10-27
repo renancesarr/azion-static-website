@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 
 const statMock = jest.fn();
 const walkDirectoryMock = jest.fn();
@@ -63,7 +64,9 @@ beforeAll(async () => {
 beforeEach(() => {
   jest.clearAllMocks();
   statMock.mockResolvedValue({ isDirectory: () => true });
-  resolveBucketReferenceMock.mockResolvedValue({ id: 'bucket-1', name: 'assets' });
+  resolveBucketReferenceMock.mockResolvedValue(
+    StorageBucketRecord.create({ id: 'bucket-1', name: 'assets', createdAt: 'now', raw: {} }),
+  );
 });
 
 describe('processUploadDir', () => {

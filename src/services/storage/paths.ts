@@ -1,4 +1,4 @@
-import { StorageBucketRecord } from '../../models/storageBucketRecord.js';
+import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 import { UPLOAD_LOG_DIR, UPLOAD_STATE_DIR } from './constants.js';
 
 export function sanitizeFileSegment(value: string): string {

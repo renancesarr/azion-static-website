@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 
 const lookupBucketByNameMock = jest.fn();
 const createBucketViaApiMock = jest.fn();
@@ -27,7 +28,7 @@ afterEach(() => {
 
 describe('ensureBucket', () => {
   it('retorna bucket existente sem recriar', async () => {
-    const existing = { id: '123', name: 'bucket-existing' };
+    const existing = StorageBucketRecord.create({ id: '123', name: 'bucket-existing', createdAt: 'now', raw: {} });
     lookupBucketByNameMock.mockResolvedValue(existing);
 
     const result = await ensureBucket({ name: 'bucket-existing' });
@@ -38,7 +39,7 @@ describe('ensureBucket', () => {
   });
 
   it('cria bucket quando inexistente', async () => {
-    const created = { id: 'abc', name: 'new-bucket' };
+    const created = StorageBucketRecord.create({ id: 'abc', name: 'new-bucket', createdAt: 'now', raw: {} });
     lookupBucketByNameMock.mockResolvedValue(undefined);
     createBucketViaApiMock.mockResolvedValue(created);
 

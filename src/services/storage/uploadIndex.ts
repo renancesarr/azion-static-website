@@ -1,5 +1,5 @@
 import { UploadIndexFile } from '../../models/uploadIndexFile.js';
-import { StorageBucketRecord } from '../../models/storageBucketRecord.js';
+import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 import { uploadIndexRelativePath } from './paths.js';
 import { StateRepository } from '../../core/state/StateRepository.js';
 

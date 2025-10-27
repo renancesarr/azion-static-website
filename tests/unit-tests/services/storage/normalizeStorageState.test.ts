@@ -1,3 +1,4 @@
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 import { normalizeStorageState } from '../../../../src/services/storage/normalizeStorageState.js';
 
 describe('normalizeStorageState', () => {
@@ -6,7 +7,8 @@ describe('normalizeStorageState', () => {
   });
 
   it('mantém buckets existentes', () => {
-    const result = normalizeStorageState({ buckets: { my: { id: '1', name: 'my', createdAt: 'now', raw: {} } } });
-    expect(result.buckets.my).toEqual({ id: '1', name: 'my', createdAt: 'now', raw: {} });
+    const bucket = StorageBucketRecord.create({ id: '1', name: 'my', createdAt: 'now', raw: {} });
+    const result = normalizeStorageState({ buckets: { my: bucket.toJSON() } });
+    expect(result.buckets.my).toEqual(bucket.toJSON());
   });
 });

@@ -1,3 +1,4 @@
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 import { buildBucketRecord } from '../../../../src/services/storage/buildBucketRecord.js';
 
 describe('buildBucketRecord', () => {
@@ -12,7 +13,8 @@ describe('buildBucketRecord', () => {
       created_at: now,
     });
 
-    expect(result).toEqual({
+    expect(result).toBeInstanceOf(StorageBucketRecord);
+    expect(result).toMatchObject({
       id: 'bucket-1',
       name: 'assets',
       edgeAccess: 'public',

@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 
 const lookupBucketByIdMock = jest.fn();
 const lookupBucketByNameMock = jest.fn();
@@ -42,27 +43,29 @@ const deps = { state: {} } as any;
 
 describe('resolveBucketReference', () => {
   it('retorna bucket cacheado pelo id', async () => {
-    lookupBucketByIdMock.mockResolvedValue({ id: 'bucket-1' });
+    lookupBucketByIdMock.mockResolvedValue(StorageBucketRecord.create({ id: 'bucket-1', name: 'assets', createdAt: 'now', raw: {} }));
 
     const bucket = await resolveBucketReference({ bucketId: 'bucket-1' }, deps);
 
-    expect(bucket).toEqual({ id: 'bucket-1' });
+    expect(bucket).toBeInstanceOf(StorageBucketRecord);
+    expect(bucket.id).toBe('bucket-1');
   });
 
   it('busca bucket na API pelo id quando não está em cache', async () => {
     lookupBucketByIdMock.mockResolvedValue(undefined);
     fetchBucketByIdApiMock.mockResolvedValue({ id: 'bucket-1', name: 'assets' });
-    buildBucketRecordMock.mockReturnValue({ id: 'bucket-1', name: 'assets' });
-    persistBucketMock.mockResolvedValue({ id: 'bucket-1', name: 'assets' });
+    const entity = StorageBucketRecord.create({ id: 'bucket-1', name: 'assets', createdAt: 'now', raw: {} });
+    buildBucketRecordMock.mockReturnValue(entity);
+    persistBucketMock.mockResolvedValue(entity);
 
     const bucket = await resolveBucketReference({ bucketId: 'bucket-1' }, deps);
 
     expect(fetchBucketByIdApiMock).toHaveBeenCalledWith('bucket-1', deps);
-    expect(bucket).toEqual({ id: 'bucket-1', name: 'assets' });
+    expect(bucket).toBe(entity);
   });
 
   it('retorna bucket cacheado por nome', async () => {
-    lookupBucketByNameMock.mockResolvedValue({ id: 'bucket-1', name: 'assets' });
+    lookupBucketByNameMock.mockResolvedValue(StorageBucketRecord.create({ id: 'bucket-1', name: 'assets', createdAt: 'now', raw: {} }));
 
     const bucket = await resolveBucketReference({ bucketName: 'assets' }, deps);
 
@@ -72,13 +75,14 @@ describe('resolveBucketReference', () => {
   it('busca bucket por nome na API quando necessário', async () => {
     lookupBucketByNameMock.mockResolvedValueOnce(undefined);
     findBucketByNameApiMock.mockResolvedValue({ id: 'bucket-3', name: 'media' });
-    buildBucketRecordMock.mockReturnValue({ id: 'bucket-3', name: 'media' });
-    persistBucketMock.mockResolvedValue({ id: 'bucket-3', name: 'media' });
+    const entity = StorageBucketRecord.create({ id: 'bucket-3', name: 'media', createdAt: 'now', raw: {} });
+    buildBucketRecordMock.mockReturnValue(entity);
+    persistBucketMock.mockResolvedValue(entity);
 
     const bucket = await resolveBucketReference({ bucketName: 'media' }, deps);
 
     expect(findBucketByNameApiMock).toHaveBeenCalledWith('media', deps);
-    expect(bucket).toEqual({ id: 'bucket-3', name: 'media' });
+    expect(bucket).toBe(entity);
   });
 
   it('lança erro quando referência não localizada', async () => {

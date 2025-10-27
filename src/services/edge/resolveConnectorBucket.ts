@@ -1,4 +1,4 @@
-import { StorageBucketRecord } from '../../models/storageBucketRecord.js';
+import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 import { resolveBucketReference } from '../storage/index.js';
 
 export async function resolveConnectorBucket(ref: { bucketId?: string; bucketName?: string }): Promise<StorageBucketRecord> {

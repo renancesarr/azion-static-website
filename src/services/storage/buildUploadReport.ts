@@ -1,4 +1,4 @@
-import { StorageBucketRecord } from '../../models/storageBucketRecord.js';
+import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 import { UploadRunReport } from '../../models/uploadRunReport.js';
 import { UploadReportEntry } from '../../models/uploadReportEntry.js';
 import { UploadDirInput } from './schemas.js';

@@ -1,4 +1,4 @@
-import { StorageBucketRecord } from '../../models/storageBucketRecord.js';
+import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 import { lookupBucketById, lookupBucketByName } from './lookupBucket.js';
 import { persistBucket } from './persistBucket.js';
 import { buildBucketRecord } from './buildBucketRecord.js';

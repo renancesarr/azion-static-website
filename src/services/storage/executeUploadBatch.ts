@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import { UploadCandidate } from '../../models/uploadCandidate.js';
 import { UploadIndexEntry } from '../../models/uploadIndexEntry.js';
-import { StorageBucketRecord } from '../../models/storageBucketRecord.js';
+import { StorageBucketRecord } from '../../models/entities/storageBucketRecord.js';
 import { runWithPool } from '../../utils/concurrency.js';
 import { defaultStorageDependencies } from './dependencies.js';
 import type { StorageDependencies, UploadBatchResult } from './types.js';
