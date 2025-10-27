@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { OrchestrationReport } from '../../../../src/models/entities/orchestrationReport.js';
 
 const writeStateFileMock = jest.fn();
 
@@ -105,16 +106,28 @@ describe('orchestrator helpers', () => {
   });
 
   it('persiste relatório normalizando timestamp', async () => {
-    const report = {
+    const report = OrchestrationReport.create({
+      project: 'proj',
+      startedAt: '2025-01-13T10:20:00.000Z',
       finishedAt: '2025-01-13T10:20:30.123Z',
-    } as any;
+      bucket: { id: 'bucket-1', name: 'bucket', created: true },
+      edgeApplication: { id: 'edge-1', name: 'edge', created: true },
+      connector: { id: 'conn-1', name: 'connector', created: true },
+      cacheRules: [],
+      domain: { id: 'domain-1', name: 'example.com', created: true },
+      waf: { id: 'waf-1', mode: 'blocking', enabled: true, created: true },
+      firewall: { id: 'firewall-1', name: 'fw', created: true },
+      wafRuleset: { id: 'ruleset-1', name: 'ruleset', mode: 'blocking', created: true },
+      firewallRule: { id: 'binding-1', order: 0, created: true },
+      notes: [],
+    });
 
     const relativePath = await persistReport(report);
 
     expect(relativePath).toBe('orchestration/runs/provision-2025-01-13T10-20-30-123Z.json');
     expect(writeStateFileMock).toHaveBeenCalledWith(
       'orchestration/runs/provision-2025-01-13T10-20-30-123Z.json',
-      report,
+      report.toJSON(),
     );
   });
 });

@@ -2,7 +2,12 @@ import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
 import { ToolExecutionContext } from '../../models/toolExecutionContext.js';
 import { ToolResponse } from '../../models/toolResponse.js';
 import { UploadExecution } from '../../models/uploadExecution.js';
-import { OrchestrationReport } from '../../models/orchestrationReport.js';
+import { OrchestrationReport } from '../../models/entities/orchestrationReport.js';
+import type {
+  OrchestrationPostDeploySummary,
+  OrchestrationReportData,
+  OrchestrationUploadSummary,
+} from '../../models/shared/orchestrationReportData.js';
 import {
   orchestrateInputSchema,
   type OrchestrateInput,
@@ -93,7 +98,7 @@ export function registerOrchestratorServices(server: McpServer): void {
           : `Bucket reutilizado: ${summarizeRecord(bucketResult.record)}`,
       );
 
-      let uploadInfo: OrchestrationReport['upload'] | undefined;
+      let uploadInfo: OrchestrationUploadSummary | undefined;
       const uploadConfig = parsed.upload;
       const notes: string[] = [];
 
@@ -216,7 +221,7 @@ export function registerOrchestratorServices(server: McpServer): void {
           : `WAF reutilizado (modo ${wafResult.record.mode}).`,
       );
 
-      let postDeployInfo: OrchestrationReport['postDeploy'] | undefined;
+      let postDeployInfo: OrchestrationPostDeploySummary | undefined;
       if (parsed.postDeploy) {
         const postDeployInput: PostDeployCheckInput = {
           ...parsed.postDeploy,
@@ -247,7 +252,7 @@ export function registerOrchestratorServices(server: McpServer): void {
       }
 
       const finishedAt = new Date();
-      const report: OrchestrationReport = {
+      const reportData: OrchestrationReportData = {
         project: parsed.project,
         startedAt: startedAt.toISOString(),
         finishedAt: finishedAt.toISOString(),
@@ -304,35 +309,38 @@ export function registerOrchestratorServices(server: McpServer): void {
         notes,
       };
 
+      const report = OrchestrationReport.create(reportData);
       const reportPath = await persistReport(report);
 
       const summaryLines = [
-        `Provisionamento concluído para ${parsed.project}`,
-        `- Bucket: ${summarizeRecord(bucketResult.record)} (${bucketResult.created ? 'criado' : 'reutilizado'})`,
-        `- Edge Application: ${summarizeRecord(edgeResult.record)} (${edgeResult.created ? 'criada' : 'reutilizada'})`,
-        `- Connector: ${summarizeRecord(connectorResult.record)} (${connectorResult.created ? 'criado' : 'reutilizado'})`,
-        `- Firewall: ${summarizeRecord(firewallResult.record)} (${firewallResult.created ? 'criado' : 'reutilizado'})`,
-        `- WAF Ruleset: ${summarizeRecord(wafRulesetResult.record)} (${wafRulesetResult.created ? 'criado' : 'reutilizado'})`,
-        `- Firewall Rule: ${firewallRuleResult.record.id} (${firewallRuleResult.created ? 'criada' : 'reutilizada'})`,
-        `- Domain: ${summarizeRecord(domainResult.record)} (${domainResult.created ? 'criado' : 'reutilizado'})`,
-        `- WAF: ${wafResult.record.mode} | enabled=${wafResult.record.enabled}`,
-        `- Rules criadas: ${ruleResults.filter((r) => r.created).length}/${ruleResults.length}`,
+        `Provisionamento concluído para ${report.project}`,
+        `- Bucket: ${summarizeRecord(bucketResult.record)} (${report.bucket.created ? 'criado' : 'reutilizado'})`,
+        `- Edge Application: ${summarizeRecord(edgeResult.record)} (${report.edgeApplication.created ? 'criada' : 'reutilizada'})`,
+        `- Connector: ${summarizeRecord(connectorResult.record)} (${report.connector.created ? 'criado' : 'reutilizado'})`,
+        `- Firewall: ${summarizeRecord(firewallResult.record)} (${report.firewall.created ? 'criado' : 'reutilizado'})`,
+        `- WAF Ruleset: ${summarizeRecord(wafRulesetResult.record)} (${report.wafRuleset.created ? 'criado' : 'reutilizado'})`,
+        `- Firewall Rule: ${report.firewallRule.id} (${report.firewallRule.created ? 'criada' : 'reutilizada'})`,
+        `- Domain: ${summarizeRecord(domainResult.record)} (${report.domain.created ? 'criado' : 'reutilizado'})`,
+        `- WAF: ${report.waf.mode} | enabled=${report.waf.enabled}`,
+        `- Rules criadas: ${report.cacheRules.filter((rule) => rule.created).length}/${report.cacheRules.length}`,
         `- Relatório: ${statePath(reportPath)}`,
       ];
 
-      if (uploadInfo) {
+      const uploadSummary = report.upload;
+      if (uploadSummary) {
         summaryLines.splice(
           5,
           0,
-          `- Upload: enviados=${uploadInfo.executed} | pulados=${uploadInfo.skipped} | log=${uploadInfo.logFile}`,
+          `- Upload: enviados=${uploadSummary.executed} | pulados=${uploadSummary.skipped} | log=${uploadSummary.logFile}`,
         );
       }
 
-      if (postDeployInfo) {
+      const postDeploySummary = report.postDeploy;
+      if (postDeploySummary) {
         summaryLines.splice(
           summaryLines.length - 1,
           0,
-          `- Post-deploy: sucesso=${postDeployInfo.success}/${postDeployInfo.success + postDeployInfo.failures} | avg=${postDeployInfo.avgMs.toFixed(1)}ms | log=${postDeployInfo.reportFile}`,
+          `- Post-deploy: sucesso=${postDeploySummary.success}/${postDeploySummary.success + postDeploySummary.failures} | avg=${postDeploySummary.avgMs.toFixed(1)}ms | log=${postDeploySummary.reportFile}`,
         );
       }
 
