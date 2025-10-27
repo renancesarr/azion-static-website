@@ -1,7 +1,7 @@
 import type { AzionDomain } from '../../models/dto/azionDomain.js';
 import type { AzionDomainResponse } from '../../models/dto/azionDomainResponse.js';
+import { DomainRecord } from '../../models/entities/domainRecord.js';
 import { CreateDomainInput } from './schemas.js';
-import { buildDomainRecord } from './buildDomainRecord.js';
 import { persistDomain } from './persistDomain.js';
 import { findDomainByNameApi } from './findDomainByNameApi.js';
 import { defaultDomainDependencies } from './dependencies.js';
@@ -23,12 +23,12 @@ export async function createDomainViaApi(
       },
     });
     const payload = response.data.results ?? response.data.data ?? (response.data as unknown as AzionDomain);
-    return await persistDomain(buildDomainRecord(payload));
+    return await persistDomain(DomainRecord.fromAzionPayload(payload));
   } catch (error) {
     if ('status' in (error as Error) && (error as { status: number }).status === 409) {
       const existing = await findDomainByNameApi(input.name, deps);
       if (existing) {
-        return await persistDomain(buildDomainRecord(existing));
+        return await persistDomain(DomainRecord.fromAzionPayload(existing));
       }
     }
     throw error;

@@ -1,10 +1,10 @@
 import { jest } from '@jest/globals';
+import { DomainRecord } from '../../../../src/models/entities/domainRecord.js';
 
 const buildDomainToolResponseMock = jest.fn();
 const findDomainByNameMock = jest.fn();
 const createDomainViaApiMock = jest.fn();
 const persistDomainMock = jest.fn();
-const buildDomainRecordMock = jest.fn();
 const findDomainByNameApiMock = jest.fn();
 const buildDnsInstructionMock = jest.fn();
 const statePathMock = jest.fn((value: string) => `/state/${value}`);
@@ -23,10 +23,6 @@ jest.unstable_mockModule('../../../../src/services/domain/createDomainViaApi.js'
 
 jest.unstable_mockModule('../../../../src/services/domain/persistDomain.js', () => ({
   persistDomain: persistDomainMock,
-}));
-
-jest.unstable_mockModule('../../../../src/services/domain/buildDomainRecord.js', () => ({
-  buildDomainRecord: buildDomainRecordMock,
 }));
 
 jest.unstable_mockModule('../../../../src/services/domain/findDomainByNameApi.js', () => ({
@@ -117,8 +113,8 @@ describe('registerDomainServices', () => {
       created_at: '2024-01-01T00:00:00Z',
     };
     findDomainByNameApiMock.mockResolvedValue(apiDomain);
-    buildDomainRecordMock.mockReturnValue({ id: 'dom-3', name: 'example.com' });
-    persistDomainMock.mockResolvedValue({ id: 'dom-3' });
+    const record = DomainRecord.fromAzionPayload(apiDomain as any);
+    persistDomainMock.mockResolvedValue(record);
     buildDnsInstructionMock.mockReturnValue(['line-1', 'line-2']);
 
     registerDomainServices(server as any);
@@ -126,7 +122,7 @@ describe('registerDomainServices', () => {
     const response = (await handlers['azion.dns_instructions']({ domainName: 'example.com' })) as any;
 
     expect(findDomainByNameApiMock).toHaveBeenCalledWith('example.com', expect.any(Object));
-    expect(persistDomainMock).toHaveBeenCalledWith({ id: 'dom-3', name: 'example.com' });
+    expect(persistDomainMock).toHaveBeenCalledWith(expect.any(DomainRecord));
     expect(response.content[0].text).toBe('line-1\nline-2');
     expect(response.content[1].text).toContain('/state/edge/domains.json');
     expect(statePathMock).toHaveBeenCalledWith('edge/domains.json');
@@ -134,15 +130,23 @@ describe('registerDomainServices', () => {
 
   it('gera instruções usando domínio cacheado quando API não retorna dados', async () => {
     const { server, handlers } = setupServer();
-    const cached = {
+    const cached = DomainRecord.hydrate({
       id: 'dom-4',
       name: 'example.com',
-      cname: 'example.com.azioncdn.net',
       edgeApplicationId: 'edge-1',
       isActive: true,
+      cname: 'example.com.azioncdn.net',
       createdAt: '2024-01-01T00:00:00Z',
-      raw: {},
-    };
+      raw: {
+        id: 'dom-4',
+        name: 'example.com',
+        edge_application_id: 'edge-1',
+        active: true,
+        cname: 'example.com.azioncdn.net',
+        cnames: [],
+        created_at: '2024-01-01T00:00:00Z',
+      },
+    });
     findDomainByNameMock.mockResolvedValue(cached);
     findDomainByNameApiMock.mockResolvedValue(undefined);
     buildDnsInstructionMock.mockReturnValue(['cached-line']);

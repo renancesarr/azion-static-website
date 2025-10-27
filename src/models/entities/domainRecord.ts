@@ -47,5 +47,20 @@ export class DomainRecord implements DomainRecordData {
       raw: this.raw,
     };
   }
-}
 
+  toAzionPayload(): AzionDomain {
+    if (this.raw && typeof this.raw === 'object') {
+      return this.raw as AzionDomain;
+    }
+
+    return {
+      id: this.id,
+      name: this.name,
+      edge_application_id: this.edgeApplicationId,
+      active: this.isActive,
+      cname: this.cname,
+      cnames: [],
+      created_at: this.createdAt,
+    };
+  }
+}

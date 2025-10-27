@@ -2,11 +2,12 @@ import { McpServer } from '@modelcontextprotocol/sdk/dist/esm/server/mcp.js';
 import { createDomainSchema, dnsInstructionsSchema } from '../../constants/domainSchemas.js';
 import { ToolExecutionContext } from '../../models/shared/toolExecutionContext.js';
 import { ToolResponse } from '../../models/shared/toolResponse.js';
+import type { AzionDomain } from '../../models/dto/azionDomain.js';
+import { DomainRecord } from '../../models/entities/domainRecord.js';
 import { buildDomainToolResponse } from './buildDomainToolResponse.js';
 import { findDomainByName } from './findDomainByName.js';
 import { createDomainViaApi } from './createDomainViaApi.js';
 import { persistDomain } from './persistDomain.js';
-import { buildDomainRecord } from './buildDomainRecord.js';
 import { findDomainByNameApi } from './findDomainByNameApi.js';
 import { buildDnsInstruction } from './buildDnsInstruction.js';
 import { defaultDomainDependencies } from './dependencies.js';
@@ -69,7 +70,8 @@ export function registerDomainServices(
         if (!apiDomain) {
           throw new Error(`Domain ${parsed.domainName} não encontrado (cache ou API).`);
         }
-        await persistDomain(buildDomainRecord(apiDomain));
+        const record = DomainRecord.fromAzionPayload(apiDomain);
+        await persistDomain(record);
         return {
           content: [
             {
@@ -86,7 +88,8 @@ export function registerDomainServices(
 
       const apiDomain = await findDomainByNameApi(parsed.domainName, deps);
       if (apiDomain) {
-        await persistDomain(buildDomainRecord(apiDomain));
+        const record = DomainRecord.fromAzionPayload(apiDomain);
+        await persistDomain(record);
         return {
           content: [
             {
@@ -97,19 +100,13 @@ export function registerDomainServices(
         };
       }
 
+      const payloadFromRecord: AzionDomain = cached.toAzionPayload();
+
       return {
         content: [
           {
             type: 'text',
-            text: buildDnsInstruction({
-              id: cached.id,
-              name: cached.name,
-              cname: cached.cname,
-              edge_application_id: cached.edgeApplicationId,
-              cnames: [],
-              active: cached.isActive,
-              created_at: cached.createdAt,
-            }).join('\n'),
+            text: buildDnsInstruction(payloadFromRecord).join('\n'),
           },
         ],
       };

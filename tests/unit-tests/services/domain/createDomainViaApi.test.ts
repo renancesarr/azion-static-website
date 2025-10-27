@@ -1,15 +1,11 @@
 import { jest } from '@jest/globals';
+import { DomainRecord } from '../../../../src/models/entities/domainRecord.js';
 
 const persistDomainMock = jest.fn();
-const buildDomainRecordMock = jest.fn();
 const findDomainByNameApiMock = jest.fn();
 
 jest.unstable_mockModule('../../../../src/services/domain/persistDomain.js', () => ({
   persistDomain: persistDomainMock,
-}));
-
-jest.unstable_mockModule('../../../../src/services/domain/buildDomainRecord.js', () => ({
-  buildDomainRecord: buildDomainRecordMock,
 }));
 
 jest.unstable_mockModule('../../../../src/services/domain/findDomainByNameApi.js', () => ({
@@ -42,8 +38,8 @@ describe('createDomainViaApi', () => {
       cnames: [],
     };
     deps.http.mockResolvedValue({ data: { results: payload } });
-    buildDomainRecordMock.mockReturnValue({ id: 'dom-1' });
-    persistDomainMock.mockResolvedValue({ id: 'dom-1' });
+    const record = DomainRecord.fromAzionPayload(payload as any);
+    persistDomainMock.mockResolvedValue(record);
 
     const result = await createDomainViaApi(
       { name: 'example.com', edgeApplicationId: 'edge-1', isActive: true },
@@ -60,9 +56,8 @@ describe('createDomainViaApi', () => {
         cname: undefined,
       },
     });
-    expect(buildDomainRecordMock).toHaveBeenCalledWith(payload);
-    expect(persistDomainMock).toHaveBeenCalledWith({ id: 'dom-1' });
-    expect(result).toEqual({ id: 'dom-1' });
+    expect(persistDomainMock).toHaveBeenCalledWith(expect.any(DomainRecord));
+    expect(result).toBe(record);
   });
 
   it('reaproveita domain existente quando API retorna 409', async () => {
@@ -77,8 +72,8 @@ describe('createDomainViaApi', () => {
       cnames: [],
     };
     findDomainByNameApiMock.mockResolvedValue(existing);
-    buildDomainRecordMock.mockReturnValue({ id: 'dom-2' });
-    persistDomainMock.mockResolvedValue({ id: 'dom-2' });
+    const record = DomainRecord.fromAzionPayload(existing as any);
+    persistDomainMock.mockResolvedValue(record);
 
     const result = await createDomainViaApi(
       { name: 'example.com', edgeApplicationId: 'edge-2', isActive: true },
@@ -86,8 +81,8 @@ describe('createDomainViaApi', () => {
     );
 
     expect(findDomainByNameApiMock).toHaveBeenCalledWith('example.com', deps);
-    expect(persistDomainMock).toHaveBeenCalledWith({ id: 'dom-2' });
-    expect(result).toEqual({ id: 'dom-2' });
+    expect(persistDomainMock).toHaveBeenCalledWith(expect.any(DomainRecord));
+    expect(result).toBe(record);
   });
 
   it('propaga erro diferente de conflito', async () => {
