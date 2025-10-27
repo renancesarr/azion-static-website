@@ -1,4 +1,4 @@
-import { ValidationCheckResult } from '../../models/validationCheckResult.js';
+import { ValidationCheckResult } from '../../models/entities/validationCheckResult.js';
 import { loadFirstUploadIndex } from './loadFirstUploadIndex.js';
 import { summarizeState } from './stateUtils.js';
 import type { ValidationDependencies } from './types.js';

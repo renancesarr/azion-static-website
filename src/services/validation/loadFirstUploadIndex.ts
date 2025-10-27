@@ -1,4 +1,5 @@
-import { UploadIndexFile } from '../../models/uploadIndexFile.js';
+import type { UploadIndexFileData } from '../../models/shared/uploadIndexFileData.js';
+import { UploadIndexFile } from '../../models/entities/uploadIndexFile.js';
 import { STACK_STATE } from './constants.js';
 import { readState } from './stateUtils.js';
 import { StateRepository } from '../../core/state/StateRepository.js';
@@ -17,10 +18,10 @@ export async function loadFirstUploadIndex(state: StateRepository): Promise<
   }
 
   const relativePath = `storage/uploads/index-${sanitize(ids[0])}.json`;
-  const index = await readState<UploadIndexFile>(state, relativePath);
+  const index = await readState<UploadIndexFileData>(state, relativePath);
   if (!index) {
     return undefined;
   }
 
-  return { bucketId: ids[0], file: index, path: relativePath };
+  return { bucketId: ids[0], file: UploadIndexFile.hydrate(index), path: relativePath };
 }

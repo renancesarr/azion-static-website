@@ -1,16 +1,16 @@
 import { StateRepository } from '../../core/state/StateRepository.js';
-import { ValidationCheckResult } from '../../models/validationCheckResult.js';
+import { ValidationCheckResult } from '../../models/entities/validationCheckResult.js';
 
 export async function readState<T>(repository: StateRepository, relativePath: string): Promise<T | undefined> {
   return await repository.read<T>(relativePath);
 }
 
 export function summarizeState(name: string, ok: boolean, detail: string): ValidationCheckResult {
-  return {
+  return ValidationCheckResult.create({
     name,
     ok,
     detail,
-  };
+  });
 }
 
 export function listIds<T extends { id: string }>(collection: Record<string, T> | undefined): string {

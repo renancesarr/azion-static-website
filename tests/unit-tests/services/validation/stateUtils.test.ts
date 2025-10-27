@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { ValidationCheckResult } from '../../../../src/models/entities/validationCheckResult.js';
 import { readState, summarizeState, listIds } from '../../../../src/services/validation/stateUtils.js';
 
 describe('validation stateUtils', () => {
@@ -15,7 +16,8 @@ describe('validation stateUtils', () => {
 
   it('resume estado indicando sucesso ou falha', () => {
     const ok = summarizeState('Check', true, 'Tudo certo');
-    expect(ok).toEqual({ name: 'Check', ok: true, detail: 'Tudo certo' });
+    expect(ok).toBeInstanceOf(ValidationCheckResult);
+    expect(ok).toMatchObject({ name: 'Check', ok: true, detail: 'Tudo certo' });
 
     const list = listIds({ a: { id: '1' }, b: { id: '2' } });
     expect(list).toBe('1, 2');

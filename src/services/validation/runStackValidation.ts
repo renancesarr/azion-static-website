@@ -1,6 +1,7 @@
-import { StackValidationReport } from '../../models/stackValidationReport.js';
-import { ValidationCheckResult } from '../../models/validationCheckResult.js';
-import { UploadIndexFile } from '../../models/uploadIndexFile.js';
+import type { UploadIndexFileData } from '../../models/shared/uploadIndexFileData.js';
+import { StackValidationReport } from '../../models/entities/stackValidationReport.js';
+import { ValidationCheckResult } from '../../models/entities/validationCheckResult.js';
+import { UploadIndexFile } from '../../models/entities/uploadIndexFile.js';
 import { STACK_STATE } from './constants.js';
 import {
   stackValidateInputSchema,
@@ -25,10 +26,11 @@ async function summarizeGzipAssets(
 
   const sanitize = (value: string) => value.replace(/[^a-zA-Z0-9._-]/g, '_');
   const indexPath = `storage/uploads/index-${sanitize(bucketIds[0])}.json`;
-  const uploadIndex = await readState<UploadIndexFile>(deps.state, indexPath);
-  if (!uploadIndex) {
+  const uploadIndexData = await readState<UploadIndexFileData>(deps.state, indexPath);
+  if (!uploadIndexData) {
     return undefined;
   }
+  const uploadIndex = UploadIndexFile.hydrate(uploadIndexData);
 
   const gzipAssets = Object.values(uploadIndex.files ?? {})
     .filter((entry) => entry.contentEncoding === 'gzip')
@@ -164,15 +166,15 @@ export async function runStackValidation(
   }
 
   const finishedAt = new Date();
-  return {
+  return StackValidationReport.create({
     project: input.project,
     domain: domainToTest,
     protocol: input.protocol,
     path: input.path,
     startedAt: startedAt.toISOString(),
     finishedAt: finishedAt.toISOString(),
-    checks,
+    checks: checks.map((check) => check.toJSON()),
     http: httpResult,
     gzipAssets: gzipResult?.assets,
-  };
+  });
 }

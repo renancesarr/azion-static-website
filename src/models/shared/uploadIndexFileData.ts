@@ -1,6 +1,6 @@
-import { UploadIndexEntry } from './uploadIndexEntry.js';
+import { UploadIndexEntry } from '../uploadIndexEntry.js';
 
-export interface UploadIndexFile {
+export interface UploadIndexFileData {
   bucketId: string;
   bucketName: string;
   files: Record<string, UploadIndexEntry>;

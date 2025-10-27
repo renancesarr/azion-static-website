@@ -1,5 +1,5 @@
 import { extname } from 'node:path';
-import { ValidationCheckResult } from '../../models/validationCheckResult.js';
+import { ValidationCheckResult } from '../../models/entities/validationCheckResult.js';
 import { lookupMimeType } from '../../utils/mime.js';
 import { loadFirstUploadIndex } from './loadFirstUploadIndex.js';
 import type { ValidationDependencies } from './types.js';
@@ -18,11 +18,11 @@ export async function validateMimetypes(
     return {
       matches: 0,
       mismatches: [
-        {
+        ValidationCheckResult.create({
           name: 'Upload index',
           ok: false,
           detail: 'Nenhum índice encontrado em .mcp-state/storage/uploads/.',
-        },
+        }),
       ],
     };
   }
@@ -38,19 +38,23 @@ export async function validateMimetypes(
     }
     const expectedMime = lookupMimeType(entry.objectPath);
     if (!entry.contentType) {
-      mismatches.push({
-        name: entry.objectPath,
-        ok: false,
-        detail: `Content-Type ausente. Esperado ~ ${expectedMime}`,
-      });
+      mismatches.push(
+        ValidationCheckResult.create({
+          name: entry.objectPath,
+          ok: false,
+          detail: `Content-Type ausente. Esperado ~ ${expectedMime}`,
+        }),
+      );
       continue;
     }
     if (!entry.contentType.startsWith(expectedMime.split(';')[0])) {
-      mismatches.push({
-        name: entry.objectPath,
-        ok: false,
-        detail: `Content-Type "${entry.contentType}" diverge de "${expectedMime}"`,
-      });
+      mismatches.push(
+        ValidationCheckResult.create({
+          name: entry.objectPath,
+          ok: false,
+          detail: `Content-Type "${entry.contentType}" diverge de "${expectedMime}"`,
+        }),
+      );
       continue;
     }
     matches += 1;

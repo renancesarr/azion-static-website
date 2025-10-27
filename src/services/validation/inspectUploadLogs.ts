@@ -1,4 +1,4 @@
-import { ValidationCheckResult } from '../../models/validationCheckResult.js';
+import { ValidationCheckResult } from '../../models/entities/validationCheckResult.js';
 import { summarizeState } from './stateUtils.js';
 import { UPLOAD_LOG_DIR } from './constants.js';
 import type { ValidationDependencies } from './types.js';
@@ -24,11 +24,13 @@ export async function inspectUploadLogs(
     for (const name of latest) {
       const content = JSON.parse(await deps.readFile(`${UPLOAD_LOG_DIR}/${name}`, 'utf-8'));
       const totals = content?.totals ?? {};
-      results.push({
-        name,
-        ok: (totals.failed ?? 0) === 0,
-        detail: `enviados=${totals.uploaded ?? 'n/d'}, pulados=${totals.skipped ?? 'n/d'}, falhas=${totals.failed ?? 'n/d'}`,
-      });
+      results.push(
+        ValidationCheckResult.create({
+          name,
+          ok: (totals.failed ?? 0) === 0,
+          detail: `enviados=${totals.uploaded ?? 'n/d'}, pulados=${totals.skipped ?? 'n/d'}, falhas=${totals.failed ?? 'n/d'}`,
+        }),
+      );
     }
 
     return results;

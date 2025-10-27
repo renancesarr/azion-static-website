@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
+import { UploadIndexFile } from '../../../../src/models/entities/uploadIndexFile.js';
 
 const resolveBucketReferenceMock = jest.fn();
 const hashBufferSHA256Mock = jest.fn();
@@ -59,7 +60,14 @@ describe('handlePutObject', () => {
     );
     hashBufferSHA256Mock.mockReturnValue('mock-hash');
     inferEncodingMock.mockReturnValue({ contentType: 'text/html; charset=utf-8', contentEncoding: undefined });
-    loadUploadIndexMock.mockResolvedValue({ files: {} });
+    loadUploadIndexMock.mockResolvedValue(
+      UploadIndexFile.create({
+        bucketId: 'bucket-1',
+        bucketName: 'assets',
+        files: {},
+        updatedAt: 'old',
+      }),
+    );
     saveUploadIndexMock.mockResolvedValue(undefined);
     buildObjectUrlMock.mockReturnValue('https://upload');
 

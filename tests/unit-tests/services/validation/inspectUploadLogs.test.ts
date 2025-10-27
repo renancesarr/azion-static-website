@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { ValidationCheckResult } from '../../../../src/models/entities/validationCheckResult.js';
 import { inspectUploadLogs } from '../../../../src/services/validation/inspectUploadLogs.js';
 
 describe('inspectUploadLogs', () => {
@@ -16,6 +17,7 @@ describe('inspectUploadLogs', () => {
     deps.readDir.mockResolvedValue([]);
 
     const result = await inspectUploadLogs(3, deps);
+    expect(result[0]).toBeInstanceOf(ValidationCheckResult);
     expect(result[0].ok).toBe(false);
   });
 

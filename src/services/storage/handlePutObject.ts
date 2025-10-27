@@ -47,15 +47,19 @@ export async function handlePutObject(
     },
   });
 
-  const index = await loadUploadIndex(deps.state, bucket);
-  index.files[objectPath] = {
-    hash,
-    size: buffer.length,
-    objectPath,
-    updatedAt: new Date().toISOString(),
-    contentType: encodingInfo.contentType,
-    contentEncoding: encodingInfo.contentEncoding,
+  let index = await loadUploadIndex(deps.state, bucket);
+  const nextFiles = {
+    ...index.files,
+    [objectPath]: {
+      hash,
+      size: buffer.length,
+      objectPath,
+      updatedAt: new Date().toISOString(),
+      contentType: encodingInfo.contentType,
+      contentEncoding: encodingInfo.contentEncoding,
+    },
   };
+  index = index.withFiles(nextFiles).withUpdatedAt(new Date().toISOString());
   await saveUploadIndex(deps.state, bucket, index);
 
   await server.sendLoggingMessage(

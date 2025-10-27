@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { UploadIndexFile } from '../../../../src/models/entities/uploadIndexFile.js';
 
 const hashFileSHA256Mock = jest.fn();
 const inferEncodingMock = jest.fn();
@@ -47,13 +48,16 @@ describe('planUploadCandidates', () => {
     inferEncodingMock.mockReturnValue({ contentType: 'text/plain', contentEncoding: undefined });
     buildUploadReportEntryMock.mockReturnValueOnce({ objectPath: 'index.html', status: 'skipped' });
 
-    const index = {
+    const index = UploadIndexFile.create({
+      bucketId: 'bucket-1',
+      bucketName: 'assets',
       files: {
-        'public/index.html': { hash: 'hash-index', size: 10, updatedAt: 'old' },
+        'public/index.html': { hash: 'hash-index', size: 10, updatedAt: 'old' } as any,
       },
-    };
+      updatedAt: 'old',
+    });
 
-    const result = await planUploadCandidates(entries, index as any, {
+    const result = await planUploadCandidates(entries, index, {
       prefix: 'public',
       stripGzipExtension: true,
     } as any);

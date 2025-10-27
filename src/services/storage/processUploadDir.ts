@@ -63,7 +63,7 @@ export async function processUploadDir(
     };
   }
 
-  const index = await loadUploadIndex(deps.state, bucket);
+  let index = await loadUploadIndex(deps.state, bucket);
   const plan = await planUploadCandidates(entries, index, input);
 
   const plannedUploads = plan.candidates.length;
@@ -125,7 +125,7 @@ export async function processUploadDir(
   const logFileName = uploadLogRelativePath(finishedAt.toISOString());
   await deps.state.write(logFileName, report);
 
-  index.files = plan.nextIndexFiles;
+  index = index.withFiles(plan.nextIndexFiles).withUpdatedAt(finishedAt.toISOString());
   await saveUploadIndex(deps.state, bucket, index);
 
   const summaryLog = `Upload para ${bucket.name}: enviados=${uploaded.length}, reaproveitados=${plan.skipped.length}, falhas=${failed.length}.`;

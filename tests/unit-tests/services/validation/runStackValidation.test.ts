@@ -1,4 +1,6 @@
 import { jest } from '@jest/globals';
+import { StackValidationReport } from '../../../../src/models/entities/stackValidationReport.js';
+import { ValidationCheckResult } from '../../../../src/models/entities/validationCheckResult.js';
 import { runStackValidation } from '../../../../src/services/validation/runStackValidation.js';
 
 describe('runStackValidation', () => {
@@ -12,6 +14,9 @@ describe('runStackValidation', () => {
     'security/waf_rulesets.json': { rulesets: { ruleset: { id: 'ruleset-1' } } },
     'security/firewall_rules.json': { bindings: { binding: { id: 'binding-1' } } },
     'storage/uploads/index-bucket-1.json': {
+      bucketId: 'bucket-1',
+      bucketName: 'assets',
+      updatedAt: 'now',
       files: {
         'file.gz': { objectPath: 'file.gz', sourcePath: 'src/file.gz', contentEncoding: 'gzip' },
       },
@@ -46,8 +51,10 @@ describe('runStackValidation', () => {
     timeStamps = [0, 100];
     const report = await runStackValidation({ project: 'site', domain: 'example.com', path: '/', timeoutMs: 1000 }, deps);
 
+    expect(report).toBeInstanceOf(StackValidationReport);
     expect(report.project).toBe('site');
     expect(report.checks.length).toBeGreaterThanOrEqual(8);
+    expect(report.checks[0]).toBeInstanceOf(ValidationCheckResult);
     expect(report.http?.ok).toBe(true);
     expect(report.gzipAssets).toEqual(['file.gz <= src/file.gz']);
     expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('https://example.com/'));

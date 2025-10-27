@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { UploadIndexFile } from '../../../../src/models/entities/uploadIndexFile.js';
 import { loadFirstUploadIndex } from '../../../../src/services/validation/loadFirstUploadIndex.js';
 
 describe('loadFirstUploadIndex', () => {
@@ -20,10 +21,17 @@ describe('loadFirstUploadIndex', () => {
   it('retorna índice do primeiro bucket', async () => {
     state.read
       .mockResolvedValueOnce({ buckets: { bucket: { id: 'bucket-1' } } })
-      .mockResolvedValueOnce({ bucketId: 'bucket-1', files: { 'index.html': { hash: '1' } } });
+      .mockResolvedValueOnce({
+        bucketId: 'bucket-1',
+        bucketName: 'assets',
+        updatedAt: 'now',
+        files: { 'index.html': { hash: '1' } },
+      });
 
     const result = await loadFirstUploadIndex(state);
 
-    expect(result).toEqual({ bucketId: 'bucket-1', path: 'storage/uploads/index-bucket-1.json', file: { bucketId: 'bucket-1', files: { 'index.html': { hash: '1' } } } });
+    expect(result?.bucketId).toBe('bucket-1');
+    expect(result?.path).toBe('storage/uploads/index-bucket-1.json');
+    expect(result?.file).toBeInstanceOf(UploadIndexFile);
   });
 });

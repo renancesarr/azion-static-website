@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { UploadIndexFile } from '../../../../src/models/entities/uploadIndexFile.js';
 import { StorageBucketRecord } from '../../../../src/models/entities/storageBucketRecord.js';
 
 const statMock = jest.fn();
@@ -105,7 +106,14 @@ describe('processUploadDir', () => {
 
   it('gera dry-run com estatísticas e log persistido', async () => {
     walkDirectoryMock.mockResolvedValue([{ absolutePath: '/tmp/index.html', relativePath: 'index.html', size: 10 }] as any);
-    loadUploadIndexMock.mockResolvedValue({ files: {} });
+    loadUploadIndexMock.mockResolvedValue(
+      UploadIndexFile.create({
+        bucketId: 'bucket-1',
+        bucketName: 'assets',
+        files: {},
+        updatedAt: 'now',
+      }),
+    );
     planUploadCandidatesMock.mockResolvedValue({
       candidates: [{ objectPath: 'index.html' }],
       skipped: [],
@@ -129,7 +137,14 @@ describe('processUploadDir', () => {
 
   it('executa upload real e atualiza índice', async () => {
     walkDirectoryMock.mockResolvedValue([{ absolutePath: '/tmp/index.html', relativePath: 'index.html', size: 10 }] as any);
-    loadUploadIndexMock.mockResolvedValue({ files: {} });
+    loadUploadIndexMock.mockResolvedValue(
+      UploadIndexFile.create({
+        bucketId: 'bucket-1',
+        bucketName: 'assets',
+        files: {},
+        updatedAt: 'now',
+      }),
+    );
     planUploadCandidatesMock.mockResolvedValue({
       candidates: [{ objectPath: 'index.html', hash: 'hash', size: 10 }],
       skipped: [],

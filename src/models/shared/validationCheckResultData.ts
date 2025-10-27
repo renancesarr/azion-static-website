@@ -1,4 +1,4 @@
-export interface ValidationCheckResult {
+export interface ValidationCheckResultData {
   name: string;
   ok: boolean;
   detail: string;

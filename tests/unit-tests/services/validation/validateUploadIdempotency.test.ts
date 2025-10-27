@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { UploadIndexFile } from '../../../../src/models/entities/uploadIndexFile.js';
 
 const loadFirstUploadIndexMock = jest.fn();
 
@@ -28,14 +29,19 @@ describe('validateUploadIdempotency', () => {
 
   it('detecta duplicados e falta de hash', async () => {
     loadFirstUploadIndexMock.mockResolvedValue({
-      file: {
+      file: UploadIndexFile.create({
+        bucketId: 'bucket-1',
+        bucketName: 'assets',
         files: {
-          'index.html': { objectPath: 'index.html', hash: 'hash-1' },
-          'duplicate.js': { objectPath: 'duplicate.js', hash: 'hash-2' },
-          'duplicate.js#2': { objectPath: 'duplicate.js', hash: 'hash-3' },
-          'no-hash.txt': { objectPath: 'no-hash.txt' },
+          'index.html': { objectPath: 'index.html', hash: 'hash-1' } as any,
+          'duplicate.js': { objectPath: 'duplicate.js', hash: 'hash-2' } as any,
+          'duplicate.js#2': { objectPath: 'duplicate.js', hash: 'hash-3' } as any,
+          'no-hash.txt': { objectPath: 'no-hash.txt' } as any,
         },
-      },
+        updatedAt: new Date().toISOString(),
+      }),
+      bucketId: 'bucket-1',
+      path: 'storage/uploads/index-bucket-1.json',
     });
 
     const result = await validateUploadIdempotency(deps);

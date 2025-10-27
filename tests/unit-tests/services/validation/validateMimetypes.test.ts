@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { UploadIndexFile } from '../../../../src/models/entities/uploadIndexFile.js';
 
 const loadFirstUploadIndexMock = jest.fn();
 const lookupMimeTypeMock = jest.fn();
@@ -34,15 +35,20 @@ describe('validateMimetypes', () => {
   });
 
   it('detecta mismatches e acertos', async () => {
+    const uploadIndex = UploadIndexFile.create({
+      bucketId: 'bucket-1',
+      bucketName: 'assets',
+      files: {
+        'index.html': { objectPath: 'index.html', contentType: 'text/html; charset=utf-8' } as any,
+        'style.css': { objectPath: 'style.css', contentType: 'text/plain' } as any,
+        'image.png': { objectPath: 'image.png' } as any,
+      },
+      updatedAt: new Date().toISOString(),
+    });
     loadFirstUploadIndexMock.mockResolvedValue({
       bucketId: 'bucket-1',
-      file: {
-        files: {
-          'index.html': { objectPath: 'index.html', contentType: 'text/html; charset=utf-8' },
-          'style.css': { objectPath: 'style.css', contentType: 'text/plain' },
-          'image.png': { objectPath: 'image.png' },
-        },
-      },
+      file: uploadIndex,
+      path: 'storage/uploads/index-bucket-1.json',
     });
     lookupMimeTypeMock.mockReturnValueOnce('text/html; charset=utf-8').mockReturnValueOnce('text/css; charset=utf-8').mockReturnValueOnce('image/png');
 

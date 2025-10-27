@@ -6,6 +6,14 @@ import {
   bucketConflictSchema,
   domainConflictSchema,
 } from '../../constants/validationSchemas.js';
+import type {
+  StackValidateInputDto,
+  MimetypeValidationInputDto,
+  IdempotencyValidationInputDto,
+  UploadLogInspectInputDto,
+  BucketConflictInputDto,
+  DomainConflictInputDto,
+} from '../../models/dto/validationInputs.js';
 
 export const stackValidateInputSchema = stackValidateSchema;
 export const mimetypeValidationInputSchema = mimetypeValidationSchema;
@@ -14,9 +22,9 @@ export const uploadLogInspectInputSchema = uploadLogInspectSchema;
 export const bucketConflictInputSchema = bucketConflictSchema;
 export const domainConflictInputSchema = domainConflictSchema;
 
-export type StackValidateInput = typeof stackValidateSchema._type;
-export type MimetypeValidationInput = typeof mimetypeValidationSchema._type;
-export type IdempotencyValidationInput = typeof idempotencyValidationSchema._type;
-export type UploadLogInspectInput = typeof uploadLogInspectSchema._type;
-export type BucketConflictInput = typeof bucketConflictSchema._type;
-export type DomainConflictInput = typeof domainConflictSchema._type;
+export type StackValidateInput = StackValidateInputDto;
+export type MimetypeValidationInput = MimetypeValidationInputDto;
+export type IdempotencyValidationInput = IdempotencyValidationInputDto;
+export type UploadLogInspectInput = UploadLogInspectInputDto;
+export type BucketConflictInput = BucketConflictInputDto;
+export type DomainConflictInput = DomainConflictInputDto;

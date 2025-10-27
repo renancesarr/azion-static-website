@@ -1,4 +1,6 @@
 import { jest } from '@jest/globals';
+import { StackValidationReport } from '../../../../src/models/entities/stackValidationReport.js';
+import { ValidationCheckResult } from '../../../../src/models/entities/validationCheckResult.js';
 
 const runStackValidationMock = jest.fn();
 const validateMimetypesMock = jest.fn();
@@ -53,17 +55,23 @@ function setupServer() {
 describe('registerValidationServices', () => {
   it('registra ferramentas e gera respostas formatadas', async () => {
     const { server, handlers } = setupServer();
-    runStackValidationMock.mockResolvedValue({
-      project: 'site',
-      domain: 'example.com',
-      checks: [{ name: 'Bucket', ok: true, detail: 'ok' }],
-      http: { ok: true, status: 200, durationMs: 100, url: 'https://example.com/', error: undefined },
-    });
+    runStackValidationMock.mockResolvedValue(
+      StackValidationReport.create({
+        project: 'site',
+        domain: 'example.com',
+        protocol: 'https',
+        path: '/',
+        startedAt: new Date().toISOString(),
+        finishedAt: new Date().toISOString(),
+        checks: [ValidationCheckResult.create({ name: 'Bucket', ok: true, detail: 'ok' }).toJSON()],
+        http: { ok: true, status: 200, durationMs: 100, url: 'https://example.com/', error: undefined },
+      }),
+    );
     validateMimetypesMock.mockResolvedValue({ matches: 2, mismatches: [] });
-    validateUploadIdempotencyMock.mockResolvedValue([{ name: 'Objetos únicos', ok: true, detail: 'ok' }]);
-    inspectUploadLogsMock.mockResolvedValue([{ name: 'upload-1.json', ok: true, detail: 'enviados=1' }]);
-    checkBucketConflictMock.mockResolvedValue({ name: 'Bucket existente', ok: true, detail: 'bucket ok' });
-    checkDomainConflictMock.mockResolvedValue({ name: 'Domain existente', ok: false, detail: 'domínio ausente' });
+    validateUploadIdempotencyMock.mockResolvedValue([ValidationCheckResult.create({ name: 'Objetos únicos', ok: true, detail: 'ok' })]);
+    inspectUploadLogsMock.mockResolvedValue([ValidationCheckResult.create({ name: 'upload-1.json', ok: true, detail: 'enviados=1' })]);
+    checkBucketConflictMock.mockResolvedValue(ValidationCheckResult.create({ name: 'Bucket existente', ok: true, detail: 'bucket ok' }));
+    checkDomainConflictMock.mockResolvedValue(ValidationCheckResult.create({ name: 'Domain existente', ok: false, detail: 'domínio ausente' }));
 
     registerValidationServices(server as any);
 
